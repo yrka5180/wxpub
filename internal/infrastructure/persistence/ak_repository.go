@@ -9,6 +9,7 @@ import (
 	"public-platform-manager/internal/consts"
 	"public-platform-manager/internal/domain/entity"
 	redis2 "public-platform-manager/internal/infrastructure/pkg/redis"
+	"public-platform-manager/internal/interfaces/errors"
 	"public-platform-manager/internal/interfaces/httputil"
 	"public-platform-manager/internal/utils"
 	"time"
@@ -47,6 +48,11 @@ func (a *AkRepo) GetAccessTokenFromRequest(ctx context.Context) (entity.AccessTo
 	if err != nil {
 		log.Errorf("get wx access token failed by unmarshal, resp:%s, traceID:%s, err:%v", string(body), traceID, err)
 		return entity.AccessTokenResp{}, err
+	}
+	// 获取失败
+	if akResp.ErrCode != errors.CodeOK {
+		log.Errorf("get wx access token failed,resp:%s,traceID:%s,errMsg:%s", string(body), traceID, akResp.ErrMsg)
+		return entity.AccessTokenResp{}, fmt.Errorf("get wx ak failed,errMsg:%s", akResp.ErrMsg)
 	}
 	return akResp, nil
 }

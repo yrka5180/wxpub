@@ -23,11 +23,12 @@ var (
 
 	// InternalAPISecret string
 
-	WXBaseURL        = config.DefaultString("wx_base_url", "https://api.weixin.qq.com")
-	WXAccessTokenURL = config.DefaultString("wx_access_token_url", WXBaseURL+"/cgi-bin/token")
-	RedisAddresses   []string
-	AppID            = config.MustString("app_id")
-	AppSecret        = config.MustString("app_secret")
+	WXBaseURL         = config.DefaultString("wx_base_url", "https://api.weixin.qq.com")
+	WXAccessTokenURL  = config.DefaultString("wx_access_token_url", WXBaseURL+"/cgi-bin/token")
+	WXTemplateListURL = config.DefaultString("wx_template_list_url", WXBaseURL+"/cgi-bin/template/get_all_private_template")
+	RedisAddresses    []string
+	AppID             = config.MustString("app_id")
+	AppSecret         = config.MustString("app_secret")
 )
 
 func Init() {

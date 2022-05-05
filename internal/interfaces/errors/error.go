@@ -19,8 +19,7 @@ const (
 )
 
 var StatusCode = map[int]int{
-	CodeOK: http.StatusOK,
-
+	CodeOK:                                     http.StatusOK,
 	CodeInternalServerError:                    http.StatusInternalServerError,
 	CodeUnauthorized:                           http.StatusUnauthorized,
 	CodeForbidden:                              http.StatusForbidden,
@@ -35,8 +34,7 @@ var StatusCode = map[int]int{
 }
 
 var ErrorMessage = map[int]string{
-	CodeOK: "ok",
-
+	CodeOK:                                     "ok",
 	CodeInternalServerError:                    "internal server error",
 	CodeUnauthorized:                           "header authorization is empty",
 	CodeForbidden:                              "token is forbidden",

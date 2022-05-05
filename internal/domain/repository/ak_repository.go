@@ -65,11 +65,25 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 	// 获取锁成功
 	if ok {
 		// 更新new ak
-		newAk, err = a.getAccessTokenAndReleaseLock(ctx, rLock)
-		if err != nil {
-			log.Errorf("FreshAccessToken AccessTokenRepository getAccessTokenAndReleaseLock failed,traceID:%s,err:%v", traceID, err)
-			return "", err
-		}
+		newAk, err = func(ctx context.Context) (string, error) {
+			defer func() {
+				for i := 0; i < 5; i++ {
+					ok, err = rLock.Release()
+					if !ok || err != nil {
+						log.Errorf("getAccessTokenAndReleaseLock delete redis lock failed,traceID:%s, ok:%v,err:%v", traceID, ok, err)
+						time.Sleep(time.Millisecond * 100)
+						continue
+					}
+					return
+				}
+			}()
+			newAk, err = a.getAccessTokenFromRemote(ctx)
+			if err != nil {
+				log.Errorf("getAccessTokenAndReleaseLock AccessTokenRepository getAccessTokenFromRemote failed,traceID:%s,err:%v", traceID, err)
+				return "", err
+			}
+			return newAk, nil
+		}(ctx)
 		return newAk, nil
 	}
 	// 获取不到锁，休眠100ms再从redis中取当前ak，如果ak value发生改变，证明已更新，判断5次
@@ -87,31 +101,6 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 		}
 	}
 	return "", err
-}
-
-func (a *AccessTokenRepository) getAccessTokenAndReleaseLock(ctx context.Context, rLock *redis2.RLock) (string, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("getAccessTokenAndReleaseLock traceID:%s", traceID)
-	var newAk string
-	var err error
-	var ok bool
-	defer func() {
-		for i := 0; i < 5; i++ {
-			ok, err = rLock.Release()
-			if !ok || err != nil {
-				log.Errorf("getAccessTokenAndReleaseLock delete redis lock failed,traceID:%s, ok:%v,err:%v", traceID, ok, err)
-				time.Sleep(time.Millisecond * 100)
-				continue
-			}
-			return
-		}
-	}()
-	newAk, err = a.getAccessTokenFromRemote(ctx)
-	if err != nil {
-		log.Errorf("getAccessTokenAndReleaseLock AccessTokenRepository getAccessTokenFromRemote failed,traceID:%s,err:%v", traceID, err)
-		return "", err
-	}
-	return newAk, nil
 }
 
 func (a *AccessTokenRepository) getAccessTokenFromRemote(ctx context.Context) (string, error) {
