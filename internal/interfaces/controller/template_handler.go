@@ -45,7 +45,7 @@ func (a *Template) ListTemplate(c *gin.Context) {
 	templates, err := a.template.ListTemplate(ctx, param)
 	if err != nil {
 		log.Errorf("ListTemplate TemplateInterface get template list failed,traceID:%s,err:%v", traceID, err)
-		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())
+		httputil.SetErrorResponseWithError(&resp, err)
 		return
 	}
 	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, templates)

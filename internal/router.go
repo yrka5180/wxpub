@@ -10,14 +10,15 @@ import (
 )
 
 var (
-	wxChecker   *controller.WXCheckSignature
+	wx          *controller.WX
 	accessToken *controller.AccessToken
 	user        *controller.User
 	template    *controller.Template
+	msg         *controller.Message
 )
 
 func registerController() {
-	wxChecker = controller.NewWXCheckSignController(repository.NewWXCheckSignRepository())
+	wx = controller.NewWXController(repository.NewWXRepository())
 	accessToken = controller.NewAccessTokenController(
 		repository.NewAccessTokenRepository(
 			persistence.NewAkRepo()))
@@ -25,6 +26,9 @@ func registerController() {
 	template = controller.NewTemplateController(
 		repository.NewTemplateRepository(
 			persistence.NewTemplateRepo()))
+	msg = controller.NewMessageController(
+		repository.NewMessageRepository(
+			persistence.NewMessageRepo()))
 }
 
 func Run() *gin.Engine {
@@ -35,8 +39,8 @@ func Run() *gin.Engine {
 }
 
 func initRouter(router *gin.Engine) {
-	// wx开放平台接入测试接口
-	router.GET("/", wxChecker.GetWXCheckSign)
+	open := router.Group("/")
+	routerWX(open)
 
 	router.Use(middleware.NovaContext)
 	// todo:鉴权认证
@@ -51,8 +55,19 @@ func initRouter(router *gin.Engine) {
 	// 模板管理
 	routerTemplate(interval)
 
-	// 事件推送
-	routerPush(interval)
+	// 消息推送
+	routerMsgPush(interval)
+}
+
+func routerWX(router *gin.RouterGroup) {
+	wxGroup := router.Group("")
+	{
+		// wx开放平台接入测试接口
+		wxGroup.GET("", wx.GetWXCheckSign)
+		// todo: 暂时先用明文传输，后续补充aes加密传输
+		// wx开放平台事件接收
+		wxGroup.POST("", wx.GetEventXml)
+	}
 }
 
 func routerAccessToken(router *gin.RouterGroup) {
@@ -80,13 +95,18 @@ func routerTemplate(router *gin.RouterGroup) {
 	}
 }
 
-func routerPush(router *gin.RouterGroup) {
-	pushGroup := router.Group("/push")
+func routerMsgPush(router *gin.RouterGroup) {
+	msgPushGroup := router.Group("/message/push")
 	{
-		// 告警事件推送
-		alertSubGroup := pushGroup.Group("/alert")
+		// 模板消息推送
+		tmplSubGroup := msgPushGroup.Group("/tmpl")
 		{
-			alertSubGroup.GET("")
+			tmplSubGroup.POST("", msg.SendTmplMessage)
 		}
+		// // 告警事件推送
+		// alertSubGroup := msgPushGroup.Group("/alert")
+		// {
+		// 	alertSubGroup.GET("")
+		// }
 	}
 }

@@ -24,7 +24,7 @@ func NewTemplateRepo() *TemplateRepo {
 func (a *TemplateRepo) ListTemplateFromRequest(ctx context.Context, param entity.ListTemplateReq) (entity.ListTemplateResp, error) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("ListTemplateFromRequest traceID:%s", traceID)
-	// 请求wx access token
+	// 请求wx template
 	requestProperty := httputil.GetRequestProperty(http.MethodGet, config.WXTemplateListURL+fmt.Sprintf("?access_token=%s", param.AccessToken),
 		nil, make(map[string]string))
 	statusCode, body, _, err := httputil.RequestWithContextAndRepeat(ctx, requestProperty, traceID)
@@ -40,6 +40,11 @@ func (a *TemplateRepo) ListTemplateFromRequest(ctx context.Context, param entity
 	err = json.Unmarshal(body, &tmpResp)
 	if err != nil {
 		log.Errorf("get wx template list failed by unmarshal, resp:%s, traceID:%s, err:%v", string(body), traceID, err)
+		return entity.ListTemplateResp{}, err
+	}
+	// token过期
+	if tmpResp.ErrCode == errors.CodeRIDExpired {
+		err = errors.NewCustomError(nil, errors.CodeForbidden, errors.GetErrorMessage(errors.CodeForbidden))
 		return entity.ListTemplateResp{}, err
 	}
 	// 获取失败

@@ -18,6 +18,10 @@ const (
 	CodeNoRight2Modify                         = 9510 // 用户没权限修改相关资源
 )
 
+const (
+	CodeRIDExpired = 42001 // token过期
+)
+
 var StatusCode = map[int]int{
 	CodeOK:                                     http.StatusOK,
 	CodeInternalServerError:                    http.StatusInternalServerError,
