@@ -83,6 +83,6 @@ func GetSecretAccessKey(accessKey string) string {
 
 func Sha1(str string) string {
 	h := sha1.New()
-	h.Write([]byte(str))
+	_, _ = h.Write([]byte(str))
 	return hex.EncodeToString(h.Sum(nil))
 }

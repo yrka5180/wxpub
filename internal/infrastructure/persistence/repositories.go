@@ -7,7 +7,7 @@ import (
 	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/redis"
 
 	"github.com/go-redis/redis/v7"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // for gorm
 	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
 )

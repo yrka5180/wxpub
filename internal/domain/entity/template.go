@@ -21,8 +21,10 @@ type TemplateItem struct {
 }
 
 func (u *ListTemplateReq) Validate() (errorMessage string) {
+	errorMessage = ""
 	if len(u.AccessToken) <= 0 {
 		errorMessage = "access token is empty"
 	}
-	return ""
+
+	return
 }

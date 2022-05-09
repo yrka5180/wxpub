@@ -42,15 +42,15 @@ func (a *WXRepository) GetWXCheckSign(signature, timestamp, nonce, token string)
 	return utils.Sha1(b.String()) == signature
 }
 
-func (a *WXRepository) GetEventXml(ctx context.Context, reqBody *entity.TextRequestBody) (respBody []byte, err error) {
+func (a *WXRepository) GetEventXML(ctx context.Context, reqBody *entity.TextRequestBody) (respBody []byte, err error) {
 	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("GetEventXml traceID:%s", traceID)
+	log.Debugf("GetEventXML traceID:%s", traceID)
 	if reqBody == nil {
 		return nil, fmt.Errorf("xml request body is empty")
 	}
 	responseTextBody, err := a.handlerEvent(ctx, reqBody)
 	if err != nil {
-		log.Errorf("GetEventXml handlerEvent failed traceID:%s,err:%v", traceID, err)
+		log.Errorf("GetEventXML handlerEvent failed traceID:%s,err:%v", traceID, err)
 		return nil, err
 	}
 	return responseTextBody, nil
@@ -84,6 +84,11 @@ func (a *WXRepository) handlerSubscribeEvent(ctx context.Context, reqBody *entit
 	if exist {
 		return "", nil
 	}
+	if err != nil {
+		log.Errorf("handlerSubscribeEvent WXRepository wx repo isExistUserMsgID traceID:%s,err:%v", traceID, err)
+		return "", err
+	}
+
 	// 持久化保存
 	u := entity.User{
 		OpenID:     reqBody.FromUserName,
@@ -110,6 +115,11 @@ func (a *WXRepository) handlerUnSubscribeEvent(ctx context.Context, reqBody *ent
 	if exist {
 		return "", nil
 	}
+	if err != nil {
+		log.Errorf("handlerUnSubscribeEvent WXRepository wx repo isExistUserMsgID traceID:%s,err:%v", traceID, err)
+		return "", err
+	}
+
 	// 删除用户信息
 	u := entity.User{
 		OpenID: reqBody.FromUserName,
