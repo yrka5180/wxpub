@@ -1,0 +1,4 @@
+include:
+  - project: nova/cicd/go
+    file: /templates/.nova.gitlab-ci.yml
+    ref: master
