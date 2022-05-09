@@ -2,7 +2,6 @@ package entity
 
 import (
 	"encoding/xml"
-	"time"
 )
 
 type WXCheckReq struct {
@@ -16,17 +15,21 @@ type TextRequestBody struct {
 	XMLName      xml.Name `xml:"xml"`
 	ToUserName   string
 	FromUserName string
-	CreateTime   time.Duration
+	CreateTime   int64
 	MsgType      string
 	Content      string
 	MsgId        int
+	Event        string
+	Ticket       string
+	EventKey     string
+	Status       string
 }
 
 type TextResponseBody struct {
 	XMLName      xml.Name `xml:"xml"`
 	ToUserName   CDATAText
 	FromUserName CDATAText
-	CreateTime   time.Duration
+	CreateTime   int64
 	MsgType      CDATAText
 	Content      CDATAText
 }

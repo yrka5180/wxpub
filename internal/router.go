@@ -18,11 +18,15 @@ var (
 )
 
 func registerController() {
-	wx = controller.NewWXController(repository.NewWXRepository())
+	wx = controller.NewWXController(
+		repository.NewWXRepository(
+			persistence.NewWxRepo(), persistence.NewUserRepo()))
 	accessToken = controller.NewAccessTokenController(
 		repository.NewAccessTokenRepository(
 			persistence.NewAkRepo()))
-	user = controller.NewUserController(repository.NewUserRepository())
+	user = controller.NewUserController(
+		repository.NewUserRepository(
+			persistence.NewUserRepo()))
 	template = controller.NewTemplateController(
 		repository.NewTemplateRepository(
 			persistence.NewTemplateRepo()))
@@ -76,6 +80,7 @@ func routerAccessToken(router *gin.RouterGroup) {
 		// 获取wx access token
 		akGroup.GET("", accessToken.GetAccessToken)
 		// 刷新wx access token
+		// todo:接口限频，微信日调用次数2000次，如果access token缓存值没失效则被视为有效调用（获取ak时ak不存在也会调用），调用次数记录，1分钟1次
 		akGroup.GET("/fresh", accessToken.FreshAccessToken)
 	}
 }

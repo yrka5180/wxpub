@@ -77,3 +77,14 @@ func (a *AkRepo) GetAccessTokenFromRedis(ctx context.Context) (string, error) {
 	log.Errorf("GetAccessTokenFromRedis get wx access token from redis failed by redis,traceID:%s, err:%v", traceID, err)
 	return "", err
 }
+
+func (a *AkRepo) SetAccessTokenToRedis(ctx context.Context, accessToken string, expiresIn int) error {
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("SetAccessTokenToRedis traceID:%s", traceID)
+	err := redis2.RSet(consts.RedisKeyAccessToken, accessToken, expiresIn)
+	if err != nil {
+		log.Errorf("SetAccessTokenToRedis AkRepo redis set new ak failed,traceID:%s,err:%v", traceID, err)
+		return err
+	}
+	return nil
+}

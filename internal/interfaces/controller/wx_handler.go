@@ -29,7 +29,7 @@ func (a *WX) GetWXCheckSign(c *gin.Context) {
 	log.Debugf("%s", traceID)
 
 	resp := httputil.DefaultResponse()
-	defer httputil.HTTPJSONResponse(ctx, c, &resp)
+	defer httputil.HTTPResponse(ctx, c, &resp)
 	var param entity.WXCheckReq
 	if err := c.ShouldBindQuery(&param); err != nil {
 		log.Errorf("validate WXCheckReq ShouldBindQuery failed, traceID:%s, err:%v", traceID, err)
@@ -53,7 +53,7 @@ func (a *WX) GetEventXml(c *gin.Context) {
 	log.Debugf("%s", traceID)
 
 	resp := httputil.DefaultResponse()
-	defer httputil.HTTPJSONResponse(ctx, c, &resp)
+	defer httputil.HTTPResponse(ctx, c, &resp)
 	var param entity.WXCheckReq
 	if err := c.ShouldBindQuery(&param); err != nil {
 		log.Errorf("validate GetEventXml ShouldBindQuery failed, traceID:%s, err:%v", traceID, err)
@@ -79,7 +79,6 @@ func (a *WX) GetEventXml(c *gin.Context) {
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, "wx public platform GetEventXml access failed!")
 		return
 	}
-	c.Header("Content-Type", "text/xml")
 	// 原样返回
 	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, string(respBody))
 	log.Infof("wx public platform access successfully!")

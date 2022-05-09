@@ -45,6 +45,19 @@ func HTTPJSONResponse(ctx context.Context, c *gin.Context, resp *GenericResponse
 	}
 }
 
+func HTTPResponse(ctx context.Context, c *gin.Context, resp *GenericResponse) {
+	log.Debugf("%s, resp: %+v", utils.ShouldGetTraceID(ctx), resp)
+	if resp.Body != nil {
+		_, err := c.Writer.WriteString(resp.Body.(string))
+		if err != nil {
+			log.Errorf("HTTPResponse writer failed")
+			return
+		}
+	} else {
+		c.Status(resp.StatusCode)
+	}
+}
+
 func SetSuccessfulResponse(resp *GenericResponse, code int, body interface{}) {
 	setResponse(resp, code, "", body)
 }

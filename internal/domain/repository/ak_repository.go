@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"public-platform-manager/internal/consts"
-	"public-platform-manager/internal/domain/entity"
 	"public-platform-manager/internal/infrastructure/persistence"
 	redis2 "public-platform-manager/internal/infrastructure/pkg/redis"
 	"public-platform-manager/internal/utils"
@@ -12,17 +11,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type AccessTokenRepositoryInterface interface {
-	GetAccessTokenFromRequest(ctx context.Context) (entity.AccessTokenResp, error)
-	GetAccessTokenFromRedis(ctx context.Context) (string, error)
-}
-
 type AccessTokenRepository struct {
 	ak *persistence.AkRepo
 }
-
-// persistence.AkRepo implements the AccessTokenRepositoryInterface
-var _ AccessTokenRepositoryInterface = &persistence.AkRepo{}
 
 func NewAccessTokenRepository(ak *persistence.AkRepo) *AccessTokenRepository {
 	return &AccessTokenRepository{
@@ -31,8 +22,20 @@ func NewAccessTokenRepository(ak *persistence.AkRepo) *AccessTokenRepository {
 }
 
 func (a *AccessTokenRepository) GetAccessToken(ctx context.Context) (string, error) {
-	// 直接从redis中取access token
-	return a.ak.GetAccessTokenFromRedis(ctx)
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("GetAccessToken traceID:%s", traceID)
+	// 先从redis中取access token，没有则调用接口获取并保存
+	var ak string
+	var err error
+	ak, err = a.ak.GetAccessTokenFromRedis(ctx)
+	if err != nil {
+		log.Errorf("GetAccessToken AccessTokenRepository GetAccessTokenFromRedis failed,traceID:%s,err:%v", traceID, err)
+		return "", err
+	}
+	if len(ak) > 0 {
+		return ak, nil
+	}
+	return a.FreshAccessToken(ctx)
 }
 
 func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, error) {
@@ -41,7 +44,7 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 	var err error
 	var oldAk string
 	// 先获取旧ak
-	oldAk, err = a.GetAccessToken(ctx)
+	oldAk, err = a.ak.GetAccessTokenFromRedis(ctx)
 	if err != nil {
 		log.Errorf("FreshAccessToken AccessTokenRepository GetAccessToken failed,traceID:%s,err:%v", traceID, err)
 	}
@@ -89,7 +92,7 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 	// 获取不到锁，休眠100ms再从redis中取当前ak，如果ak value发生改变，证明已更新，判断5次
 	for i := 0; i < 5; i++ {
 		// 获取新的accessToken
-		newAk, err = a.GetAccessToken(ctx)
+		newAk, err = a.ak.GetAccessTokenFromRedis(ctx)
 		if err != nil {
 			log.Errorf("GetAccessTokenFromRedis AkRepo GetAccessToken failed,traceID:%s,err:%v", traceID, err)
 			time.Sleep(time.Millisecond * 100)
@@ -106,19 +109,15 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 func (a *AccessTokenRepository) getAccessTokenFromRemote(ctx context.Context) (string, error) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("FreshAccessToken traceID:%s", traceID)
-	akResp, err := a.GetAccessTokenFromRequest(ctx)
+	akResp, err := a.ak.GetAccessTokenFromRequest(ctx)
 	if err != nil {
 		log.Errorf("getAccessTokenFromRemote AccessTokenRepository GetAccessTokenFromRequest failed,traceID:%s,err:%v", traceID, err)
 		return "", err
 	}
-	err = redis2.RSet(consts.RedisKeyAccessToken, akResp.AccessToken, int(akResp.ExpiresIn))
+	err = a.ak.SetAccessTokenToRedis(ctx, akResp.AccessToken, int(akResp.ExpiresIn))
 	if err != nil {
-		log.Errorf("getAccessTokenFromRemote AccessTokenRepository redis set new ak failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("getAccessTokenFromRemote AccessTokenRepository  SetAccessTokenToRedis failed,traceID:%s,err:%v", traceID, err)
 		return "", err
 	}
 	return akResp.AccessToken, nil
-}
-
-func (a *AccessTokenRepository) GetAccessTokenFromRequest(ctx context.Context) (entity.AccessTokenResp, error) {
-	return a.ak.GetAccessTokenFromRequest(ctx)
 }

@@ -6,16 +6,9 @@ import (
 	"public-platform-manager/internal/infrastructure/persistence"
 )
 
-type MessageRepositoryInterface interface {
-	SendTmplMsgFromRequest(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error)
-}
-
 type MessageRepository struct {
 	msg *persistence.MessageRepo
 }
-
-// persistence.MessageRepo implements the MessageRepositoryInterface
-var _ MessageRepositoryInterface = &persistence.MessageRepo{}
 
 func NewMessageRepository(msg *persistence.MessageRepo) *MessageRepository {
 	return &MessageRepository{

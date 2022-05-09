@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"public-platform-manager/internal"
 	"public-platform-manager/internal/config"
+	"public-platform-manager/internal/consts"
 	"public-platform-manager/internal/g"
 	"public-platform-manager/internal/infrastructure/persistence"
 	"syscall"
@@ -64,20 +65,20 @@ func gracefulShutdown(srv *http.Server) {
 }
 
 func InitService() {
-	// debugMode := config.SMode == consts.ServerModeDebug
-	// dbConf := persistence.DBConfig{
-	// 	DBUser:      config.DBUser,
-	// 	DBPassword:  config.DBPassword,
-	// 	DBHost:      config.DBHost,
-	// 	DBName:      config.DBName,
-	// 	MaxIdleConn: config.DBMaxIdleConn,
-	// 	MaxOpenConn: config.DBMaxOpenConn,
-	// }
-	// err := persistence.NewDBRepositories(dbConf, debugMode)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	err := persistence.NewRedisRepositories(config.RedisAddresses)
+	debugMode := config.SMode == consts.ServerModeDebug
+	dbConf := persistence.DBConfig{
+		DBUser:      config.DBUser,
+		DBPassword:  config.DBPassword,
+		DBHost:      config.DBHost,
+		DBName:      config.DBName,
+		MaxIdleConn: config.DBMaxIdleConn,
+		MaxOpenConn: config.DBMaxOpenConn,
+	}
+	err := persistence.NewDBRepositories(dbConf, debugMode)
+	if err != nil {
+		panic(err)
+	}
+	err = persistence.NewRedisRepositories(config.RedisAddresses)
 	if err != nil {
 		panic(err)
 	}

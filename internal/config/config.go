@@ -14,12 +14,12 @@ var (
 	// SMode 服务端运行状态，已知影响 gin 框架日志输出等级
 	SMode = consts.ServerMode(config.DefaultString("server_mode", string(consts.ServerModeRelease)))
 
-	// DBHost        string
-	// DBUser        string
-	// DBPassword    string
-	// DBName        = config.DefaultString("db_name", "oplog_mgr")
-	// DBMaxIdleConn = config.DefaultInt("max_db_idle_conn", 1000)
-	// DBMaxOpenConn = config.DefaultInt("max_db_open_conn", 1000)
+	DBHost        string
+	DBUser        string
+	DBPassword    string
+	DBName        = config.DefaultString("db_name", "pub_platform_mgr")
+	DBMaxIdleConn = config.DefaultInt("max_db_idle_conn", 1000)
+	DBMaxOpenConn = config.DefaultInt("max_db_open_conn", 1000)
 
 	// InternalAPISecret string
 
@@ -33,9 +33,9 @@ var (
 )
 
 func Init() {
-	// DBHost = config.MustString("db_host")
-	// DBUser = config.MustString("db_user")
-	// DBPassword = config.MustString("db_password")
+	DBHost = config.MustString("db_host")
+	DBUser = config.MustString("db_user")
+	DBPassword = config.MustString("db_password")
 
 	if SMode == consts.ServerModeDebug {
 		LogLevel = logrus.DebugLevel
