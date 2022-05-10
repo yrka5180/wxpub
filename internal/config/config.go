@@ -14,6 +14,12 @@ var (
 	// SMode 服务端运行状态，已知影响 gin 框架日志输出等级
 	SMode = consts.ServerMode(config.DefaultString("server_mode", string(consts.ServerModeRelease)))
 
+	KafkaBrokers []string
+	KafkaTopics  []string
+	KafkaVersion string
+	KafkaTopic   = config.DefaultString("kafka_topic", "public-platform-msg")
+	KafkaGroup   = config.DefaultString("kafka_group", "public-platform-msg")
+
 	DBHost        string
 	DBUser        string
 	DBPassword    string
@@ -23,13 +29,13 @@ var (
 
 	// InternalAPISecret string
 
-	WXBaseURL         = config.DefaultString("wx_base_url", "https://api.weixin.qq.com")
-	WXAccessTokenURL  = config.DefaultString("wx_access_token_url", WXBaseURL+"/cgi-bin/token")
-	WXTemplateListURL = config.DefaultString("wx_template_list_url", WXBaseURL+"/cgi-bin/template/get_all_private_template")
-	WXMsgTmplSendURL  = config.DefaultString("wx_msg_tmpl_send_url", WXBaseURL+"/cgi-bin/message/template/send")
-	RedisAddresses    []string
-	AppID             = config.MustString("app_id")
-	AppSecret         = config.MustString("app_secret")
+	WXBaseURL        = config.DefaultString("wx_base_url", "https://api.weixin.qq.com")
+	WXAccessTokenURL = config.DefaultString("wx_access_token_url", WXBaseURL+"/cgi-bin/token")
+	WXMsgTmplSendURL = config.DefaultString("wx_msg_tmpl_send_url", WXBaseURL+"/cgi-bin/message/template/send")
+	RedisAddresses   []string
+	AppID            = config.MustString("app_id")
+	AppSecret        = config.MustString("app_secret")
+	TmplMsgID        = config.MustString("tmpl_msg_id")
 )
 
 func Init() {
@@ -42,6 +48,10 @@ func Init() {
 	} else {
 		LogLevel = logrus.InfoLevel
 	}
+
+	KafkaBrokers = strings.Split(config.MustString("kafka_brokers"), ",")
+	KafkaTopics = strings.Split(KafkaTopic, ",")
+	KafkaVersion = config.DefaultString("kafka_version", "1.1.1")
 
 	// InternalAPISecret = config.MustString("internal_api_secret")
 	RedisAddresses = strings.Split(config.MustString("redis_addresses"), ",")

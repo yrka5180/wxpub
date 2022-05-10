@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"public-platform-manager/internal/consts"
@@ -18,12 +19,14 @@ import (
 type WXRepository struct {
 	wx   *persistence.WxRepo
 	user *persistence.UserRepo
+	msg  *persistence.MessageRepo
 }
 
-func NewWXRepository(wx *persistence.WxRepo, user *persistence.UserRepo) *WXRepository {
+func NewWXRepository(wx *persistence.WxRepo, user *persistence.UserRepo, msg *persistence.MessageRepo) *WXRepository {
 	return &WXRepository{
 		wx:   wx,
 		user: user,
+		msg:  msg,
 	}
 }
 
@@ -70,6 +73,10 @@ func (a *WXRepository) handlerEvent(ctx context.Context, reqBody *entity.TextReq
 			return nil, err
 		}
 	case consts.TEMPLATESENDJOBFINISHEvent:
+		// 事件回调内部系统错误重发
+		if respContent, err = a.handlerTEMPLATESENDJOBFINISHEvent(ctx, reqBody); err != nil {
+			return nil, err
+		}
 	}
 	return a.makeTextResponseBody(reqBody.ToUserName, reqBody.FromUserName, respContent)
 }
@@ -129,9 +136,96 @@ func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, re
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("handlerTEMPLATESENDJOBFINISHEvent traceID:%s", traceID)
 	// 对事件推送由于其他原因发送失败的消息进行重发
-	// todo: 引入消息队列重发，定时任务扫描 发送中 状态的消息，定时任务补偿3次，还没成功状态设为失败，人工介入，消费者根据消息id做幂等处理
-
-	return "", nil
+	// 判断当前发送次数是否小于最大重发次数，若小于则重发
+	msg, err := a.msg.GetMaxCountFailureMsgByMsgID(ctx, reqBody.MsgID)
+	if err != nil {
+		log.Errorf("handlerTEMPLATESENDJOBFINISHEvent GetMaxCountFailureMsgByMsgID failed,traceID:%s,err:%v", traceID, err)
+		return consts.TEMPLATESENDJOBFINISHRespContent, err
+	}
+	// 发送成功，改状态
+	if reqBody.Status == consts.TemplateSendSuccessStatus {
+		updateItem := entity.FailureMsgLog{
+			ID:         msg.ID,
+			Status:     consts.SendSuccess,
+			Cause:      consts.TemplateSendSuccessStatus,
+			UpdateTime: reqBody.CreateTime,
+		}
+		err = a.msg.UpdateFailureMsg(ctx, updateItem)
+		if err != nil {
+			log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateFailureMsg TemplateSendSuccessStatus failed,traceID:%s,err:%v", traceID, err)
+			return consts.TEMPLATESENDJOBFINISHRespContent, err
+		}
+	}
+	// 发送失败，用户拒接
+	if reqBody.Status == consts.TemplateSendUserBlockStatus {
+		updateItem := entity.FailureMsgLog{
+			ID:         msg.ID,
+			Status:     consts.SendFailure,
+			Cause:      consts.TemplateSendUserBlockStatus,
+			UpdateTime: reqBody.CreateTime,
+		}
+		err = a.msg.UpdateFailureMsg(ctx, updateItem)
+		if err != nil {
+			log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateFailureMsg TemplateSendUserBlockStatus failed,traceID:%s,err:%v", traceID, err)
+			return consts.TEMPLATESENDJOBFINISHRespContent, err
+		}
+	}
+	// 发送失败，内部错误，重发
+	if reqBody.Status == consts.TemplateSendFailedStatus {
+		if msg.Count < consts.MaxRetryCount {
+			var bs []byte
+			bs, err = json.Marshal(msg.TransferSendTmplMsgRemoteReq())
+			if err != nil {
+				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent json marshal tmpl msg failed,traceID:%s,err:%v", traceID, err)
+				return consts.TEMPLATESENDJOBFINISHRespContent, err
+			}
+			err = a.msg.SendTmplMsgToMQ(ctx, a.msg.GetTopic(), string(bs))
+			if err != nil {
+				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent send tmpl msg to MQ failed,traceID:%s,err:%v", traceID, err)
+				return consts.TEMPLATESENDJOBFINISHRespContent, err
+			}
+			// 更新上一条消息失败原因
+			updateItem := entity.FailureMsgLog{
+				ID:         msg.ID,
+				Cause:      consts.TemplateSendFailedStatus,
+				UpdateTime: reqBody.CreateTime,
+			}
+			err = a.msg.UpdateFailureMsg(ctx, updateItem)
+			if err != nil {
+				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateFailureMsg TemplateSendFailedStatus failed,traceID:%s,err:%v", traceID, err)
+				return consts.TEMPLATESENDJOBFINISHRespContent, err
+			}
+			// 增加重发记录条目
+			item := entity.FailureMsgLog{
+				MsgID:      msg.MsgID,
+				ToUser:     msg.ToUser,
+				TemplateID: msg.TemplateID,
+				Content:    msg.Content,
+				Cause:      msg.Cause,
+				Status:     consts.SendRetry,
+				Count:      msg.Count + 1,
+				CreateTime: time.Now().Unix(),
+			}
+			err = a.msg.SaveFailureMsgLog(ctx, item)
+			if err != nil {
+				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent SaveFailureMsgLog TemplateSendFailedStatus failed,traceID:%s,err:%v", traceID, err)
+				return consts.TEMPLATESENDJOBFINISHRespContent, err
+			}
+		} else {
+			// 改变发送状态为失败
+			updateItem := entity.FailureMsgLog{
+				ID:         msg.ID,
+				Status:     consts.SendFailure,
+				UpdateTime: reqBody.CreateTime,
+			}
+			err = a.msg.UpdateFailureMsg(ctx, updateItem)
+			if err != nil {
+				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateFailureMsg send status TemplateSendFailedStatus failed,traceID:%s,err:%v", traceID, err)
+				return consts.TEMPLATESENDJOBFINISHRespContent, err
+			}
+		}
+	}
+	return consts.TEMPLATESENDJOBFINISHRespContent, nil
 }
 
 func (a *WXRepository) isExistUserMsgID(ctx context.Context, msgID string, fromUserName string, createTime int64) (bool, error) {

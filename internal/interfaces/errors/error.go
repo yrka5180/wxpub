@@ -16,6 +16,7 @@ const (
 	CodeInspectionRecordScoreDetailMatchFailed = 9508
 	CodeUnknownError                           = 9509 // 未知异常
 	CodeNoRight2Modify                         = 9510 // 用户没权限修改相关资源
+	CodeTokenExpire                            = 9511 // token失效，请重新获取
 )
 
 const (
@@ -35,6 +36,7 @@ var StatusCode = map[int]int{
 	CodeInspectionRecordScoreDetailMatchFailed: http.StatusConflict,
 	CodeUnknownError:                           http.StatusInternalServerError,
 	CodeNoRight2Modify:                         http.StatusForbidden,
+	CodeTokenExpire:                            http.StatusForbidden,
 }
 
 var ErrorMessage = map[int]string{
@@ -50,6 +52,7 @@ var ErrorMessage = map[int]string{
 	CodeInspectionRecordScoreDetailMatchFailed: "inspection record call success to match score detail not all",
 	CodeUnknownError:                           "unknown error",
 	CodeNoRight2Modify:                         "have no right to modify resource",
+	CodeTokenExpire:                            "token is expire",
 }
 
 func GetStatusCode(code int) int {

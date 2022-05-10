@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"public-platform-manager/internal/config"
 	"public-platform-manager/internal/domain/repository"
 	"public-platform-manager/internal/infrastructure/persistence"
 	"public-platform-manager/internal/interfaces/controller"
@@ -13,26 +14,22 @@ var (
 	wx          *controller.WX
 	accessToken *controller.AccessToken
 	user        *controller.User
-	template    *controller.Template
 	msg         *controller.Message
 )
 
 func registerController() {
 	wx = controller.NewWXController(
 		repository.NewWXRepository(
-			persistence.NewWxRepo(), persistence.NewUserRepo()))
+			persistence.NewWxRepo(), persistence.NewUserRepo(), persistence.NewMessageRepo(config.KafkaTopics)))
 	accessToken = controller.NewAccessTokenController(
 		repository.NewAccessTokenRepository(
 			persistence.NewAkRepo()))
 	user = controller.NewUserController(
 		repository.NewUserRepository(
 			persistence.NewUserRepo()))
-	template = controller.NewTemplateController(
-		repository.NewTemplateRepository(
-			persistence.NewTemplateRepo()))
 	msg = controller.NewMessageController(
 		repository.NewMessageRepository(
-			persistence.NewMessageRepo()))
+			persistence.NewMessageRepo(config.KafkaTopics)))
 }
 
 func Run() *gin.Engine {
@@ -55,9 +52,6 @@ func initRouter(router *gin.Engine) {
 
 	// 获取wx user info
 	routerUser(interval)
-
-	// 模板管理
-	routerTemplate(interval)
 
 	// 消息推送
 	routerMsgPush(interval)
@@ -93,13 +87,6 @@ func routerUser(router *gin.RouterGroup) {
 	}
 }
 
-func routerTemplate(router *gin.RouterGroup) {
-	templateGroup := router.Group("/template")
-	{
-		templateGroup.GET("", template.ListTemplate)
-	}
-}
-
 func routerMsgPush(router *gin.RouterGroup) {
 	msgPushGroup := router.Group("/message/push")
 	{
@@ -108,10 +95,5 @@ func routerMsgPush(router *gin.RouterGroup) {
 		{
 			tmplSubGroup.POST("", msg.SendTmplMessage)
 		}
-		// // 告警事件推送
-		// alertSubGroup := msgPushGroup.Group("/alert")
-		// {
-		// 	alertSubGroup.GET("")
-		// }
 	}
 }

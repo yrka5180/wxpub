@@ -8,8 +8,9 @@ import (
 	"public-platform-manager/internal"
 	"public-platform-manager/internal/config"
 	"public-platform-manager/internal/consts"
-	"public-platform-manager/internal/g"
 	"public-platform-manager/internal/infrastructure/persistence"
+	"public-platform-manager/internal/tasks"
+	"public-platform-manager/internal/tasks/g"
 	"syscall"
 	"time"
 
@@ -28,6 +29,7 @@ func main() {
 	globalCtx, globalCancel = context.WithCancel(context.Background())
 	// init
 	InitService()
+	tasks.ConsumerTask(globalCtx)
 
 	engine := internal.Run()
 	srv := &http.Server{
@@ -75,6 +77,17 @@ func InitService() {
 		MaxOpenConn: config.DBMaxOpenConn,
 	}
 	err := persistence.NewDBRepositories(dbConf, debugMode)
+	if err != nil {
+		panic(err)
+	}
+	kafkaConf := persistence.KafkaConfig{
+		Config:          nil,
+		Brokers:         config.KafkaBrokers,
+		ConsumerGroupID: config.KafkaGroup,
+		Topics:          config.KafkaTopics,
+		KafkaVersion:    config.KafkaVersion,
+	}
+	err = persistence.NewMQRepositories(kafkaConf, debugMode)
 	if err != nil {
 		panic(err)
 	}
