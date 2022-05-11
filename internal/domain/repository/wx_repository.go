@@ -145,6 +145,16 @@ func (a *WXRepository) handlerUnSubscribeEvent(ctx context.Context, reqBody *ent
 func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, reqBody *entity.TextRequestBody) (string, error) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("handlerTEMPLATESENDJOBFINISHEvent traceID:%s", traceID)
+	// 判断是否存在该消息id,用 FromUserName+CreateTime 去重
+	msgID := fmt.Sprintf("%s%d", reqBody.FromUserName, reqBody.CreateTime)
+	exist, err := a.isExistTemplateSendJobMsgID(ctx, msgID, reqBody.FromUserName, reqBody.CreateTime)
+	if err != nil {
+		log.Errorf("handlerTEMPLATESENDJOBFINISHEvent WXRepository wx repo isExistTemplateSendJobMsgID traceID:%s,err:%v", traceID, err)
+		return "", err
+	}
+	if exist {
+		return "", nil
+	}
 	// 对事件推送由于其他原因发送失败的消息进行重发
 	// 判断当前发送次数是否小于最大重发次数，若小于则重发
 	msg, err := a.msg.GetMaxCountFailureMsgByMsgID(ctx, reqBody.MsgID)
@@ -243,7 +253,7 @@ func (a *WXRepository) isExistUserMsgID(ctx context.Context, msgID string, fromU
 	log.Debugf("IsExistUserMsgID traceID:%s", traceID)
 	exist, err := a.wx.IsExistMsgIDFromRedis(ctx, msgID)
 	if err != nil {
-		log.Errorf("handlerSubscribeEvent IsExistMsgIDFromRedis failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("isExistUserMsgID IsExistMsgIDFromRedis failed,traceID:%s,err:%v", traceID, err)
 		return false, err
 	}
 	// 若存在返回空串,不存在则持久化存储,并保存msg id 到 redis
@@ -253,14 +263,42 @@ func (a *WXRepository) isExistUserMsgID(ctx context.Context, msgID string, fromU
 	// 从db上找，存在则返回空串
 	exist, err = a.user.IsExistUserMsgFromDB(ctx, fromUserName, createTime)
 	if err != nil {
-		log.Errorf("handlerSubscribeEvent IsExistUserFromDB failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("isExistUserMsgID IsExistUserFromDB failed,traceID:%s,err:%v", traceID, err)
 		return false, err
 	}
 	if exist {
 		// 回写到redis中
 		err = a.wx.SetMsgIDToRedis(ctx, msgID)
 		if err != nil {
-			log.Errorf("handlerSubscribeEvent WXRepository wx repo set msg id to redis failed,traceID:%s,err:%v", traceID, err)
+			log.Errorf("isExistUserMsgID WXRepository wx repo set msg id to redis failed,traceID:%s,err:%v", traceID, err)
+		}
+		return true, nil
+	}
+	return false, nil
+}
+
+func (a *WXRepository) isExistTemplateSendJobMsgID(ctx context.Context, msgID string, fromUserName string, createTime int64) (bool, error) {
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("isExistTemplateSendJobMsgID traceID:%s", traceID)
+	exist, err := a.wx.IsExistMsgIDFromRedis(ctx, msgID)
+	if err != nil {
+		log.Errorf("isExistTemplateSendJobMsgID IsExistMsgIDFromRedis exist msg id from redis,traceID:%s,err:%v", traceID, err)
+		return false, err
+	}
+	if exist {
+		return true, nil
+	}
+	// db查当前消息是否存在
+	exist, err = a.msg.IsExistFailureMsgFromDB(ctx, fromUserName, createTime)
+	if err != nil {
+		log.Errorf("isExistTemplateSendJobMsgID IsExistFailureMsgFromDB failed,traceID:%s,err:%v", traceID, err)
+		return false, err
+	}
+	if exist {
+		// 回写到redis
+		err = a.wx.SetMsgIDToRedis(ctx, msgID)
+		if err != nil {
+			log.Errorf("isExistUserMsgID WXRepository wx repo set msg id to redis failed,traceID:%s,err:%v", traceID, err)
 		}
 		return true, nil
 	}

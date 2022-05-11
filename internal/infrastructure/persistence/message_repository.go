@@ -132,3 +132,18 @@ func (a *MessageRepo) GetMaxCountFailureMsgByMsgID(ctx context.Context, msgID in
 	}
 	return m, err
 }
+
+func (a *MessageRepo) IsExistFailureMsgFromDB(ctx context.Context, fromUserName string, createTime int64) (bool, error) {
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("IsExistFailureMsgFromDB traceID:%s", traceID)
+	var failureMsgLog entity.FailureMsgLog
+	err := a.DB.Where("to_user = ? AND create_time = ?", fromUserName, createTime).First(&failureMsgLog).Error
+	if err != nil {
+		// 不存在记录
+		if gorm.IsRecordNotFoundError(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
