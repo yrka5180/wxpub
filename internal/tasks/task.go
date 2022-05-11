@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
@@ -11,7 +13,6 @@ import (
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks/consumer"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks/g"
-	"time"
 
 	"github.com/Shopify/sarama"
 	log "github.com/sirupsen/logrus"

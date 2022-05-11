@@ -2,9 +2,10 @@ package entity
 
 import (
 	"encoding/json"
+	"time"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
-	"time"
 )
 
 type SendTmplMsgReq struct {

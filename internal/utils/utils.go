@@ -6,10 +6,11 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"regexp"
 	"strings"
 	"time"
+
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"

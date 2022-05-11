@@ -2,9 +2,10 @@ package persistence
 
 import (
 	"fmt"
+	"time"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/kafka"
 	"github.com/Shopify/sarama"
-	"time"
 
 	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/redis"
 
