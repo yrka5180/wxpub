@@ -1,12 +1,13 @@
 package controller
 
 import (
-	"public-platform-manager/internal/application"
-	"public-platform-manager/internal/interfaces/errors"
-	"public-platform-manager/internal/interfaces/httputil"
-	"public-platform-manager/internal/interfaces/middleware"
-	"public-platform-manager/internal/utils"
 	"strconv"
+
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/application"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/httputil"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/middleware"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"

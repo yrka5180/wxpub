@@ -5,13 +5,15 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"public-platform-manager/internal/consts"
-	"public-platform-manager/internal/domain/entity"
-	"public-platform-manager/internal/infrastructure/persistence"
-	"public-platform-manager/internal/utils"
 	"sort"
 	"strings"
 	"time"
+
+
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -44,7 +46,7 @@ func (a *WXRepository) GetWXCheckSign(signature, timestamp, nonce, token string)
 	return utils.Sha1(b.String()) == signature
 }
 
-func (a *WXRepository) GetEventXml(ctx context.Context, reqBody *entity.TextRequestBody) (respBody []byte, err error) {
+func (a *WXRepository) GetEventXML(ctx context.Context, reqBody *entity.TextRequestBody) (respBody []byte, err error) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("GetEventXml traceID:%s", traceID)
 	if reqBody == nil {
@@ -87,6 +89,10 @@ func (a *WXRepository) handlerSubscribeEvent(ctx context.Context, reqBody *entit
 	// 判断是否存在该消息id,用 FromUserName+CreateTime 去重
 	msgID := fmt.Sprintf("%s%d", reqBody.FromUserName, reqBody.CreateTime)
 	exist, err := a.isExistUserMsgID(ctx, msgID, reqBody.FromUserName, reqBody.CreateTime)
+	if err != nil {
+		log.Errorf("handlerSubscribeEvent WXRepository wx repo isExistUserMsgID traceID:%s,err:%v", traceID, err)
+		return "", err
+	}
 	if exist {
 		return "", nil
 	}
@@ -114,6 +120,10 @@ func (a *WXRepository) handlerUnSubscribeEvent(ctx context.Context, reqBody *ent
 	// 判断是否存在该消息id,用 FromUserName+CreateTime 去重
 	msgID := fmt.Sprintf("%s%d", reqBody.FromUserName, reqBody.CreateTime)
 	exist, err := a.isExistUserMsgID(ctx, msgID, reqBody.FromUserName, reqBody.CreateTime)
+	if err != nil {
+		log.Errorf("handlerUnSubscribeEvent WXRepository wx repo isExistUserMsgID traceID:%s,err:%v", traceID, err)
+		return "", err
+	}
 	if exist {
 		return "", nil
 	}

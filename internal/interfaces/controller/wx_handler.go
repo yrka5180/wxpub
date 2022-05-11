@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"public-platform-manager/internal/application"
-	"public-platform-manager/internal/consts"
-	"public-platform-manager/internal/domain/entity"
-	"public-platform-manager/internal/interfaces/errors"
-	"public-platform-manager/internal/interfaces/httputil"
-	"public-platform-manager/internal/interfaces/middleware"
-	"public-platform-manager/internal/utils"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/application"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/httputil"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/middleware"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -47,7 +47,7 @@ func (a *WX) GetWXCheckSign(c *gin.Context) {
 	log.Infof("wx public platform access successfully!")
 }
 
-func (a *WX) GetEventXml(c *gin.Context) {
+func (a *WX) GetEventXML(c *gin.Context) {
 	ctx := middleware.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
@@ -56,7 +56,7 @@ func (a *WX) GetEventXml(c *gin.Context) {
 	defer httputil.HTTPResponse(ctx, c, &resp)
 	var param entity.WXCheckReq
 	if err := c.ShouldBindQuery(&param); err != nil {
-		log.Errorf("validate GetEventXml ShouldBindQuery failed, traceID:%s, err:%v", traceID, err)
+		log.Errorf("validate GetEventXML ShouldBindQuery failed, traceID:%s, err:%v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, "Invalid query provided")
 		return
 	}
@@ -68,15 +68,15 @@ func (a *WX) GetEventXml(c *gin.Context) {
 	}
 	var reqBody *entity.TextRequestBody
 	if err := c.ShouldBindXML(&reqBody); err != nil {
-		log.Errorf("validate GetEventXml ShouldBindXml failed, traceID:%s, err:%v", traceID, err)
+		log.Errorf("validate GetEventXML ShouldBindXML failed, traceID:%s, err:%v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, "Invalid xml body provided")
 		return
 	}
 	// 事件xml返回
-	respBody, err := a.wx.GetEventXml(ctx, reqBody)
+	respBody, err := a.wx.GetEventXML(ctx, reqBody)
 	if err != nil {
-		log.Errorf("wx public platform GetEventXml access failed,traceID:%s,err:%v", traceID, err)
-		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, "wx public platform GetEventXml access failed!")
+		log.Errorf("wx public platform GetEventXML access failed,traceID:%s,err:%v", traceID, err)
+		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, "wx public platform GetEventXML access failed!")
 		return
 	}
 	// 原样返回

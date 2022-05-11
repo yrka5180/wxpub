@@ -2,10 +2,11 @@ package persistence
 
 import (
 	"context"
-	"public-platform-manager/internal/consts"
-	redis2 "public-platform-manager/internal/infrastructure/pkg/redis"
-	"public-platform-manager/internal/utils"
 	"time"
+
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
+	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/redis"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"github.com/go-redis/redis/v7"
 	"github.com/jinzhu/gorm"

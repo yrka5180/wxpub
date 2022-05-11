@@ -5,16 +5,16 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"public-platform-manager/internal"
-	"public-platform-manager/internal/config"
-	"public-platform-manager/internal/consts"
-	"public-platform-manager/internal/infrastructure/persistence"
-	"public-platform-manager/internal/tasks"
-	"public-platform-manager/internal/tasks/g"
 	"syscall"
 	"time"
 
 	extra "git.nova.net.cn/nova/go-common/logrus-extra"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks/g"
 	log "github.com/sirupsen/logrus"
 )
 

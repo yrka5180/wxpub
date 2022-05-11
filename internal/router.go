@@ -1,11 +1,11 @@
 package internal
 
 import (
-	"public-platform-manager/internal/config"
-	"public-platform-manager/internal/domain/repository"
-	"public-platform-manager/internal/infrastructure/persistence"
-	"public-platform-manager/internal/interfaces/controller"
-	"public-platform-manager/internal/interfaces/middleware"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/controller"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -64,7 +64,7 @@ func routerWX(router *gin.RouterGroup) {
 		wxGroup.GET("", wx.GetWXCheckSign)
 		// todo: 暂时先用明文传输，后续补充aes加密传输
 		// wx开放平台事件接收
-		wxGroup.POST("", wx.GetEventXml)
+		wxGroup.POST("", wx.GetEventXML)
 	}
 }
 

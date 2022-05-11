@@ -8,9 +8,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"public-platform-manager/internal/consts"
 	"strconv"
 	"time"
+
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 
 	log "github.com/sirupsen/logrus"
 )

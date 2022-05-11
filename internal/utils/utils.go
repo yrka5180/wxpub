@@ -6,7 +6,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
-	"public-platform-manager/internal/consts"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"regexp"
 	"strings"
 	"time"

@@ -3,9 +3,10 @@ package httputil
 import (
 	"context"
 	"fmt"
-	error2 "public-platform-manager/internal/interfaces/errors"
-	"public-platform-manager/internal/utils"
 	"strconv"
+
+	error2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"

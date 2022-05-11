@@ -4,16 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/kafka"
+	"github.com/jinzhu/gorm"
 	"net/http"
-	"public-platform-manager/internal/config"
-	"public-platform-manager/internal/domain/entity"
-	"public-platform-manager/internal/infrastructure/pkg/kafka"
-	"public-platform-manager/internal/interfaces/errors"
-	"public-platform-manager/internal/interfaces/httputil"
-	"public-platform-manager/internal/utils"
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/httputil"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	log "github.com/sirupsen/logrus"
 )

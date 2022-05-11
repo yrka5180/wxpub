@@ -2,8 +2,8 @@ package entity
 
 import (
 	"encoding/json"
-	"public-platform-manager/internal/config"
-	"public-platform-manager/internal/consts"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"time"
 )
 

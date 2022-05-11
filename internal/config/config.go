@@ -1,8 +1,9 @@
 package config
 
 import (
-	"public-platform-manager/internal/consts"
 	"strings"
+
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 
 	config "git.nova.net.cn/nova/go-common/config2"
 	"github.com/sirupsen/logrus"

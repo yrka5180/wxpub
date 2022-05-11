@@ -2,10 +2,11 @@ package middleware
 
 import (
 	"context"
-	"public-platform-manager/internal/consts"
-	"public-platform-manager/internal/utils"
 	"strconv"
 	"time"
+
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"

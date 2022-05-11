@@ -2,10 +2,11 @@ package repository
 
 import (
 	"context"
+
 	"encoding/json"
-	"public-platform-manager/internal/domain/entity"
-	"public-platform-manager/internal/infrastructure/persistence"
-	"public-platform-manager/internal/utils"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 	"sync"
 
 	log "github.com/sirupsen/logrus"

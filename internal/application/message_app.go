@@ -2,8 +2,9 @@ package application
 
 import (
 	"context"
-	"public-platform-manager/internal/domain/entity"
-	"public-platform-manager/internal/domain/repository"
+
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
 )
 
 type messageApp struct {
