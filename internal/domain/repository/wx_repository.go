@@ -94,6 +94,7 @@ func (a *WXRepository) handlerSubscribeEvent(ctx context.Context, reqBody *entit
 	u := entity.User{
 		OpenID:     reqBody.FromUserName,
 		CreateTime: reqBody.CreateTime,
+		DeleteTime: 0,
 	}
 	err = a.user.SaveUser(ctx, u)
 	if err != nil {
@@ -241,7 +242,7 @@ func (a *WXRepository) isExistUserMsgID(ctx context.Context, msgID string, fromU
 		return true, nil
 	}
 	// 从db上找，存在则返回空串
-	exist, err = a.user.IsExistUserFromDB(ctx, fromUserName, createTime)
+	exist, err = a.user.IsExistUserMsgFromDB(ctx, fromUserName, createTime)
 	if err != nil {
 		log.Errorf("handlerSubscribeEvent IsExistUserFromDB failed,traceID:%s,err:%v", traceID, err)
 		return false, err

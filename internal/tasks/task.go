@@ -95,7 +95,7 @@ func handleMsg(ctx context.Context) {
 			log.Infof("handleMsg get context done, still has data len[%d]", allCount)
 			if allCount > 0 {
 				for msg := range MaxMsgChan {
-					err := msgRepo.SendTmplMsgToMQ(context.TODO(), topicMgr.GetTopic(), string(msg))
+					err := msgRepo.SendTmplMsgToMQ(context.TODO(), topicMgr.GetTopic(), msg)
 					if err != nil {
 						log.Errorf("rewrite the msg to queue failed, msg:%v, err:%v", msg, err)
 					}
@@ -111,7 +111,7 @@ func handleMsg(ctx context.Context) {
 			if !ok {
 				return
 			}
-			log.Infof("recv msg is %s", msg)
+			log.Debugf("recv msg is %s", msg)
 			// 失败次数判断，状态重试
 			item, err := validKafkaTmplMsg(msg)
 			if err != nil {
@@ -130,14 +130,14 @@ func handleMsg(ctx context.Context) {
 				item.SendTmplMsgRemoteReq.AccessToken = ak
 				resp, err = msgRepo.SendTmplMsgFromRequest(ctx, item.SendTmplMsgRemoteReq)
 				if err != nil {
-					// 回写
-					retryToQueue(&item)
 					// 记录当前错误状态为重试中
 					failureMsg = item.TransferSendRetryMsgLog(err.Error())
+					failureMsg.Count = item.FailureCount
+					// 回写
+					retryToQueue(&item)
 				}
-				log.Infof("resp msg id is %v", resp.MsgID)
 				failureMsg.MsgID = resp.MsgID
-				failureMsg.Count = item.FailureCount
+				log.Debugf("resp msg id is %v", resp.MsgID)
 				err = msgRepo.SaveFailureMsgLog(context.TODO(), failureMsg)
 				if err != nil {
 					log.Errorf("handleMsg SaveFailureMsgLog failed,err:%v", err)
@@ -157,7 +157,7 @@ func validKafkaTmplMsg(m string) (entity.KafkaTmplMsg, error) {
 	}
 
 	// 超过重试次数丢弃
-	if msg.FailureCount >= consts.MaxRetryCount {
+	if msg.FailureCount > consts.MaxRetryCount {
 		log.Errorf("msg has exceed max retry count[%d], will discard it, message:%v", consts.MaxRetryCount, msg)
 		return entity.KafkaTmplMsg{}, fmt.Errorf("msg has exceed max retry count[%d]", consts.MaxExpireTime)
 	}
