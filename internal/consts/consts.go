@@ -22,16 +22,6 @@ const (
 	GinContextContext = "context"
 	ContextTraceID    = contextKey(HTTPTraceIDHeader)
 
-	ContextAccessKey = contextKey(AccessKeyHeader)
-	ContextAppID     = contextKey(AppIDHeader)
-
-	SignTimestampHeader = "x-nova-sign-timestamp"
-	SignExpireHeader    = "x-nova-sign-expire"
-	SignDebugHeader     = "x-nova-sign-debug"
-
-	AppIDHeader     = "x-nova-app-id"
-	AccessKeyHeader = "x-nova-access-key"
-
 	Authorization          = "Authorization"
 	InternalAPITokenHeader = "x-auth-token"
 
