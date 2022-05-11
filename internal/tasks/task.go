@@ -124,6 +124,7 @@ func handleMsg(ctx context.Context) {
 				var resp entity.SendTmplMsgRemoteResp
 				var failureMsg entity.FailureMsgLog
 				failureMsg = item.TransferSendRetryMsgLog("")
+				failureMsg.Count = item.FailureCount
 				// 获取access token
 				var ak string
 				ak, err = akRepository.GetAccessToken(ctx)
@@ -132,7 +133,6 @@ func handleMsg(ctx context.Context) {
 				if err != nil {
 					// 记录当前错误状态为重试中
 					failureMsg = item.TransferSendRetryMsgLog(err.Error())
-					failureMsg.Count = item.FailureCount
 					// 回写
 					retryToQueue(&item)
 				}
