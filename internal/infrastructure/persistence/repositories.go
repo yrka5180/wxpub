@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/kafka"
+	"github.com/Shopify/sarama"
+
 	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/redis"
 
 	"github.com/go-redis/redis/v7"
@@ -13,8 +16,17 @@ import (
 )
 
 type Repositories struct {
+	MQ    *kafka.MQ
 	DB    *gorm.DB
 	Redis *redis.UniversalClient
+}
+
+type KafkaConfig struct {
+	Config          *sarama.Config
+	Brokers         []string
+	ConsumerGroupID string
+	Topics          []string
+	KafkaVersion    string
 }
 
 type DBConfig struct {
@@ -27,6 +39,28 @@ const (
 )
 
 var CommonRepositories Repositories
+
+func NewMQRepositories(conf KafkaConfig, debugMode bool) error {
+	config, brokers, consumerGroupID, kafkaVersion := conf.Config, conf.Brokers, conf.ConsumerGroupID, conf.KafkaVersion
+	// 生产者
+	producer, err := kafka.InitProducer(config, brokers, kafkaVersion, debugMode)
+	if err != nil {
+		return err
+	}
+
+	// 正常业务消费者
+	consumer, err := kafka.InitKafkaConsumerGroup(config, brokers, consumerGroupID, kafkaVersion, false)
+	if err != nil {
+		return err
+	}
+
+	CommonRepositories.MQ = &kafka.MQ{
+		Producer:      producer,
+		ConsumerGroup: consumer,
+	}
+
+	return nil
+}
 
 func NewDBRepositories(config DBConfig, debugMode bool) error {
 	dbUser, dbPassword, dbHost, dbName := config.DBUser, config.DBPassword, config.DBHost, config.DBName

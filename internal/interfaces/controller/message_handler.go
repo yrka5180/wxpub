@@ -31,11 +31,6 @@ func (a *Message) SendTmplMessage(c *gin.Context) {
 	defer httputil.HTTPJSONResponse(ctx, c, &resp)
 
 	var param entity.SendTmplMsgReq
-	if err := c.ShouldBindQuery(&param); err != nil {
-		log.Errorf("validate sendmsg req ShouldBindQuery failed, traceID:%s, err:%v", traceID, err)
-		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, "Invalid query provided")
-		return
-	}
 	if err := c.ShouldBindJSON(&param); err != nil {
 		log.Errorf("validate sendmsg req ShouldBindJSON failed, traceID:%s, err:%v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, "Invalid json provided")

@@ -22,16 +22,6 @@ const (
 	GinContextContext = "context"
 	ContextTraceID    = contextKey(HTTPTraceIDHeader)
 
-	ContextAccessKey = contextKey(AccessKeyHeader)
-	ContextAppID     = contextKey(AppIDHeader)
-
-	SignTimestampHeader = "x-nova-sign-timestamp"
-	SignExpireHeader    = "x-nova-sign-expire"
-	SignDebugHeader     = "x-nova-sign-debug"
-
-	AppIDHeader     = "x-nova-app-id"
-	AccessKeyHeader = "x-nova-access-key"
-
 	Authorization          = "Authorization"
 	InternalAPITokenHeader = "x-auth-token"
 
@@ -66,10 +56,29 @@ const (
 )
 
 const (
-	SubscribeRespContent   = "欢迎关注南凌微信公众号，有疑问请致电热线12345"
-	UnSubscribeRespContent = ""
+	SubscribeRespContent             = "欢迎关注南凌微信公众号，有疑问请致电热线12345"
+	UnSubscribeRespContent           = ""
+	TEMPLATESENDJOBFINISHRespContent = ""
 )
 
 const (
-	TemplateSendFailedStatus = "failed: system failed"
+	TemplateSendSuccessStatus   = "success"
+	TemplateSendUserBlockStatus = "failed:user block"
+	TemplateSendFailedStatus    = "failed: system failed"
+)
+
+const (
+	MaxRetryCount = 3        // 消息最大失败重试次数，实际调用接口次数为3*3(http client repeated count)=9
+	MaxExpireTime = 3 * 3600 // 消息最大过期时间
+)
+
+const (
+	SendSuccess = iota + 1
+	SendRetry
+	SendFailure
+)
+
+const (
+	SendMaxExpireFailureCause = "超过最大重试时间，请人工确认该消息!"
+	SendMaxRetryFailureCause  = "超过最大重试次数，请人工确认该消息!"
 )

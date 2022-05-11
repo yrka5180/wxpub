@@ -50,7 +50,6 @@ func (a *WxRepo) IsExistMsgIDFromRedis(ctx context.Context, msgID string) (bool,
 			if err == redis.Nil {
 				return false, nil
 			}
-
 			time.Sleep(10 * time.Millisecond)
 			continue
 		}

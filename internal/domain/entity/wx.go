@@ -18,7 +18,7 @@ type TextRequestBody struct {
 	CreateTime   int64
 	MsgType      string
 	Content      string
-	MsgID        int
+	MsgID        int64
 	Event        string
 	Ticket       string
 	EventKey     string

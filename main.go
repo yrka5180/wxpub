@@ -8,13 +8,13 @@ import (
 	"syscall"
 	"time"
 
+	extra "git.nova.net.cn/nova/go-common/logrus-extra"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/g"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
-
-	extra "git.nova.net.cn/nova/go-common/logrus-extra"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks/g"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -29,6 +29,7 @@ func main() {
 	globalCtx, globalCancel = context.WithCancel(context.Background())
 	// init
 	InitService()
+	tasks.ConsumerTask(globalCtx)
 
 	engine := internal.Run()
 	srv := &http.Server{
@@ -76,6 +77,17 @@ func InitService() {
 		MaxOpenConn: config.DBMaxOpenConn,
 	}
 	err := persistence.NewDBRepositories(dbConf, debugMode)
+	if err != nil {
+		panic(err)
+	}
+	kafkaConf := persistence.KafkaConfig{
+		Config:          nil,
+		Brokers:         config.KafkaBrokers,
+		ConsumerGroupID: config.KafkaGroup,
+		Topics:          config.KafkaTopics,
+		KafkaVersion:    config.KafkaVersion,
+	}
+	err = persistence.NewMQRepositories(kafkaConf, debugMode)
 	if err != nil {
 		panic(err)
 	}
