@@ -54,7 +54,3 @@ func (t *MessageRepository) SendTmplMsg(ctx context.Context, param entity.SendTm
 	wg.Wait()
 	return entity.SendTmplMsgResp{Msg: "success"}, nil
 }
-
-func (t *MessageRepository) SaveFailureMsg(ctx context.Context, param entity.FailureMsgLog) (err error) {
-	return t.msg.SaveFailureMsgLog(ctx, param)
-}

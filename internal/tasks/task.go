@@ -86,7 +86,7 @@ func listenConsumer(ctx context.Context) {
 	}
 }
 
-// 处理消息，状态为发送中，针对消息失败记录失败次数，失败3次，状态改为发送失败
+// 处理消息，状态为发送中，针对消息失败记录失败次数，失败3次，状态改为发送失败，消息写入db无序
 func handleMsg(ctx context.Context) {
 	defer g.Done()
 	for {
