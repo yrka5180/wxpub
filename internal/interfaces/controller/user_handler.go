@@ -4,6 +4,8 @@ import (
 	"strconv"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/application"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/httputil"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/middleware"
@@ -61,4 +63,36 @@ func (u *User) GetUser(c *gin.Context) {
 		return
 	}
 	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, user)
+}
+
+func (u *User) SendSms(c *gin.Context) {
+	ctx := middleware.DefaultTodoNovaContext(c)
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("%s", traceID)
+
+	resp := httputil.DefaultResponse()
+	defer httputil.HTTPJSONResponse(ctx, c, &resp)
+
+	var req entity.SendSmsReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		log.Errorf("SendSms ShouldBindJSON error: %+v, traceID:%s", err, traceID)
+		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, errors.GetErrorMessage(errors.CodeInvalidParams))
+		return
+	}
+
+	if utils.VerifyMobilePhoneFormat(req.Phone) {
+		log.Errorf("invaild phone number: %s, traceID:%s", req.Phone, traceID)
+		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, errors.GetErrorMessage(errors.CodeInvalidParams))
+		return
+	}
+
+	err = repository.DefaultPhoneVerifyRepository().SendSms(ctx, req)
+	if err != nil {
+		log.Errorf("validate SendSms ShouldBindJSON failed, traceID:%s, err:%v", traceID, err)
+		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, errors.GetErrorMessage(errors.CodeInternalServerError))
+		return
+	}
+
+	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, nil)
 }

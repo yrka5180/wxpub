@@ -1,12 +1,16 @@
 package internal
 
 import (
+	"fmt"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/controller"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/middleware"
+	"google.golang.org/grpc"
 
+	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
 	"github.com/gin-gonic/gin"
 )
 
@@ -42,9 +46,20 @@ func registerMiddleware() {
 			persistence.NewPassportRepo()))
 }
 
+func registerGRPCClient() {
+	smsConn, err := grpc.Dial(config.SmsRPCAddr, grpc.WithInsecure())
+	if err != nil {
+		panic(fmt.Sprintf("failed to dial captcha grpc server: %v", err))
+	}
+
+	smsClient := smsPb.NewSenderClient(smsConn)
+	repository.InitDefaultPhoneVerifyRepository(persistence.NewPhoneVerifyRepo(smsClient))
+}
+
 func Run() *gin.Engine {
 	registerController()
 	registerMiddleware()
+	registerGRPCClient()
 	engine := gin.Default()
 	initRouter(engine)
 	return engine

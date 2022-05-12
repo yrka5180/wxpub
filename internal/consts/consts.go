@@ -31,6 +31,8 @@ const (
 
 	// Token wx 公众号token
 	Token = "nova"
+
+	SmsSender = "nova-wxpublic-proxy"
 )
 
 const (
@@ -40,11 +42,16 @@ const (
 	RedisLockAccessToken = DLockPrefix + Module + "-access_token"
 	RedisKeyMsgID        = Module + "-msg_id-"
 	RedisKeyAuthN        = Module + "-authN_"
+
+	RedisKeyVerifyCodeSmsID = "sms"
+	RedisKeyPrefixChallenge = Module + "-challenge_"
+	RedisKeyPrefixSms       = Module + "-sms_"
 )
 
 const (
-	RedisMsgIDTTL = 30
-	RedisAuthTTL  = 300
+	RedisMsgIDTTL             = 30
+	RedisAuthTTL              = 300
+	VerifyCodeSmsChallengeTTL = 1800 // 验证短信时候期限设置为30分钟，期间可以重发短信
 )
 
 const (
