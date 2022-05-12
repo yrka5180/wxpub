@@ -28,7 +28,8 @@ var (
 	DBMaxIdleConn = config.DefaultInt("max_db_idle_conn", 1000)
 	DBMaxOpenConn = config.DefaultInt("max_db_open_conn", 1000)
 
-	// InternalAPISecret string
+	PassportBaseURL           = config.DefaultString("passport_base_url", "https://passport.nova.net.cn")
+	PassportOIDCIntrospectURL = config.DefaultString("passport_oidc_oauth2_introspect", PassportBaseURL+"/apis/v1/oidc/oauth2/introspect")
 
 	WXBaseURL        = config.DefaultString("wx_base_url", "https://api.weixin.qq.com")
 	WXAccessTokenURL = config.DefaultString("wx_access_token_url", WXBaseURL+"/cgi-bin/token")

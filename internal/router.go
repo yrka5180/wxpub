@@ -17,6 +17,10 @@ var (
 	msg         *controller.Message
 )
 
+var (
+	auth *middleware.Passport
+)
+
 func registerController() {
 	wx = controller.NewWXController(
 		repository.NewWXRepository(
@@ -32,8 +36,15 @@ func registerController() {
 			persistence.NewMessageRepo(config.KafkaTopics)))
 }
 
+func registerMiddleware() {
+	auth = middleware.NewPassportMiddleware(
+		repository.NewPassportRepository(
+			persistence.NewPassportRepo()))
+}
+
 func Run() *gin.Engine {
 	registerController()
+	registerMiddleware()
 	engine := gin.Default()
 	initRouter(engine)
 	return engine
@@ -45,7 +56,7 @@ func initRouter(router *gin.Engine) {
 
 	router.Use(middleware.NovaContext)
 	// todo:鉴权认证
-	interval := router.Group("/interval/v1")
+	interval := router.Group("/interval/v1", auth.VerifyToken)
 
 	// access token
 	routerAccessToken(interval)

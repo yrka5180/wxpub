@@ -39,10 +39,12 @@ const (
 	RedisKeyAccessToken  = Module + "-access_token"
 	RedisLockAccessToken = DLockPrefix + Module + "-access_token"
 	RedisKeyMsgID        = Module + "-msg_id-"
+	RedisKeyAuthN        = Module + "-authN_"
 )
 
 const (
 	RedisMsgIDTTL = 30
+	RedisAuthTTL  = 300
 )
 
 const (
