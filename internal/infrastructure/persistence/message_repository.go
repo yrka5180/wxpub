@@ -123,11 +123,11 @@ func (a *MessageRepo) UpdateFailureMsg(ctx context.Context, failure entity.Failu
 
 func (a *MessageRepo) GetMaxCountFailureMsgByMsgID(ctx context.Context, msgID int64) (entity.FailureMsgLog, error) {
 	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("GetFailureCountByMsgID traceID:%s", traceID)
+	log.Debugf("GetMaxCountFailureMsgByMsgID traceID:%s", traceID)
 	var m entity.FailureMsgLog
 	err := a.DB.Where("msg_id = ?", msgID).Order("`count` DESC").First(&m).Error
 	if err != nil {
-		log.Errorf("GetFailureCountByMsgID failed to get max count,traceID:%s,err:%v", traceID, err)
+		log.Errorf("GetMaxCountFailureMsgByMsgID failed to get max count,traceID:%s,err:%v", traceID, err)
 		return entity.FailureMsgLog{}, err
 	}
 	return m, err

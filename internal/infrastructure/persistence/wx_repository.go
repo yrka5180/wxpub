@@ -9,18 +9,15 @@ import (
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"github.com/go-redis/redis/v7"
-	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
 )
 
 type WxRepo struct {
-	DB    *gorm.DB
 	Redis *redis.UniversalClient
 }
 
 func NewWxRepo() *WxRepo {
 	return &WxRepo{
-		DB:    CommonRepositories.DB,
 		Redis: CommonRepositories.Redis,
 	}
 }
