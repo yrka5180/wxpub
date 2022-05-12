@@ -78,7 +78,7 @@ func (r *SendTmplMsgReq) Validate() (errorMsg string) {
 	return
 }
 
-func (r *SendTmplMsgReq) TransferPerSendTmplMsg(index int, toUser string) SendTmplMsgRemoteReq {
+func (r *SendTmplMsgReq) TransferPerSendTmplMsg(toUser string) SendTmplMsgRemoteReq {
 	return SendTmplMsgRemoteReq{
 		ToUser:     toUser,
 		TemplateID: config.TmplMsgID,

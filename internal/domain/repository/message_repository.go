@@ -47,7 +47,7 @@ func (t *MessageRepository) SendTmplMsg(ctx context.Context, param entity.SendTm
 				<-ch
 			}()
 			var bs []byte
-			bs, err = json.Marshal(param.TransferPerSendTmplMsg(idx, users[idx].OpenID).TransferKafkaTmplReq())
+			bs, err = json.Marshal(param.TransferPerSendTmplMsg(users[idx].OpenID).TransferKafkaTmplReq())
 			if err != nil {
 				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent json marshal tmpl msg failed,traceID:%s,err:%v", traceID, err)
 				return
