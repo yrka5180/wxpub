@@ -103,7 +103,7 @@ func (a *UserRepo) UpdateUser(ctx context.Context, user entity.User) error {
 func (a *UserRepo) ListUser(ctx context.Context) (users []entity.User, err error) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("ListUser traceID:%s", traceID)
-	if err = a.DB.Where("delete_time != 0").Find(&users).Error; err != nil {
+	if err = a.DB.Where("delete_time = 0").Find(&users).Error; err != nil {
 		log.Errorf("ListUser find list users failed,traceID:%s,err:%v", traceID, err)
 		return nil, err
 	}
