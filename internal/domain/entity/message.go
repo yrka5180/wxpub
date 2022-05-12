@@ -9,8 +9,8 @@ import (
 )
 
 type SendTmplMsgReq struct {
-	// 接收者openid
-	ToUsers []string `json:"tousers"`
+	// 接收者手机号
+	ToUsersPhone []string `json:"tousers_phone"`
 	// 模板数据
 	Data json.RawMessage `json:"data"`
 }
@@ -71,16 +71,16 @@ func (f FailureMsgLog) TableName() string {
 }
 
 func (r *SendTmplMsgReq) Validate() (errorMsg string) {
-	if len(r.ToUsers) <= 0 {
-		errorMsg = "toUser is empty"
+	if len(r.ToUsersPhone) <= 0 {
+		errorMsg = "toUsersPhone is empty"
 		return
 	}
 	return
 }
 
-func (r *SendTmplMsgReq) TransferPerSendTmplMsg(index int) SendTmplMsgRemoteReq {
+func (r *SendTmplMsgReq) TransferPerSendTmplMsg(index int, toUser string) SendTmplMsgRemoteReq {
 	return SendTmplMsgRemoteReq{
-		ToUser:     r.ToUsers[index],
+		ToUser:     toUser,
 		TemplateID: config.TmplMsgID,
 		Data:       r.Data,
 	}

@@ -6,6 +6,8 @@ type User struct {
 	ID int `json:"id" gorm:"id"`
 	// 用户open id
 	OpenID string `json:"open_id" gorm:"open_id"`
+	// 联系号码
+	Phone string `json:"phone" gorm:"phone"`
 	// 创建时间
 	CreateTime int64 `json:"create_time" gorm:"create_time"`
 	// 删除时间

@@ -33,7 +33,7 @@ func registerController() {
 			persistence.NewUserRepo()))
 	msg = controller.NewMessageController(
 		repository.NewMessageRepository(
-			persistence.NewMessageRepo(config.KafkaTopics)))
+			persistence.NewMessageRepo(config.KafkaTopics), persistence.NewUserRepo()))
 }
 
 func registerMiddleware() {
@@ -55,7 +55,6 @@ func initRouter(router *gin.Engine) {
 	routerWX(open)
 
 	router.Use(middleware.NovaContext)
-	// todo:鉴权认证
 	interval := router.Group("/interval/v1", auth.VerifyToken)
 
 	// access token

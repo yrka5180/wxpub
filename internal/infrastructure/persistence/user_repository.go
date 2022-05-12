@@ -119,3 +119,13 @@ func (a *UserRepo) GetUserByID(ctx context.Context, id int) (user entity.User, e
 	}
 	return
 }
+
+func (a *UserRepo) ListUserByPhones(ctx context.Context, phones []string) (user []entity.User, err error) {
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("ListUserByPhones traceID:%s", traceID)
+	if err = a.DB.Where("id IN (?)", phones).First(&user).Error; err != nil {
+		log.Errorf("ListUserByPhones get list user by phones failed,traceID:%s,err:%v", traceID, err)
+		return
+	}
+	return
+}

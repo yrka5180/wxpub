@@ -14,23 +14,31 @@ import (
 )
 
 type MessageRepository struct {
-	msg *persistence.MessageRepo
+	msg  *persistence.MessageRepo
+	user *persistence.UserRepo
 }
 
-func NewMessageRepository(msg *persistence.MessageRepo) *MessageRepository {
+func NewMessageRepository(msg *persistence.MessageRepo, user *persistence.UserRepo) *MessageRepository {
 	return &MessageRepository{
-		msg: msg,
+		msg:  msg,
+		user: user,
 	}
 }
 
 func (t *MessageRepository) SendTmplMsg(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("SendTmplMsg traceID:%s", traceID)
+	// 先拿到接收者的open_id列表
+	users, err := t.user.ListUserByPhones(ctx, param.ToUsersPhone)
+	if err != nil {
+		log.Errorf("SendTmplMsg UserRepo ListUserByPhones failed,traceID:%s,err:%v", traceID, err)
+		return entity.SendTmplMsgResp{}, err
+	}
 	wg := new(sync.WaitGroup)
 	// 批量写入到kafka做消息推送
 	ch := make(chan struct{}, 100)
 	defer close(ch)
-	for idx := range param.ToUsers {
+	for idx := range users {
 		ch <- struct{}{}
 		wg.Add(1)
 		go func(idx int) {
@@ -38,7 +46,8 @@ func (t *MessageRepository) SendTmplMsg(ctx context.Context, param entity.SendTm
 				wg.Done()
 				<-ch
 			}()
-			bs, err := json.Marshal(param.TransferPerSendTmplMsg(idx).TransferKafkaTmplReq())
+			var bs []byte
+			bs, err = json.Marshal(param.TransferPerSendTmplMsg(idx, users[idx].OpenID).TransferKafkaTmplReq())
 			if err != nil {
 				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent json marshal tmpl msg failed,traceID:%s,err:%v", traceID, err)
 				return
