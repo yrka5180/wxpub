@@ -32,8 +32,8 @@ var (
 
 func ConsumerTask(ctx context.Context) {
 	taskCtx = ctx
-	msgRepo = persistence.NewMessageRepo(config.KafkaTopics)
-	akRepository = repository.NewAccessTokenRepository(persistence.NewAkRepo())
+	msgRepo = persistence.DefaultMessageRepo()
+	akRepository = repository.NewAccessTokenRepository(persistence.DefaultAkRepo())
 	// 消息任务处理
 	g.Add(1)
 	go listenConsumer(ctx)
@@ -124,7 +124,9 @@ func handleMsg(ctx context.Context) {
 				// 业务处理
 				var resp entity.SendTmplMsgRemoteResp
 				var failureMsg entity.FailureMsgLog
-				failureMsg = item.TransferSendRetryMsgLog("")
+				// 发送时间
+				sendCreateTime := time.Now().Unix()
+				failureMsg = item.TransferSendRetryMsgLog("", sendCreateTime)
 				failureMsg.Count = item.FailureCount
 				// 获取access token
 				var ak string
@@ -133,7 +135,7 @@ func handleMsg(ctx context.Context) {
 				resp, err = msgRepo.SendTmplMsgFromRequest(ctx, item.SendTmplMsgRemoteReq)
 				if err != nil {
 					// 记录当前错误状态为重试中
-					failureMsg = item.TransferSendRetryMsgLog(err.Error())
+					failureMsg = item.TransferSendRetryMsgLog(err.Error(), sendCreateTime)
 					// 回写
 					retryToQueue(&item)
 				}
@@ -143,6 +145,7 @@ func handleMsg(ctx context.Context) {
 				if err != nil {
 					log.Errorf("handleMsg SaveFailureMsgLog failed,err:%v", err)
 				}
+				log.Debugf("consumer msg success,msg is %v", msg)
 			}()
 		}
 	}

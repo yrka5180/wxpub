@@ -23,10 +23,19 @@ type AkRepo struct {
 	Redis *redis.UniversalClient
 }
 
+var defaultAkRepo *AkRepo
+
 func NewAkRepo() *AkRepo {
-	return &AkRepo{
-		Redis: CommonRepositories.Redis,
+	if defaultAkRepo == nil {
+		defaultAkRepo = &AkRepo{
+			Redis: CommonRepositories.Redis,
+		}
 	}
+	return defaultAkRepo
+}
+
+func DefaultAkRepo() *AkRepo {
+	return defaultAkRepo
 }
 
 func (a *AkRepo) GetAccessTokenFromRequest(ctx context.Context) (entity.AccessTokenResp, error) {

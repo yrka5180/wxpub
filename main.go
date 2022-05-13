@@ -76,10 +76,6 @@ func InitService() {
 		MaxIdleConn: config.DBMaxIdleConn,
 		MaxOpenConn: config.DBMaxOpenConn,
 	}
-	err := persistence.NewDBRepositories(dbConf, debugMode)
-	if err != nil {
-		panic(err)
-	}
 	kafkaConf := persistence.KafkaConfig{
 		Config:          nil,
 		Brokers:         config.KafkaBrokers,
@@ -87,11 +83,7 @@ func InitService() {
 		Topics:          config.KafkaTopics,
 		KafkaVersion:    config.KafkaVersion,
 	}
-	err = persistence.NewMQRepositories(kafkaConf, debugMode)
-	if err != nil {
-		panic(err)
-	}
-	err = persistence.NewRedisRepositories(config.RedisAddresses)
+	err := persistence.NewRepositories(kafkaConf, dbConf, config.RedisAddresses, debugMode)
 	if err != nil {
 		panic(err)
 	}

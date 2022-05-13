@@ -16,10 +16,19 @@ type WxRepo struct {
 	Redis *redis.UniversalClient
 }
 
+var defaultWxRepo *WxRepo
+
 func NewWxRepo() *WxRepo {
-	return &WxRepo{
-		Redis: CommonRepositories.Redis,
+	if defaultWxRepo == nil {
+		defaultWxRepo = &WxRepo{
+			Redis: CommonRepositories.Redis,
+		}
 	}
+	return defaultWxRepo
+}
+
+func NewDefaultWxRepo() *WxRepo {
+	return defaultWxRepo
 }
 
 func (a *WxRepo) SetMsgIDToRedis(ctx context.Context, msgID string) error {

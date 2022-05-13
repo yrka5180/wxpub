@@ -224,7 +224,6 @@ func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, re
 				Cause:      msg.Cause,
 				Status:     consts.SendRetry,
 				Count:      msg.Count + 1,
-				CreateTime: time.Now().Unix(),
 			}
 			err = a.msg.SaveFailureMsgLog(ctx, item)
 			if err != nil {

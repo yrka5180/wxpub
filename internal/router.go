@@ -28,22 +28,21 @@ var (
 func registerController() {
 	wx = controller.NewWXController(
 		repository.NewWXRepository(
-			persistence.NewWxRepo(), persistence.NewUserRepo(), persistence.NewMessageRepo(config.KafkaTopics)))
+			persistence.NewDefaultWxRepo(), persistence.NewDefaultUserRepo(), persistence.DefaultMessageRepo()))
 	accessToken = controller.NewAccessTokenController(
-		repository.NewAccessTokenRepository(
-			persistence.NewAkRepo()))
+		repository.NewDefaultAccessTokenRepository())
 	user = controller.NewUserController(
 		repository.NewUserRepository(
-			persistence.NewUserRepo()))
+			persistence.NewDefaultUserRepo()))
 	msg = controller.NewMessageController(
 		repository.NewMessageRepository(
-			persistence.NewMessageRepo(config.KafkaTopics), persistence.NewUserRepo()))
+			persistence.DefaultMessageRepo(), persistence.NewDefaultUserRepo()))
 }
 
 func registerMiddleware() {
 	auth = middleware.NewPassportMiddleware(
 		repository.NewPassportRepository(
-			persistence.NewPassportRepo()))
+			persistence.NewDefaultPassportRepo()))
 }
 
 func registerGRPCClient() {

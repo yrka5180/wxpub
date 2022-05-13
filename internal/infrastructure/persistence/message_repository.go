@@ -26,12 +26,21 @@ type MessageRepo struct {
 	MQ                *kafka.MQ
 }
 
+var defaultMessageRepo *MessageRepo
+
 func NewMessageRepo(topics []string) *MessageRepo {
-	return &MessageRepo{
-		kafkaTopics: topics,
-		DB:          CommonRepositories.DB,
-		MQ:          CommonRepositories.MQ,
+	if defaultMessageRepo == nil {
+		defaultMessageRepo = &MessageRepo{
+			kafkaTopics: topics,
+			DB:          CommonRepositories.DB,
+			MQ:          CommonRepositories.MQ,
+		}
 	}
+	return defaultMessageRepo
+}
+
+func DefaultMessageRepo() *MessageRepo {
+	return defaultMessageRepo
 }
 
 // GetTopic 获取Topic

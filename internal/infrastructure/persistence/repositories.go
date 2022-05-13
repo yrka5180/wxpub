@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	config2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/kafka"
 	"github.com/Shopify/sarama"
 
@@ -39,6 +41,27 @@ const (
 )
 
 var CommonRepositories Repositories
+
+func NewRepositories(KafkaConfig KafkaConfig, DBConfig DBConfig, redisAddresses []string, debugMode bool) error {
+	err := NewDBRepositories(DBConfig, debugMode)
+	if err != nil {
+		return err
+	}
+	err = NewMQRepositories(KafkaConfig, debugMode)
+	if err != nil {
+		return err
+	}
+	err = NewRedisRepositories(redisAddresses)
+	if err != nil {
+		return err
+	}
+	NewAkRepo()
+	NewMessageRepo(config2.KafkaTopics)
+	NewPassportRepo()
+	NewUserRepo()
+	NewWxRepo()
+	return nil
+}
 
 func NewMQRepositories(conf KafkaConfig, debugMode bool) error {
 	config, brokers, consumerGroupID, kafkaVersion := conf.Config, conf.Brokers, conf.ConsumerGroupID, conf.KafkaVersion

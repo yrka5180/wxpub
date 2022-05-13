@@ -21,10 +21,19 @@ type PassportRepo struct {
 	Redis *redis.UniversalClient
 }
 
+var defaultPassportRepo *PassportRepo
+
 func NewPassportRepo() *PassportRepo {
-	return &PassportRepo{
-		Redis: CommonRepositories.Redis,
+	if defaultPassportRepo == nil {
+		defaultPassportRepo = &PassportRepo{
+			Redis: CommonRepositories.Redis,
+		}
 	}
+	return defaultPassportRepo
+}
+
+func NewDefaultPassportRepo() *PassportRepo {
+	return defaultPassportRepo
 }
 
 func (p *PassportRepo) GetAuthFromRedis(ctx context.Context, auth string) (authN *entity.AuthN, err error) {

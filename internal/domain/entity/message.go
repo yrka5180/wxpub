@@ -86,14 +86,14 @@ func (r *SendTmplMsgReq) TransferPerSendTmplMsg(toUser string) SendTmplMsgRemote
 	}
 }
 
-func (r *SendTmplMsgRemoteReq) TransferSendRetryMsgLog(errMsg string) FailureMsgLog {
+func (r *SendTmplMsgRemoteReq) TransferSendRetryMsgLog(errMsg string, sendCreateTime int64) FailureMsgLog {
 	return FailureMsgLog{
 		ToUser:     r.ToUser,
 		TemplateID: r.TemplateID,
 		Content:    r.Data,
 		Cause:      errMsg,
 		Status:     consts.SendRetry,
-		CreateTime: time.Now().Unix(),
+		CreateTime: sendCreateTime,
 	}
 }
 
