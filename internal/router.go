@@ -2,7 +2,6 @@ package internal
 
 import (
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/controller"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/middleware"
 	"github.com/gin-gonic/gin"
@@ -28,7 +27,6 @@ func registerController() {
 		repository.DefaultUserRepository())
 	msg = controller.NewMessageController(
 		repository.DefaultMessageRepository())
-	repository.InitDefaultPhoneVerifyRepository(persistence.DefaultPhoneVerifyRepo())
 }
 
 func registerMiddleware() {

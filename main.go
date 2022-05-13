@@ -95,7 +95,7 @@ func InitService() {
 	repository.NewAccessTokenRepository(
 		persistence.DefaultAkRepo())
 	repository.NewUserRepository(
-		persistence.DefaultUserRepo())
+		persistence.DefaultUserRepo(), persistence.DefaultPhoneVerifyRepo())
 	repository.NewMessageRepository(
 		persistence.DefaultMessageRepo(), persistence.DefaultUserRepo())
 	repository.NewPassportRepository(

@@ -5,7 +5,6 @@ import (
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/application"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/httputil"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/middleware"
@@ -87,7 +86,7 @@ func (u *User) SendSms(c *gin.Context) {
 		return
 	}
 
-	err = repository.DefaultPhoneVerifyRepository().SendSms(ctx, req)
+	err = u.user.SendSms(ctx, req)
 	if err != nil {
 		log.Errorf("validate SendSms ShouldBindJSON failed, traceID:%s, err:%v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, errors.GetErrorMessage(errors.CodeInternalServerError))
