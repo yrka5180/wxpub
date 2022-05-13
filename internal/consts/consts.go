@@ -65,7 +65,7 @@ const (
 )
 
 const (
-	SubscribeRespContent             = "欢迎关注南凌微信公众号，有疑问请致电热线12345"
+	SubscribeRespContent             = ""
 	UnSubscribeRespContent           = ""
 	TEMPLATESENDJOBFINISHRespContent = ""
 )
