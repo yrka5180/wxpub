@@ -3,6 +3,8 @@ package controller
 import (
 	"strconv"
 
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/application"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
@@ -88,8 +90,69 @@ func (u *User) SendSms(c *gin.Context) {
 
 	err = u.user.SendSms(ctx, req)
 	if err != nil {
-		log.Errorf("validate SendSms ShouldBindJSON failed, traceID:%s, err:%v", traceID, err)
+		log.Errorf("SendSms failed, traceID:%s, err:%v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, errors.GetErrorMessage(errors.CodeInternalServerError))
+		return
+	}
+
+	ret := entity.SendSmsResp{
+		OpenID:       req.OpenID,
+		VerifyCodeID: consts.RedisKeyVerifyCodeSmsID,
+	}
+	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, ret)
+}
+
+func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
+	ctx := middleware.DefaultTodoNovaContext(c)
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("%s", traceID)
+
+	resp := httputil.DefaultResponse()
+	defer httputil.HTTPJSONResponse(ctx, c, &resp)
+
+	var req entity.VerifyCodeReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		log.Errorf("SendSms ShouldBindJSON error: %+v, traceID:%s", err, traceID)
+		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, errors.GetErrorMessage(errors.CodeInvalidParams))
+		return
+	}
+
+	if utils.VerifyMobilePhoneFormat(req.Phone) {
+		log.Errorf("invaild phone number: %s, traceID:%s", req.Phone, traceID)
+		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, errors.GetErrorMessage(errors.CodeInvalidParams))
+		return
+	}
+
+	ok, isExpire, err := u.user.VerifySmsCode(ctx, req)
+	if err != nil {
+		log.Errorf("user VerifySmsCode failed, traceID:%s, err:%v", traceID, err)
+		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, errors.GetErrorMessage(errors.CodeInternalServerError))
+		return
+	}
+	if !ok {
+		log.Errorf("verify code is not correct, code: %s, traceID: %s", req.VerifyCode, traceID)
+		httputil.SetErrorResponse(&resp, errors.CodeForbidden, errors.GetErrorMessage(errors.CodeForbidden))
+		return
+	}
+	if !isExpire {
+		log.Errorf("sms code is expired, code: %s, traceID: %s", req.VerifyCode, traceID)
+		httputil.SetErrorResponse(&resp, errors.CodeTokenExpire, errors.GetErrorMessage(errors.CodeTokenExpire))
+		return
+	}
+
+	user, err := u.user.GetUserByOpenID(ctx, req.OpenID)
+	if err != nil {
+		log.Errorf("VerifyAndUpdatePhone get user by open_id error: %v, traceID: %s", err, traceID)
+		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())
+		return
+	}
+
+	user.Phone = req.Phone
+	err = u.user.UpdateUser(ctx, user)
+	if err != nil {
+		log.Errorf("VerifyAndUpdatePhone update user error: %v, traceID: %s", err, traceID)
+		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())
 		return
 	}
 

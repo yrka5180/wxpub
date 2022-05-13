@@ -12,7 +12,6 @@ type SendSmsResp struct {
 	OpenID string `json:"open_id"`
 	// 验证方式id，目前固定为短信"sms"
 	VerifyCodeID string `json:"verify_code_id"`
-	ErrorInfo
 }
 
 type VerifyCodeRedisValue struct {

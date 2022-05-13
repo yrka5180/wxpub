@@ -40,6 +40,14 @@ func (a *UserRepository) GetUserByID(ctx context.Context, id int) (entity.User, 
 	return a.user.GetUserByID(ctx, id)
 }
 
+func (a *UserRepository) GetUserByOpenID(ctx context.Context, openID string) (entity.User, error) {
+	return a.user.GetUserByOpenID(ctx, openID)
+}
+
+func (a *UserRepository) UpdateUser(ctx context.Context, user entity.User) error {
+	return a.user.UpdateUser(ctx, user)
+}
+
 func (a *UserRepository) SendSms(ctx context.Context, req entity.SendSmsReq) error {
 	verifyCodeID, verifyCodeAnswer := utils.GenVerifySmsCode()
 	err := a.phoneVerify.SetVerifyCodeSmsStorage(ctx, req.OpenID, verifyCodeID, verifyCodeAnswer)

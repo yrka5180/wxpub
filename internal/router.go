@@ -86,6 +86,8 @@ func routerUser(router *gin.RouterGroup) {
 	{
 		userGroup.GET("", user.ListUser)
 		userGroup.GET("/:id", user.GetUser)
+		userGroup.GET("/send-sms", user.SendSms)
+		userGroup.POST("/verify-sms", user.VerifyAndUpdatePhone)
 	}
 }
 

@@ -128,6 +128,16 @@ func (a *UserRepo) GetUserByID(ctx context.Context, id int) (user entity.User, e
 	return
 }
 
+func (a *UserRepo) GetUserByOpenID(ctx context.Context, openID string) (user entity.User, err error) {
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("GetUserByID traceID:%s", traceID)
+	if err = a.DB.Where("open_id = ?", openID).First(&user).Error; err != nil {
+		log.Errorf("GetUserByID get user by id failed,traceID:%s,err:%v", traceID, err)
+		return
+	}
+	return
+}
+
 func (a *UserRepo) ListUserByPhones(ctx context.Context, phones []string) (users []entity.User, err error) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("ListUserByPhones traceID:%s", traceID)
