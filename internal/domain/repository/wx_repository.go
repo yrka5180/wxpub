@@ -23,12 +23,22 @@ type WXRepository struct {
 	msg  *persistence.MessageRepo
 }
 
-func NewWXRepository(wx *persistence.WxRepo, user *persistence.UserRepo, msg *persistence.MessageRepo) *WXRepository {
-	return &WXRepository{
-		wx:   wx,
-		user: user,
-		msg:  msg,
+var defaultWXRepository = &WXRepository{}
+
+func NewWXRepository(wx *persistence.WxRepo, user *persistence.UserRepo, msg *persistence.MessageRepo) {
+	if defaultWXRepository.wx == nil {
+		defaultWXRepository.wx = wx
 	}
+	if defaultWXRepository.user == nil {
+		defaultWXRepository.user = user
+	}
+	if defaultWXRepository.msg == nil {
+		defaultWXRepository.msg = msg
+	}
+}
+
+func DefaultWXRepository() *WXRepository {
+	return defaultWXRepository
 }
 
 func (a *WXRepository) GetWXCheckSign(signature, timestamp, nonce, token string) bool {

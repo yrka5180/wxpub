@@ -28,7 +28,7 @@ type MessageRepo struct {
 
 var defaultMessageRepo *MessageRepo
 
-func NewMessageRepo(topics []string) *MessageRepo {
+func NewMessageRepo(topics []string) {
 	if defaultMessageRepo == nil {
 		defaultMessageRepo = &MessageRepo{
 			kafkaTopics: topics,
@@ -36,7 +36,6 @@ func NewMessageRepo(topics []string) *MessageRepo {
 			MQ:          CommonRepositories.MQ,
 		}
 	}
-	return defaultMessageRepo
 }
 
 func DefaultMessageRepo() *MessageRepo {

@@ -18,11 +18,19 @@ type MessageRepository struct {
 	user *persistence.UserRepo
 }
 
-func NewMessageRepository(msg *persistence.MessageRepo, user *persistence.UserRepo) *MessageRepository {
-	return &MessageRepository{
-		msg:  msg,
-		user: user,
+var defaultMessageRepository = &MessageRepository{}
+
+func NewMessageRepository(msg *persistence.MessageRepo, user *persistence.UserRepo) {
+	if defaultMessageRepository.msg == nil {
+		defaultMessageRepository.msg = msg
 	}
+	if defaultMessageRepository.user == nil {
+		defaultMessageRepository.user = user
+	}
+}
+
+func DefaultMessageRepository() *MessageRepository {
+	return defaultMessageRepository
 }
 
 func (t *MessageRepository) SendTmplMsg(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error) {

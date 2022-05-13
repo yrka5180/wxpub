@@ -23,16 +23,15 @@ type PassportRepo struct {
 
 var defaultPassportRepo *PassportRepo
 
-func NewPassportRepo() *PassportRepo {
+func NewPassportRepo() {
 	if defaultPassportRepo == nil {
 		defaultPassportRepo = &PassportRepo{
 			Redis: CommonRepositories.Redis,
 		}
 	}
-	return defaultPassportRepo
 }
 
-func NewDefaultPassportRepo() *PassportRepo {
+func DefaultPassportRepo() *PassportRepo {
 	return defaultPassportRepo
 }
 

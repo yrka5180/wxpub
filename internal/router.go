@@ -1,16 +1,10 @@
 package internal
 
 import (
-	"fmt"
-
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/controller"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/middleware"
-	"google.golang.org/grpc"
-
-	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,38 +21,24 @@ var (
 
 func registerController() {
 	wx = controller.NewWXController(
-		repository.NewWXRepository(
-			persistence.NewDefaultWxRepo(), persistence.NewDefaultUserRepo(), persistence.DefaultMessageRepo()))
+		repository.DefaultWXRepository())
 	accessToken = controller.NewAccessTokenController(
-		repository.NewDefaultAccessTokenRepository())
+		repository.DefaultAccessTokenRepository())
 	user = controller.NewUserController(
-		repository.NewUserRepository(
-			persistence.NewDefaultUserRepo()))
+		repository.DefaultUserRepository())
 	msg = controller.NewMessageController(
-		repository.NewMessageRepository(
-			persistence.DefaultMessageRepo(), persistence.NewDefaultUserRepo()))
+		repository.DefaultMessageRepository())
+	repository.InitDefaultPhoneVerifyRepository(persistence.DefaultPhoneVerifyRepo())
 }
 
 func registerMiddleware() {
 	auth = middleware.NewPassportMiddleware(
-		repository.NewPassportRepository(
-			persistence.NewDefaultPassportRepo()))
-}
-
-func registerGRPCClient() {
-	smsConn, err := grpc.Dial(config.SmsRPCAddr, grpc.WithInsecure())
-	if err != nil {
-		panic(fmt.Sprintf("failed to dial captcha grpc server: %v", err))
-	}
-
-	smsClient := smsPb.NewSenderClient(smsConn)
-	repository.InitDefaultPhoneVerifyRepository(persistence.NewPhoneVerifyRepo(smsClient))
+		repository.DefaultPassportRepository())
 }
 
 func Run() *gin.Engine {
 	registerController()
 	registerMiddleware()
-	registerGRPCClient()
 	engine := gin.Default()
 	initRouter(engine)
 	return engine

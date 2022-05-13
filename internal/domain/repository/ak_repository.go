@@ -16,18 +16,17 @@ type AccessTokenRepository struct {
 	ak *persistence.AkRepo
 }
 
-var defaultAccessTokenRepository *AccessTokenRepository
+var defaultAccessTokenRepository = &AccessTokenRepository{}
 
-func NewAccessTokenRepository(ak *persistence.AkRepo) *AccessTokenRepository {
-	if defaultAccessTokenRepository == nil {
+func NewAccessTokenRepository(ak *persistence.AkRepo) {
+	if defaultAccessTokenRepository.ak == nil {
 		defaultAccessTokenRepository = &AccessTokenRepository{
 			ak: ak,
 		}
 	}
-	return defaultAccessTokenRepository
 }
 
-func NewDefaultAccessTokenRepository() *AccessTokenRepository {
+func DefaultAccessTokenRepository() *AccessTokenRepository {
 	return defaultAccessTokenRepository
 }
 

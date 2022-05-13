@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"time"
 
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/g"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks/consumer"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks/g"
-
 	"github.com/Shopify/sarama"
 	log "github.com/sirupsen/logrus"
 )
@@ -33,7 +33,7 @@ var (
 func ConsumerTask(ctx context.Context) {
 	taskCtx = ctx
 	msgRepo = persistence.DefaultMessageRepo()
-	akRepository = repository.NewAccessTokenRepository(persistence.DefaultAkRepo())
+	akRepository = repository.DefaultAccessTokenRepository()
 	// 消息任务处理
 	g.Add(1)
 	go listenConsumer(ctx)

@@ -25,13 +25,12 @@ type AkRepo struct {
 
 var defaultAkRepo *AkRepo
 
-func NewAkRepo() *AkRepo {
+func NewAkRepo() {
 	if defaultAkRepo == nil {
 		defaultAkRepo = &AkRepo{
 			Redis: CommonRepositories.Redis,
 		}
 	}
-	return defaultAkRepo
 }
 
 func DefaultAkRepo() *AkRepo {

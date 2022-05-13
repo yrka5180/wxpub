@@ -15,14 +15,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func NewPhoneVerifyRepo(smsClient smsPb.SenderClient) *PhoneVerifyRepo {
-	return &PhoneVerifyRepo{
-		smsGRPCClient: smsClient,
+type PhoneVerifyRepo struct {
+	smsGRPCClient smsPb.SenderClient
+}
+
+var defaultPhoneVerifyRepo *PhoneVerifyRepo
+
+func NewPhoneVerifyRepo() {
+	if defaultPhoneVerifyRepo == nil {
+		defaultPhoneVerifyRepo = &PhoneVerifyRepo{
+			smsGRPCClient: CommonRepositories.SmsGRPCClient,
+		}
 	}
 }
 
-type PhoneVerifyRepo struct {
-	smsGRPCClient smsPb.SenderClient
+func DefaultPhoneVerifyRepo() *PhoneVerifyRepo {
+	return defaultPhoneVerifyRepo
 }
 
 func (r *PhoneVerifyRepo) SendSms(ctx context.Context, content string, sender string, phone string) (err error) {

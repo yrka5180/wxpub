@@ -19,17 +19,16 @@ type UserRepo struct {
 
 var defaultUserRepo *UserRepo
 
-func NewUserRepo() *UserRepo {
+func NewUserRepo() {
 	if defaultUserRepo == nil {
 		defaultUserRepo = &UserRepo{
 			DB:    CommonRepositories.DB,
 			Redis: CommonRepositories.Redis,
 		}
 	}
-	return defaultUserRepo
 }
 
-func NewDefaultUserRepo() *UserRepo {
+func DefaultUserRepo() *UserRepo {
 	return defaultUserRepo
 }
 

@@ -11,10 +11,16 @@ type UserRepository struct {
 	user *persistence.UserRepo
 }
 
-func NewUserRepository(user *persistence.UserRepo) *UserRepository {
-	return &UserRepository{
-		user: user,
+var defaultUserRepository = &UserRepository{}
+
+func NewUserRepository(user *persistence.UserRepo) {
+	if defaultUserRepository.user == nil {
+		defaultUserRepository.user = user
 	}
+}
+
+func DefaultUserRepository() *UserRepository {
+	return defaultUserRepository
 }
 
 func (a *UserRepository) ListUser(ctx context.Context) ([]entity.User, error) {

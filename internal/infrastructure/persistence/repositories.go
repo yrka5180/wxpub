@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
+	"google.golang.org/grpc"
+
 	config2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/kafka"
@@ -18,9 +21,10 @@ import (
 )
 
 type Repositories struct {
-	MQ    *kafka.MQ
-	DB    *gorm.DB
-	Redis *redis.UniversalClient
+	MQ            *kafka.MQ
+	DB            *gorm.DB
+	Redis         *redis.UniversalClient
+	SmsGRPCClient smsPb.SenderClient
 }
 
 type KafkaConfig struct {
@@ -42,7 +46,7 @@ const (
 
 var CommonRepositories Repositories
 
-func NewRepositories(KafkaConfig KafkaConfig, DBConfig DBConfig, redisAddresses []string, debugMode bool) error {
+func NewRepositories(KafkaConfig KafkaConfig, DBConfig DBConfig, redisAddresses []string, smsRPCAddr string, debugMode bool) error {
 	err := NewDBRepositories(DBConfig, debugMode)
 	if err != nil {
 		return err
@@ -55,11 +59,17 @@ func NewRepositories(KafkaConfig KafkaConfig, DBConfig DBConfig, redisAddresses 
 	if err != nil {
 		return err
 	}
+	err = NewSmsGRPCClientRepositories(smsRPCAddr)
+	if err != nil {
+		return err
+	}
+	// persistence repo init
 	NewAkRepo()
 	NewMessageRepo(config2.KafkaTopics)
 	NewPassportRepo()
 	NewUserRepo()
 	NewWxRepo()
+	NewPhoneVerifyRepo()
 	return nil
 }
 
@@ -117,5 +127,16 @@ func NewRedisRepositories(addresses []string) error {
 	}
 	CommonRepositories.Redis = &redisClient
 	log.Info("redis client init success")
+	return nil
+}
+
+func NewSmsGRPCClientRepositories(smsRPCAddr string) error {
+	smsConn, err := grpc.Dial(smsRPCAddr, grpc.WithInsecure())
+	if err != nil {
+		log.Errorf("failed to dial captcha grpc server: %v", err)
+		return err
+	}
+	smsClient := smsPb.NewSenderClient(smsConn)
+	CommonRepositories.SmsGRPCClient = smsClient
 	return nil
 }

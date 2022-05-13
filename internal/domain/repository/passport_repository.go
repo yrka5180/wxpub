@@ -13,10 +13,16 @@ type PassportRepository struct {
 	passport *persistence.PassportRepo
 }
 
-func NewPassportRepository(passport *persistence.PassportRepo) *PassportRepository {
-	return &PassportRepository{
-		passport: passport,
+var defaultPassportRepository = &PassportRepository{}
+
+func NewPassportRepository(passport *persistence.PassportRepo) {
+	if defaultPassportRepository.passport == nil {
+		defaultPassportRepository.passport = passport
 	}
+}
+
+func DefaultPassportRepository() *PassportRepository {
+	return defaultPassportRepository
 }
 
 func (p *PassportRepository) GetAuthN(ctx context.Context, auth string) error {

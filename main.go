@@ -8,13 +8,15 @@ import (
 	"syscall"
 	"time"
 
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/g"
+
 	extra "git.nova.net.cn/nova/go-common/logrus-extra"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks/g"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -83,8 +85,19 @@ func InitService() {
 		Topics:          config.KafkaTopics,
 		KafkaVersion:    config.KafkaVersion,
 	}
-	err := persistence.NewRepositories(kafkaConf, dbConf, config.RedisAddresses, debugMode)
+	err := persistence.NewRepositories(kafkaConf, dbConf, config.RedisAddresses, config.SmsRPCAddr, debugMode)
 	if err != nil {
 		panic(err)
 	}
+	// repository init
+	repository.NewWXRepository(
+		persistence.DefaultWxRepo(), persistence.DefaultUserRepo(), persistence.DefaultMessageRepo())
+	repository.NewAccessTokenRepository(
+		persistence.DefaultAkRepo())
+	repository.NewUserRepository(
+		persistence.DefaultUserRepo())
+	repository.NewMessageRepository(
+		persistence.DefaultMessageRepo(), persistence.DefaultUserRepo())
+	repository.NewPassportRepository(
+		persistence.DefaultPassportRepo())
 }

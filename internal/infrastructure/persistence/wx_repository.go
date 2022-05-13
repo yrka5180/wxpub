@@ -18,16 +18,15 @@ type WxRepo struct {
 
 var defaultWxRepo *WxRepo
 
-func NewWxRepo() *WxRepo {
+func NewWxRepo() {
 	if defaultWxRepo == nil {
 		defaultWxRepo = &WxRepo{
 			Redis: CommonRepositories.Redis,
 		}
 	}
-	return defaultWxRepo
 }
 
-func NewDefaultWxRepo() *WxRepo {
+func DefaultWxRepo() *WxRepo {
 	return defaultWxRepo
 }
 
