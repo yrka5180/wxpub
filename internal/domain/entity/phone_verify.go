@@ -20,10 +20,11 @@ type VerifyCodeRedisValue struct {
 	VerifyCodeCreateTime int64  `json:"verify_code_create_time"`
 }
 
-type VerifySmsCodeReq struct {
+type VerifyCodeReq struct {
 	// 微信用户的openID
 	OpenID string `json:"open_id"`
 	// 目标手机号
 	Phone string `json:"phone"`
-	//
+	// 验证码
+	VerifyCode string `json:"verify_code"`
 }

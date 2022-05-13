@@ -51,3 +51,7 @@ func (a *UserRepository) SendSms(ctx context.Context, req entity.SendSmsReq) err
 	sender := consts.SmsSender
 	return a.phoneVerify.SendSms(ctx, content, sender, req.Phone)
 }
+
+func (a *UserRepository) VerifySmsCode(ctx context.Context, req entity.VerifyCodeReq) (bool, bool, error) {
+	return a.phoneVerify.VerifySmsCode(ctx, req.OpenID, consts.RedisKeyVerifyCodeSmsID, req.VerifyCode, consts.RedisAuthTTL)
+}
