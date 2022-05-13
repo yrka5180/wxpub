@@ -27,7 +27,7 @@ type PhoneVerifyRepo struct {
 
 func (r *PhoneVerifyRepo) SendSms(ctx context.Context, content string, sender string, phone string) (err error) {
 	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("SaveUser traceID:%s", traceID)
+	log.Debugf("SendSms traceID:%s", traceID)
 
 	// 发短信是调用的第三方的服务，计费使用
 	_, err = r.smsGRPCClient.SendMessage(ctx, &smsPb.SendMsgRequest{
@@ -51,7 +51,7 @@ func (r *PhoneVerifyRepo) SetVerifyCodeSmsStorage(ctx context.Context, challenge
 	var verifyCodeSmsRedisValue entity.VerifyCodeRedisValue
 
 	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("SaveUser traceID:%s", traceID)
+	log.Debugf("SetVerifyCodeSmsStorage traceID:%s", traceID)
 
 	smsCreateTime := time.Now().UnixNano()
 	verifyCodeSmsRedisValue.VerifyCodeCreateTime = smsCreateTime
@@ -59,17 +59,25 @@ func (r *PhoneVerifyRepo) SetVerifyCodeSmsStorage(ctx context.Context, challenge
 
 	smsRedisValue, _ := json.Marshal(verifyCodeSmsRedisValue)
 
+	// 使用txpipeline进行原子操作
+	pipe := redis.RClient.TxPipeline()
 	// redis存放verifyCodeID:{verifyCodeAnswer,smsCreateTime}到相应的challenge的hashset上
-	err = redis.RClient.HSet(consts.RedisKeyPrefixChallenge+challenge, consts.RedisKeyPrefixSms+verifyCodeID, smsRedisValue).Err()
+	err = pipe.HSet(consts.RedisKeyPrefixChallenge+challenge, consts.RedisKeyPrefixSms+verifyCodeID, smsRedisValue).Err()
 	if err != nil {
 		log.Errorf("failed to do redis HSet, error: %+v, traceID: %s", err, traceID)
 		return
 	}
 
-	// 更新当前challenge的key过期时间为30分钟，30分钟不执行验证短信验证码操作就无法找回密码，即为30分钟内可以重发短信验证码
-	err = redis.RClient.Expire(consts.RedisKeyPrefixChallenge+challenge, consts.VerifyCodeSmsChallengeTTL).Err()
+	// 更新当前challenge的key过期时间为30分钟，30分钟不执行验证短信验证码操作就无法绑定手机号，即为30分钟内可以重发短信验证码
+	err = pipe.Expire(consts.RedisKeyPrefixChallenge+challenge, consts.VerifyCodeSmsChallengeTTL).Err()
 	if err != nil {
 		log.Errorf("failed to do redis SetExpireTime, error: %+v, traceID: %s", err, traceID)
+		return
+	}
+
+	_, err = pipe.Exec()
+	if err != nil {
+		log.Errorf("failed to exec redis pipeline, error: %+v, traceID: %s", err, traceID)
 	}
 
 	return
