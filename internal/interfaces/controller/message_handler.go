@@ -22,6 +22,18 @@ func NewMessageController(msg application.MessageInterface) *Message {
 	}
 }
 
+// swagger:route POST /message/push/tmpl 消息推送 SendTmplMessage
+//
+// description: 模板消息推送
+//
+// responses:
+//   200: APISendTmplMessage
+//   400: badRequest
+//   401: unauthorized
+//   403: forbidden
+//   404: notfound
+//   409: conflict
+//   500: serverError
 func (a *Message) SendTmplMessage(c *gin.Context) {
 	ctx := middleware.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)

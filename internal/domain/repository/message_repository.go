@@ -40,7 +40,7 @@ func (t *MessageRepository) SendTmplMsg(ctx context.Context, param entity.SendTm
 	users, err := t.user.ListUserByPhones(ctx, param.ToUsersPhone)
 	if err != nil {
 		log.Errorf("SendTmplMsg UserRepo ListUserByPhones failed,traceID:%s,err:%v", traceID, err)
-		return entity.SendTmplMsgResp{}, err
+		return entity.SendTmplMsgResp{Msg: "send failed"}, err
 	}
 	wg := new(sync.WaitGroup)
 	// 批量写入到kafka做消息推送

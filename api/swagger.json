@@ -1,0 +1,259 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/access_token": {
+      "get": {
+        "description": "description: 获取access token",
+        "tags": [
+          "accessToken"
+        ],
+        "operationId": "GetAccessToken",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/APIGetAccessTokenResp"
+          },
+          "400": {
+            "$ref": "#/responses/badRequest"
+          },
+          "401": {
+            "$ref": "#/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/notfound"
+          },
+          "409": {
+            "$ref": "#/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/responses/serverError"
+          }
+        }
+      }
+    },
+    "/access_token/fresh": {
+      "get": {
+        "description": "description: 刷新access token",
+        "tags": [
+          "accessToken"
+        ],
+        "operationId": "FreshAccessToken",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/APIGetAccessTokenResp"
+          },
+          "400": {
+            "$ref": "#/responses/badRequest"
+          },
+          "401": {
+            "$ref": "#/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/notfound"
+          },
+          "409": {
+            "$ref": "#/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/responses/serverError"
+          }
+        }
+      }
+    },
+    "/message/push/tmpl": {
+      "post": {
+        "description": "description: 模板消息推送",
+        "tags": [
+          "消息推送"
+        ],
+        "operationId": "SendTmplMessage",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/APISendTmplMessage"
+          },
+          "400": {
+            "$ref": "#/responses/badRequest"
+          },
+          "401": {
+            "$ref": "#/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/notfound"
+          },
+          "409": {
+            "$ref": "#/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/responses/serverError"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "GetAccessTokenResp": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "description": "请求wx凭证ak",
+          "type": "string",
+          "x-go-name": "AccessToken"
+        }
+      },
+      "x-go-package": "git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
+    },
+    "SendTmplMsgResp": {
+      "type": "object",
+      "properties": {
+        "msg": {
+          "description": "发送状态",
+          "type": "string",
+          "x-go-name": "Msg"
+        }
+      },
+      "x-go-package": "git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
+    }
+  },
+  "responses": {
+    "APIGetAccessTokenResp": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/GetAccessTokenResp"
+      }
+    },
+    "APISendTmplMessage": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/SendTmplMsgResp"
+      }
+    },
+    "badRequest": {
+      "description": "ErrBadRequest 请求异常，请求格式错误或者参数异常",
+      "headers": {
+        "x-code": {
+          "type": "integer",
+          "format": "int64",
+          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+        },
+        "x-msg": {
+          "type": "string"
+        }
+      }
+    },
+    "conflict": {
+      "description": "ErrConflict 资源状态冲突",
+      "headers": {
+        "x-code": {
+          "type": "integer",
+          "format": "int64",
+          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+        },
+        "x-msg": {
+          "type": "string"
+        }
+      }
+    },
+    "expectationFailed": {
+      "description": "ErrExpectationFailed 请求异常，请求格式错误或者参数异常",
+      "headers": {
+        "x-code": {
+          "type": "integer",
+          "format": "int64",
+          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+        },
+        "x-msg": {
+          "type": "string"
+        }
+      }
+    },
+    "forbidden": {
+      "description": "ErrForbidden 没有权限访问",
+      "headers": {
+        "x-code": {
+          "type": "integer",
+          "format": "int64",
+          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+        },
+        "x-msg": {
+          "type": "string"
+        }
+      }
+    },
+    "noContent": {
+      "description": "NoContentResp 操作成功(不需要返回内容，比如删除)"
+    },
+    "notfound": {
+      "description": "ErrNotFound 找不到该资源",
+      "headers": {
+        "x-code": {
+          "type": "integer",
+          "format": "int64",
+          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+        },
+        "x-msg": {
+          "type": "string"
+        }
+      }
+    },
+    "redirect": {
+      "description": "ErrRedirect 重定向",
+      "headers": {
+        "x-code": {
+          "type": "integer",
+          "format": "int64",
+          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+        },
+        "x-msg": {
+          "type": "string"
+        }
+      }
+    },
+    "serverError": {
+      "description": "ErrServerInternal 服务器内部错误",
+      "headers": {
+        "x-code": {
+          "type": "integer",
+          "format": "int64",
+          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+        },
+        "x-msg": {
+          "type": "string"
+        }
+      }
+    },
+    "success": {
+      "description": "SuccessResp 操作成功(不需要返回内容，比如删除)",
+      "headers": {
+        "x-code": {
+          "type": "integer",
+          "format": "int64",
+          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+        },
+        "x-msg": {
+          "type": "string"
+        }
+      }
+    },
+    "unauthorized": {
+      "description": "ErrUnauthorized 无法识别用户身份，令牌过期或者令牌被篡改",
+      "headers": {
+        "x-code": {
+          "type": "integer",
+          "format": "int64",
+          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+        },
+        "x-msg": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

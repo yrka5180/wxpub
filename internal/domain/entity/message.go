@@ -16,6 +16,7 @@ type SendTmplMsgReq struct {
 }
 
 type SendTmplMsgResp struct {
+	// 发送状态
 	Msg string `json:"msg"`
 }
 

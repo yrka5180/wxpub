@@ -22,6 +22,18 @@ func NewAccessTokenController(akApp application.AccessTokenInterface) *AccessTok
 	}
 }
 
+// swagger:route GET /access_token accessToken GetAccessToken
+//
+// description: 获取access token
+//
+// responses:
+//   200: APIGetAccessTokenResp
+//   400: badRequest
+//   401: unauthorized
+//   403: forbidden
+//   404: notfound
+//   409: conflict
+//   500: serverError
 func (a *AccessToken) GetAccessToken(c *gin.Context) {
 	ctx := middleware.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
@@ -40,6 +52,18 @@ func (a *AccessToken) GetAccessToken(c *gin.Context) {
 	})
 }
 
+// swagger:route GET /access_token/fresh accessToken FreshAccessToken
+//
+// description: 刷新access token
+//
+// responses:
+//   200: APIGetAccessTokenResp
+//   400: badRequest
+//   401: unauthorized
+//   403: forbidden
+//   404: notfound
+//   409: conflict
+//   500: serverError
 func (a *AccessToken) FreshAccessToken(c *gin.Context) {
 	ctx := middleware.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)

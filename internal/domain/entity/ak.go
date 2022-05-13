@@ -18,5 +18,6 @@ type AccessTokenResp struct {
 }
 
 type GetAccessTokenResp struct {
+	// 请求wx凭证ak
 	AccessToken string `json:"access_token"`
 }
