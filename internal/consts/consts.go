@@ -65,7 +65,7 @@ const (
 )
 
 const (
-	SubscribeRespContent             = "您好！欢迎您关注【南凌科技】，南凌科技NOVAnet以信息网络服务，构建企业核心竞争力。该公众号用于设备告警信息推送，若贵客户与我司有相关业务联系需推送业务设备告警信息，请点击绑定信息链接："
+	SubscribeRespContent             = "您好！欢迎您关注【南凌科技】，南凌科技NOVAnet以信息网络服务，构建企业核心竞争力。该公众号用于设备告警信息推送，若贵客户与我司有相关业务联系需接收业务设备告警信息，请点击绑定信息链接："
 	UnSubscribeRespContent           = ""
 	TEMPLATESENDJOBFINISHRespContent = ""
 )
