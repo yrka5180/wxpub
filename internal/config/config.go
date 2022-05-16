@@ -37,10 +37,12 @@ var (
 	WXBaseURL        = config.DefaultString("wx_base_url", "https://api.weixin.qq.com")
 	WXAccessTokenURL = config.DefaultString("wx_access_token_url", WXBaseURL+"/cgi-bin/token")
 	WXMsgTmplSendURL = config.DefaultString("wx_msg_tmpl_send_url", WXBaseURL+"/cgi-bin/message/template/send")
+
 	RedisAddresses   []string
 	AppID            = config.MustString("app_id")
 	AppSecret        = config.MustString("app_secret")
 	TmplMsgID        = config.MustString("tmpl_msg_id")
+	VerifyProfileURL = config.MustString("verify_profile_url")
 )
 
 func Init() {
