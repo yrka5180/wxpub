@@ -44,8 +44,8 @@ func (a *UserRepository) GetUserByOpenID(ctx context.Context, openID string) (en
 	return a.user.GetUserByOpenID(ctx, openID)
 }
 
-func (a *UserRepository) UpdateUser(ctx context.Context, user entity.User) error {
-	return a.user.UpdateUser(ctx, user)
+func (a *UserRepository) SaveUser(ctx context.Context, user entity.User) error {
+	return a.user.SaveUser(ctx, user)
 }
 
 func (a *UserRepository) SendSms(ctx context.Context, req entity.SendSmsReq) error {

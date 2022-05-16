@@ -18,7 +18,7 @@ type UserInterface interface {
 	ListUser(ctx context.Context) ([]entity.User, error)
 	GetUserByID(ctx context.Context, id int) (entity.User, error)
 	GetUserByOpenID(ctx context.Context, openID string) (entity.User, error)
-	UpdateUser(ctx context.Context, user entity.User) error
+	SaveUser(ctx context.Context, user entity.User) error
 	SendSms(ctx context.Context, req entity.SendSmsReq) error
 	VerifySmsCode(ctx context.Context, req entity.VerifyCodeReq) (bool, bool, error)
 }
@@ -35,8 +35,8 @@ func (u *userApp) GetUserByOpenID(ctx context.Context, openID string) (entity.Us
 	return u.user.GetUserByOpenID(ctx, openID)
 }
 
-func (u *userApp) UpdateUser(ctx context.Context, user entity.User) error {
-	return u.user.UpdateUser(ctx, user)
+func (u *userApp) SaveUser(ctx context.Context, user entity.User) error {
+	return u.user.SaveUser(ctx, user)
 }
 
 func (u *userApp) SendSms(ctx context.Context, req entity.SendSmsReq) error {

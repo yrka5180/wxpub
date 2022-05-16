@@ -149,7 +149,7 @@ func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
 	}
 
 	user.Phone = req.Phone
-	err = u.user.UpdateUser(ctx, user)
+	err = u.user.SaveUser(ctx, user)
 	if err != nil {
 		log.Errorf("VerifyAndUpdatePhone update user error: %v, traceID: %s", err, traceID)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())
