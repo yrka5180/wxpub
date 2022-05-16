@@ -43,8 +43,11 @@ func Run() *gin.Engine {
 }
 
 func initRouter(router *gin.Engine) {
-	open := router.Group("/")
+	open := router.Group("")
+	// wx open api
 	routerWX(open)
+	// user info verify and binding
+	routerVerify(open)
 
 	router.Use(middleware.NovaContext)
 	interval := router.Group("/interval/v1", auth.VerifyToken)
@@ -60,13 +63,21 @@ func initRouter(router *gin.Engine) {
 }
 
 func routerWX(router *gin.RouterGroup) {
-	wxGroup := router.Group("")
+	wxGroup := router.Group("/")
 	{
 		// wx开放平台接入测试接口
 		wxGroup.GET("", wx.GetWXCheckSign)
 		// todo: 暂时先用明文传输，后续补充aes加密传输
 		// wx开放平台事件接收
 		wxGroup.POST("", wx.GetEventXML)
+	}
+}
+
+func routerVerify(router *gin.RouterGroup) {
+	smsProfileGroup := router.Group("/user")
+	{
+		smsProfileGroup.GET("/send-sms", user.SendSms)
+		smsProfileGroup.POST("/verify-sms", user.VerifyAndUpdatePhone)
 	}
 }
 
@@ -86,8 +97,6 @@ func routerUser(router *gin.RouterGroup) {
 	{
 		userGroup.GET("", user.ListUser)
 		userGroup.GET("/:id", user.GetUser)
-		userGroup.GET("/send-sms", user.SendSms)
-		userGroup.POST("/verify-sms", user.VerifyAndUpdatePhone)
 	}
 }
 
