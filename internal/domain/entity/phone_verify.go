@@ -26,6 +26,8 @@ type VerifyCodeRedisValue struct {
 type VerifyCodeReq struct {
 	// 微信用户的openID
 	OpenID string `json:"open_id"`
+	// 用户名字
+	Name string `json:"name"`
 	// 目标手机号
 	Phone string `json:"phone"`
 	// 验证码

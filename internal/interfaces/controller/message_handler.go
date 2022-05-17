@@ -44,17 +44,24 @@ func (a *Message) SendTmplMessage(c *gin.Context) {
 
 	var param entity.SendTmplMsgReq
 	if err := c.ShouldBindJSON(&param); err != nil {
-		log.Errorf("validate sendmsg req ShouldBindJSON failed, traceID:%s, err:%v", traceID, err)
+		log.Errorf("SendTmplMessage validate sendmsg req ShouldBindJSON failed, traceID:%s, err:%v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, "Invalid json provided")
 		return
 	}
 	errMsg := param.Validate()
 	if len(errMsg) > 0 {
-		log.Errorf("validate sendmsg req param failed, traceID:%s, errMsg:%s", traceID, errMsg)
+		log.Errorf("SendTmplMessage validate sendmsg req param failed, traceID:%s, errMsg:%s", traceID, errMsg)
 		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, errMsg)
 		return
 	}
-	msgResp, err := a.message.SendTmplMsg(ctx, param)
+	var msgResp entity.SendTmplMsgResp
+	msgResp, users, err := a.message.GetMissingUsers(ctx, param)
+	if err != nil {
+		log.Errorf("SendTmplMessage GetMissingUsers failed,traceID:%s,err:%v", traceID, err)
+		httputil.SetSuccessfulResponseWithError(&resp, err, msgResp)
+		return
+	}
+	msgResp, err = a.message.SendTmplMsg(ctx, users, param)
 	if err != nil {
 		log.Errorf("SendMessage MessageInterface send msg failed,traceID:%s,err:%v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())

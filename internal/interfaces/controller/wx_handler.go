@@ -44,7 +44,6 @@ func (a *WX) GetWXCheckSign(c *gin.Context) {
 	}
 	// 原样返回
 	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, param.EchoStr)
-	log.Infof("wx public platform access successfully!")
 }
 
 func (a *WX) GetEventXML(c *gin.Context) {
@@ -81,5 +80,4 @@ func (a *WX) GetEventXML(c *gin.Context) {
 	}
 	// 原样返回
 	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, string(respBody))
-	log.Infof("wx public platform access successfully!")
 }

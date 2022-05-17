@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 )
@@ -16,6 +18,8 @@ type SendTmplMsgReq struct {
 }
 
 type SendTmplMsgResp struct {
+	// 发送失败手机号
+	FailureSendPhones []string `json:"failure_send_phones"`
 	// 发送状态
 	Msg string `json:"msg"`
 }
@@ -76,6 +80,8 @@ func (r *SendTmplMsgReq) Validate() (errorMsg string) {
 		errorMsg = "toUsersPhone is empty"
 		return
 	}
+	// 去重
+	r.ToUsersPhone = utils.RemoveStringRepeated(r.ToUsersPhone)
 	return
 }
 

@@ -67,3 +67,16 @@ func ToOutGoingContext(c context.Context) (out context.Context) {
 	out = metadata.NewOutgoingContext(c, md)
 	return
 }
+
+func RemoveStringRepeated(str []string) (ret []string) {
+	ret = make([]string, 0, len(str))
+	temp := map[string]struct{}{}
+	for _, item := range str {
+		// 如果字典中找不到元素，ok=false，!ok为true，就往切片中append元素。
+		if _, ok := temp[item]; !ok {
+			temp[item] = struct{}{}
+			ret = append(ret, item)
+		}
+	}
+	return ret
+}

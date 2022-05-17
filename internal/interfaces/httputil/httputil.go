@@ -63,6 +63,14 @@ func SetSuccessfulResponse(resp *GenericResponse, code int, body interface{}) {
 	setResponse(resp, code, "", body)
 }
 
+func SetSuccessfulResponseWithError(resp *GenericResponse, err error, body interface{}) {
+	if customErr, ok := err.(error2.CustomError); ok {
+		setResponse(resp, customErr.ErrorCode, customErr.ErrorMsg, body)
+		return
+	}
+	setResponse(resp, error2.CodeInternalServerError, error2.GetErrorMessage(error2.CodeInternalServerError), body)
+}
+
 func SetErrorResponse(resp *GenericResponse, errCode int, errMsg string) {
 	setResponse(resp, errCode, errMsg, nil)
 }

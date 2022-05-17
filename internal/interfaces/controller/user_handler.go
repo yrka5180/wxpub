@@ -26,6 +26,18 @@ func NewUserController(user application.UserInterface) *User {
 	}
 }
 
+// swagger:route GET /user 用户管理 ListUser
+//
+// description: 获取用户列表
+//
+// responses:
+//   200: APIListUser
+//   400: badRequest
+//   401: unauthorized
+//   403: forbidden
+//   404: notfound
+//   409: conflict
+//   500: serverError
 func (u *User) ListUser(c *gin.Context) {
 	ctx := middleware.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
@@ -198,6 +210,7 @@ func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
 	}
 
 	user.Phone = req.Phone
+	user.Name = req.Name
 	err = u.user.SaveUser(ctx, user)
 	if err != nil {
 		log.Errorf("VerifyAndUpdatePhone update user error: %v, traceID: %s", err, traceID)

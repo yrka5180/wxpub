@@ -15,9 +15,14 @@ type messageApp struct {
 var _ MessageInterface = &messageApp{}
 
 type MessageInterface interface {
-	SendTmplMsg(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error)
+	GetMissingUsers(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, []entity.User, error)
+	SendTmplMsg(ctx context.Context, users []entity.User, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error)
 }
 
-func (u *messageApp) SendTmplMsg(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error) {
-	return u.message.SendTmplMsg(ctx, param)
+func (u *messageApp) GetMissingUsers(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, []entity.User, error) {
+	return u.message.GetMissingUsers(ctx, param)
+}
+
+func (u *messageApp) SendTmplMsg(ctx context.Context, users []entity.User, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error) {
+	return u.message.SendTmplMsg(ctx, users, param)
 }
