@@ -31,6 +31,7 @@ var (
 	PassportBaseURL           = config.DefaultString("passport_base_url", "https://passport.nova.net.cn")
 	PassportOIDCIntrospectURL = config.DefaultString("passport_oidc_oauth2_introspect", PassportBaseURL+"/apis/v1/oidc/oauth2/introspect")
 
+	CaptchaRPCAddr       = config.DefaultString("captcha_rpc_addr", "captcha.common:80")
 	SmsRPCAddr           = config.DefaultString("sms_rpc_addr", "sms-xuanwu.misc-pub:80")
 	SmsContentTemplateCN = config.DefaultString("sms_content_template_cn", "南凌科技验证码：%s。尊敬的用户，您正在绑定手机号，切勿轻易将验证码告知他人！")
 

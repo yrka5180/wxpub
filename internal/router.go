@@ -97,6 +97,7 @@ func routerUser(router *gin.RouterGroup) {
 	{
 		userGroup.GET("", user.ListUser)
 		userGroup.GET("/:id", user.GetUser)
+		userGroup.GET("/captcha", user.GenCaptcha)
 	}
 }
 

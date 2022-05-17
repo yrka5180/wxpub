@@ -4,27 +4,26 @@ import (
 	"fmt"
 	"time"
 
-	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
-	"google.golang.org/grpc"
-
-	config2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
-
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/kafka"
-	"github.com/Shopify/sarama"
-
 	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/redis"
 
+	config2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
+	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
+	captchaPb "git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace"
+	"github.com/Shopify/sarama"
 	"github.com/go-redis/redis/v7"
 	_ "github.com/go-sql-driver/mysql" // for gorm
 	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 )
 
 type Repositories struct {
-	MQ            *kafka.MQ
-	DB            *gorm.DB
-	Redis         *redis.UniversalClient
-	SmsGRPCClient smsPb.SenderClient
+	MQ                *kafka.MQ
+	DB                *gorm.DB
+	Redis             *redis.UniversalClient
+	SmsGRPCClient     smsPb.SenderClient
+	CaptchaGRPCClient captchaPb.CaptchaServiceClient
 }
 
 type KafkaConfig struct {
@@ -46,7 +45,7 @@ const (
 
 var CommonRepositories Repositories
 
-func NewRepositories(KafkaConfig KafkaConfig, DBConfig DBConfig, redisAddresses []string, smsRPCAddr string, debugMode bool) error {
+func NewRepositories(KafkaConfig KafkaConfig, DBConfig DBConfig, redisAddresses []string, smsRPCAddr, captchaRPCAddr string, debugMode bool) error {
 	err := NewDBRepositories(DBConfig, debugMode)
 	if err != nil {
 		return err
@@ -63,6 +62,11 @@ func NewRepositories(KafkaConfig KafkaConfig, DBConfig DBConfig, redisAddresses 
 	if err != nil {
 		return err
 	}
+	err = NewCaptchaGRPCClientRepositories(captchaRPCAddr)
+	if err != nil {
+		return err
+	}
+
 	// persistence repo init
 	NewAkRepo()
 	NewMessageRepo(config2.KafkaTopics)
@@ -133,10 +137,22 @@ func NewRedisRepositories(addresses []string) error {
 func NewSmsGRPCClientRepositories(smsRPCAddr string) error {
 	smsConn, err := grpc.Dial(smsRPCAddr, grpc.WithInsecure())
 	if err != nil {
-		log.Errorf("failed to dial captcha grpc server: %v", err)
+		log.Errorf("failed to dial sms grpc server: %v", err)
 		return err
 	}
 	smsClient := smsPb.NewSenderClient(smsConn)
 	CommonRepositories.SmsGRPCClient = smsClient
+	return nil
+}
+
+func NewCaptchaGRPCClientRepositories(captchaRPCAddr string) error {
+	captchaConn, err := grpc.Dial(captchaRPCAddr, grpc.WithInsecure())
+	if err != nil {
+		log.Errorf("failed to dial captcha grpc server: %v", err)
+		return err
+	}
+
+	captchaClient := captchaPb.NewCaptchaServiceClient(captchaConn)
+	CommonRepositories.CaptchaGRPCClient = captchaClient
 	return nil
 }

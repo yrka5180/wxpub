@@ -19,6 +19,8 @@ type UserInterface interface {
 	GetUserByID(ctx context.Context, id int) (entity.User, error)
 	GetUserByOpenID(ctx context.Context, openID string) (entity.User, error)
 	SaveUser(ctx context.Context, user entity.User) error
+	GenCaptcha(ctx context.Context, width int32, height int32) (string, string, error)
+	VerifyCaptcha(ctx context.Context, captchaID string, captchaAnswer string) (bool, error)
 	SendSms(ctx context.Context, req entity.SendSmsReq) error
 	VerifySmsCode(ctx context.Context, req entity.VerifyCodeReq) (bool, bool, error)
 }
@@ -37,6 +39,14 @@ func (u *userApp) GetUserByOpenID(ctx context.Context, openID string) (entity.Us
 
 func (u *userApp) SaveUser(ctx context.Context, user entity.User) error {
 	return u.user.SaveUser(ctx, user)
+}
+
+func (u *userApp) GenCaptcha(ctx context.Context, width int32, height int32) (string, string, error) {
+	return u.user.GenCaptcha(ctx, width, height)
+}
+
+func (u *userApp) VerifyCaptcha(ctx context.Context, captchaID string, captchaAnswer string) (bool, error) {
+	return u.user.VerifyCaptcha(ctx, captchaID, captchaAnswer)
 }
 
 func (u *userApp) SendSms(ctx context.Context, req entity.SendSmsReq) error {

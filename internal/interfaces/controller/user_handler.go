@@ -66,6 +66,43 @@ func (u *User) GetUser(c *gin.Context) {
 	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, user)
 }
 
+func (u *User) GenCaptcha(c *gin.Context) {
+	ctx := middleware.DefaultTodoNovaContext(c)
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("%s", traceID)
+
+	resp := httputil.DefaultResponse()
+	defer httputil.HTTPJSONResponse(ctx, c, &resp)
+
+	width := c.DefaultQuery("width", strconv.Itoa(consts.CaptchaDefaultWidth))
+	w, err := strconv.ParseInt(width, 10, 64)
+	if err != nil {
+		log.Errorf("%s get width failed,err: %+v", traceID, err)
+		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, errors.GetErrorMessage(errors.CodeInternalServerError))
+		return
+	}
+	height := c.DefaultQuery("height", strconv.Itoa(consts.CaptchaDefaultHeight))
+	h, err := strconv.ParseInt(height, 10, 64)
+	if err != nil {
+		log.Errorf("%s get height failed,err: %+v", traceID, err)
+		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, errors.GetErrorMessage(errors.CodeInternalServerError))
+		return
+	}
+
+	captchaID, captchaBase64Value, err := u.user.GenCaptcha(ctx, int32(w), int32(h))
+	if err != nil {
+		log.Errorf("%s get captchaID and captchaBase64Value failed,err: %+v", traceID, err)
+		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, "get captchaID and captchaBase64Value failed")
+		return
+	}
+
+	CaptchaResp := entity.CaptchaResp{
+		CaptchaID:          captchaID,
+		CaptchaBase64Value: captchaBase64Value,
+	}
+	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, CaptchaResp)
+}
+
 func (u *User) SendSms(c *gin.Context) {
 	ctx := middleware.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
@@ -85,6 +122,18 @@ func (u *User) SendSms(c *gin.Context) {
 	if utils.VerifyMobilePhoneFormat(req.Phone) {
 		log.Errorf("invaild phone number: %s, traceID:%s", req.Phone, traceID)
 		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, errors.GetErrorMessage(errors.CodeInvalidParams))
+		return
+	}
+
+	ok, err := u.user.VerifyCaptcha(ctx, req.CaptchaID, req.CaptchaAnswer)
+	if err != nil {
+		log.Errorf("VerifyCaptcha failed, traceID:%s, err:%v", traceID, err)
+		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, errors.GetErrorMessage(errors.CodeInternalServerError))
+		return
+	}
+	if !ok {
+		log.Errorf("wrong captcha answer: %s, traceID:%s", req.CaptchaAnswer, traceID)
+		httputil.SetErrorResponse(&resp, errors.CodeForbidden, "wrong captcha answer")
 		return
 	}
 

@@ -12,11 +12,13 @@ import (
 
 	"git.nova.net.cn/nova/go-common/uuid"
 	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
+	captchaPb "git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace"
 	log "github.com/sirupsen/logrus"
 )
 
 type PhoneVerifyRepo struct {
-	smsGRPCClient smsPb.SenderClient
+	smsGRPCClient    smsPb.SenderClient
+	captchaRPCClient captchaPb.CaptchaServiceClient
 }
 
 var defaultPhoneVerifyRepo *PhoneVerifyRepo
@@ -24,13 +26,51 @@ var defaultPhoneVerifyRepo *PhoneVerifyRepo
 func NewPhoneVerifyRepo() {
 	if defaultPhoneVerifyRepo == nil {
 		defaultPhoneVerifyRepo = &PhoneVerifyRepo{
-			smsGRPCClient: CommonRepositories.SmsGRPCClient,
+			smsGRPCClient:    CommonRepositories.SmsGRPCClient,
+			captchaRPCClient: CommonRepositories.CaptchaGRPCClient,
 		}
 	}
 }
 
 func DefaultPhoneVerifyRepo() *PhoneVerifyRepo {
 	return defaultPhoneVerifyRepo
+}
+
+func (r *PhoneVerifyRepo) GenCaptcha(ctx context.Context, width int32, height int32) (captchaID, captchaBase64Value string, err error) {
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("GenCaptcha traceID:%s", traceID)
+
+	rpcResp, err := r.captchaRPCClient.Get(ctx, &captchaPb.GetCaptchaRequest{
+		Width:           width,
+		Height:          height,
+		NoiseCount:      10,
+		ShowLineOptions: 2,
+	})
+	if err != nil {
+		log.Errorf("GenCaptcha get captcha error: %v, traceID: %s", err, traceID)
+		return
+	}
+
+	captchaID = rpcResp.GetID()
+	captchaBase64Value = rpcResp.GetBase64Value()
+	return
+}
+
+func (r *PhoneVerifyRepo) VerifyCaptcha(ctx context.Context, captchaID string, captchaAnswer string) (ok bool, err error) {
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("VerifyCaptcha traceID:%s", traceID)
+
+	rpcResp, err := r.captchaRPCClient.Verify(ctx, &captchaPb.VerifyCaptchaRequest{
+		ID:     captchaID,
+		Answer: captchaAnswer,
+	})
+	if err != nil {
+		log.Errorf("VerifyCaptcha Verify error: %v, traceID: %s", err, traceID)
+		return
+	}
+
+	ok = rpcResp.GetData()
+	return
 }
 
 func (r *PhoneVerifyRepo) SendSms(ctx context.Context, content string, sender string, phone string) (err error) {

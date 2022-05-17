@@ -40,6 +40,8 @@ git.nova.net.cn/nova/go-common/uuid v0.0.0-20220331073514-eaa8a56c82fc h1:SVCrsh
 git.nova.net.cn/nova/go-common/uuid v0.0.0-20220331073514-eaa8a56c82fc/go.mod h1:tKNlzdKEeUAXt68DEaKSGdA8z0Kyw9hdghm7QAFoCsQ=
 git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace v0.0.0-20210406140908-c976b41ebd96 h1:T+kubedooQAg+ASsSZmssk58fCNu34tonmErCy8Lc9Y=
 git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace v0.0.0-20210406140908-c976b41ebd96/go.mod h1:mbAPxFNeZPt/7AQse6yVMXxwDg5RctOEjX1Fr0X6S7U=
+git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace v0.0.0-20210406140912-7c6267b0a662 h1:7K/dw3StFtseENHoTrBYCuRDmJi3ZTjBRi/2FEoGsc0=
+git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace v0.0.0-20210406140912-7c6267b0a662/go.mod h1:+Dnx+p4faIo2weQ42Noir36OWodWIU/QkKwlJF5xKGU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=

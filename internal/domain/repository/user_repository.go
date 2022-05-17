@@ -48,6 +48,14 @@ func (a *UserRepository) SaveUser(ctx context.Context, user entity.User) error {
 	return a.user.SaveUser(ctx, user)
 }
 
+func (a *UserRepository) GenCaptcha(ctx context.Context, width int32, height int32) (string, string, error) {
+	return a.phoneVerify.GenCaptcha(ctx, width, height)
+}
+
+func (a *UserRepository) VerifyCaptcha(ctx context.Context, captchaID string, captchaAnswer string) (bool, error) {
+	return a.phoneVerify.VerifyCaptcha(ctx, captchaID, captchaAnswer)
+}
+
 func (a *UserRepository) SendSms(ctx context.Context, req entity.SendSmsReq) error {
 	verifyCodeID, verifyCodeAnswer := utils.GenVerifySmsCode()
 	err := a.phoneVerify.SetVerifyCodeSmsStorage(ctx, req.OpenID, verifyCodeID, verifyCodeAnswer)

@@ -33,6 +33,9 @@ const (
 	Token = "nova"
 
 	SmsSender = "nova-wxpublic-proxy"
+
+	CaptchaDefaultWidth  = 150
+	CaptchaDefaultHeight = 50
 )
 
 const (

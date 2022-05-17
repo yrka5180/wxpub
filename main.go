@@ -85,7 +85,7 @@ func InitService() {
 		Topics:          config.KafkaTopics,
 		KafkaVersion:    config.KafkaVersion,
 	}
-	err := persistence.NewRepositories(kafkaConf, dbConf, config.RedisAddresses, config.SmsRPCAddr, debugMode)
+	err := persistence.NewRepositories(kafkaConf, dbConf, config.RedisAddresses, config.SmsRPCAddr, config.CaptchaRPCAddr, debugMode)
 	if err != nil {
 		panic(err)
 	}
