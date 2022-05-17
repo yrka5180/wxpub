@@ -40,7 +40,8 @@ func (r *PhoneVerifyRepo) GenCaptcha(ctx context.Context, width int32, height in
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("GenCaptcha traceID:%s", traceID)
 
-	rpcResp, err := r.captchaRPCClient.Get(ctx, &captchaPb.GetCaptchaRequest{
+	c := utils.ToOutGoingContext(ctx)
+	rpcResp, err := r.captchaRPCClient.Get(c, &captchaPb.GetCaptchaRequest{
 		Width:           width,
 		Height:          height,
 		NoiseCount:      10,
@@ -60,7 +61,8 @@ func (r *PhoneVerifyRepo) VerifyCaptcha(ctx context.Context, captchaID string, c
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("VerifyCaptcha traceID:%s", traceID)
 
-	rpcResp, err := r.captchaRPCClient.Verify(ctx, &captchaPb.VerifyCaptchaRequest{
+	c := utils.ToOutGoingContext(ctx)
+	rpcResp, err := r.captchaRPCClient.Verify(c, &captchaPb.VerifyCaptchaRequest{
 		ID:     captchaID,
 		Answer: captchaAnswer,
 	})
@@ -77,8 +79,9 @@ func (r *PhoneVerifyRepo) SendSms(ctx context.Context, content string, sender st
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("SendSms traceID:%s", traceID)
 
+	c := utils.ToOutGoingContext(ctx)
 	// 发短信是调用的第三方的服务，计费使用
-	_, err = r.smsGRPCClient.SendMessage(ctx, &smsPb.SendMsgRequest{
+	_, err = r.smsGRPCClient.SendMessage(c, &smsPb.SendMsgRequest{
 		Content: content,
 		Sender:  sender,
 		Items: []*smsPb.SendMsgRequest_Item{

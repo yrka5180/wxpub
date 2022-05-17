@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"strconv"
 
+	"google.golang.org/grpc/metadata"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 
 	"github.com/google/uuid"
@@ -55,4 +57,13 @@ func VerifyMobilePhoneFormat(phone string) bool {
 
 	reg := regexp.MustCompile(regular)
 	return reg.MatchString(phone)
+}
+
+func ToOutGoingContext(c context.Context) (out context.Context) {
+	data := make(map[string]string)
+	data[consts.HTTPTraceIDHeader] = ShouldGetTraceID(c)
+
+	md := metadata.New(data)
+	out = metadata.NewOutgoingContext(c, md)
+	return
 }

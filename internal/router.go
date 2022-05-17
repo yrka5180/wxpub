@@ -78,6 +78,7 @@ func routerVerify(router *gin.RouterGroup) {
 	{
 		smsProfileGroup.GET("/send-sms", user.SendSms)
 		smsProfileGroup.POST("/verify-sms", user.VerifyAndUpdatePhone)
+		smsProfileGroup.GET("/captcha", user.GenCaptcha)
 	}
 }
 
@@ -97,7 +98,6 @@ func routerUser(router *gin.RouterGroup) {
 	{
 		userGroup.GET("", user.ListUser)
 		userGroup.GET("/:id", user.GetUser)
-		userGroup.GET("/captcha", user.GenCaptcha)
 	}
 }
 
