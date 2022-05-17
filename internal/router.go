@@ -44,7 +44,7 @@ func Run() *gin.Engine {
 
 func initRouter(router *gin.Engine) {
 	open := router.Group("")
-	// wx open api
+	// wx api
 	routerWX(open)
 	// user info verify and binding
 	routerVerify(open)
