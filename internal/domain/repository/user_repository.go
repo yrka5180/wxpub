@@ -44,8 +44,8 @@ func (a *UserRepository) GetUserByOpenID(ctx context.Context, openID string) (en
 	return a.user.GetUserByOpenID(ctx, openID)
 }
 
-func (a *UserRepository) SaveUser(ctx context.Context, user entity.User) error {
-	return a.user.SaveUser(ctx, user)
+func (a *UserRepository) SaveUser(ctx context.Context, user entity.User, isUpdateAll bool) error {
+	return a.user.SaveUser(ctx, user, isUpdateAll)
 }
 
 func (a *UserRepository) GenCaptcha(ctx context.Context, width int32, height int32) (string, string, error) {
@@ -57,8 +57,8 @@ func (a *UserRepository) VerifyCaptcha(ctx context.Context, captchaID string, ca
 }
 
 func (a *UserRepository) SendSms(ctx context.Context, req entity.SendSmsReq) error {
-	verifyCodeID, verifyCodeAnswer := utils.GenVerifySmsCode()
-	err := a.phoneVerify.SetVerifyCodeSmsStorage(ctx, req.OpenID, verifyCodeID, verifyCodeAnswer)
+	verifyCodeAnswer := utils.GenVerifySmsCode()
+	err := a.phoneVerify.SetVerifyCodeSmsStorage(ctx, req.OpenID+req.Phone, verifyCodeAnswer)
 	if err != nil {
 		return err
 	}
@@ -69,5 +69,5 @@ func (a *UserRepository) SendSms(ctx context.Context, req entity.SendSmsReq) err
 }
 
 func (a *UserRepository) VerifySmsCode(ctx context.Context, req entity.VerifyCodeReq) (bool, bool, error) {
-	return a.phoneVerify.VerifySmsCode(ctx, req.OpenID, consts.RedisKeyVerifyCodeSmsID, req.VerifyCode, consts.RedisAuthTTL)
+	return a.phoneVerify.VerifySmsCode(ctx, req.OpenID+req.Phone, req.VerifyCode, consts.RedisAuthTTL)
 }

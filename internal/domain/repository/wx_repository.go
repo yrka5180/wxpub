@@ -113,7 +113,7 @@ func (a *WXRepository) handlerSubscribeEvent(ctx context.Context, reqBody *entit
 		CreateTime: reqBody.CreateTime,
 		DeleteTime: 0,
 	}
-	err = a.user.SaveUser(ctx, u)
+	err = a.user.SaveUser(ctx, u, false)
 	if err != nil {
 		log.Errorf("handlerSubscribeEvent WXRepository wx repo SaveUser traceID:%s,err:%v", traceID, err)
 		return "", err

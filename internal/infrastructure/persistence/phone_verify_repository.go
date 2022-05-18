@@ -98,7 +98,7 @@ func (r *PhoneVerifyRepo) SendSms(ctx context.Context, content string, sender st
 	return
 }
 
-func (r *PhoneVerifyRepo) SetVerifyCodeSmsStorage(ctx context.Context, openID string, verifyCodeID string, verifyCodeAnswer string) (err error) {
+func (r *PhoneVerifyRepo) SetVerifyCodeSmsStorage(ctx context.Context, challenge string, verifyCodeAnswer string) (err error) {
 	var verifyCodeSmsRedisValue entity.VerifyCodeRedisValue
 
 	traceID := utils.ShouldGetTraceID(ctx)
@@ -110,31 +110,17 @@ func (r *PhoneVerifyRepo) SetVerifyCodeSmsStorage(ctx context.Context, openID st
 
 	smsRedisValue, _ := json.Marshal(verifyCodeSmsRedisValue)
 
-	// 使用pipeline进行原子操作
-	pipe := redis.RClient.TxPipeline()
-	// redis存放verifyCodeID:{verifyCodeAnswer,smsCreateTime}到相应的challenge的hashset上
-	err = pipe.HSet(consts.RedisKeyPrefixChallenge+openID, consts.RedisKeyPrefixSms+verifyCodeID, smsRedisValue).Err()
+	// redis存放verifyCodeID:{verifyCodeAnswer,smsCreateTime}到相应的challenge的hashset上，过期时间为30分钟
+	err = redis.RSet(consts.RedisKeyPrefixChallenge+challenge, smsRedisValue, consts.VerifyCodeSmsChallengeTTL)
 	if err != nil {
-		log.Errorf("failed to do redis HSet, error: %+v, traceID: %s", err, traceID)
+		log.Errorf("failed to do redis Set, error: %+v, traceID: %s", err, traceID)
 		return
-	}
-
-	// 更新当前challenge的key过期时间为30分钟，30分钟不执行验证短信验证码操作就无法绑定手机号，即为30分钟内可以重发短信验证码
-	err = pipe.Expire(consts.RedisKeyPrefixChallenge+openID, consts.VerifyCodeSmsChallengeTTL).Err()
-	if err != nil {
-		log.Errorf("failed to do redis SetExpireTime, error: %+v, traceID: %s", err, traceID)
-		return
-	}
-
-	_, err = pipe.Exec()
-	if err != nil {
-		log.Errorf("failed to exec redis pipeline, error: %+v, traceID: %s", err, traceID)
 	}
 
 	return
 }
 
-func (r *PhoneVerifyRepo) VerifySmsCode(ctx context.Context, openID string, verifyCodeID, verifyCodeAnswer string, ttl int64) (ok, isExpire bool, err error) {
+func (r *PhoneVerifyRepo) VerifySmsCode(ctx context.Context, challenge, verifyCodeAnswer string, ttl int64) (ok, isExpire bool, err error) {
 	var value []byte
 	var verifyCodeValue entity.VerifyCodeRedisValue
 	ok = false
@@ -144,7 +130,7 @@ func (r *PhoneVerifyRepo) VerifySmsCode(ctx context.Context, openID string, veri
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("VerifySmsCode traceID:%s", traceID)
 
-	value, err = redis.RClient.HGet(consts.RedisKeyPrefixChallenge+openID, consts.RedisKeyPrefixSms+verifyCodeID).Bytes()
+	value, err = redis.RGet(consts.RedisKeyPrefixChallenge + challenge)
 	if err != nil {
 		log.Errorf("failed to do redis HGet, error: %+v, traceID: %s", err, traceID)
 		return

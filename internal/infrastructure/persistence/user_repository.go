@@ -62,7 +62,7 @@ func (a *UserRepo) IsExistUserFromDB(ctx context.Context, fromUserName string) (
 	return true, nil
 }
 
-func (a *UserRepo) SaveUser(ctx context.Context, user entity.User) error {
+func (a *UserRepo) SaveUser(ctx context.Context, user entity.User, isUpdateAll bool) error {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("SaveUser traceID:%s", traceID)
 	// 先查看是否有这用户，如果没有则创建，否则将创建时间和删除时间更新
@@ -77,10 +77,17 @@ func (a *UserRepo) SaveUser(ctx context.Context, user entity.User) error {
 			return err
 		}
 	}
-	if err = a.UpdateUser(ctx, user); err != nil {
-		log.Errorf("SaveUser UpdateUser failed,traceID:%s,err:%v", traceID, err)
+
+	if !isUpdateAll {
+		err = a.UpdateUserTime(ctx, user)
+	} else {
+		err = a.DB.Model(&entity.User{}).Where("open_id=?", user.OpenID).Update(&user).Error
+	}
+	if err != nil {
+		log.Errorf("SaveUser UpdateUser failed, traceID: %s,err: %v", traceID, err)
 		return err
 	}
+
 	return nil
 }
 
@@ -95,14 +102,14 @@ func (a *UserRepo) DelUser(ctx context.Context, user entity.User) error {
 	return nil
 }
 
-func (a *UserRepo) UpdateUser(ctx context.Context, user entity.User) error {
+func (a *UserRepo) UpdateUserTime(ctx context.Context, user entity.User) error {
 	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("UpdateUser traceID:%s", traceID)
+	log.Debugf("UpdateUserTime traceID:%s", traceID)
 	if err := a.DB.Model(&entity.User{}).Where("open_id = ?", user.OpenID).Updates(map[string]interface{}{
 		"create_time": user.CreateTime,
 		"delete_time": user.DeleteTime,
 	}).Error; err != nil {
-		log.Errorf("UpdateUser update user failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("UpdateUserTime update user failed,traceID:%s,err:%v", traceID, err)
 		return err
 	}
 	return nil
@@ -132,7 +139,7 @@ func (a *UserRepo) GetUserByOpenID(ctx context.Context, openID string) (user ent
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("GetUserByID traceID:%s", traceID)
 	if err = a.DB.Where("open_id = ?", openID).First(&user).Error; err != nil {
-		log.Errorf("GetUserByID get user by id failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("GetUserByOpenID get user by open_id failed,traceID: %s, err: %v", traceID, err)
 		return
 	}
 	return

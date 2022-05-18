@@ -39,7 +39,7 @@ const (
 )
 
 const (
-	Module               = "git.nova.net.cn/nova/misc/wx-public/proxy"
+	Module               = "wx-public-proxy"
 	DLockPrefix          = "__dlock-"
 	RedisKeyAccessToken  = Module + "-access_token"
 	RedisLockAccessToken = DLockPrefix + RedisKeyAccessToken

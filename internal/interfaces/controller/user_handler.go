@@ -156,11 +156,7 @@ func (u *User) SendSms(c *gin.Context) {
 		return
 	}
 
-	ret := entity.SendSmsResp{
-		OpenID:       req.OpenID,
-		VerifyCodeID: consts.RedisKeyVerifyCodeSmsID,
-	}
-	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, ret)
+	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, nil)
 }
 
 func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
@@ -196,7 +192,7 @@ func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
 		httputil.SetErrorResponse(&resp, errors.CodeForbidden, errors.GetErrorMessage(errors.CodeForbidden))
 		return
 	}
-	if !isExpire {
+	if isExpire {
 		log.Errorf("sms code is expired, code: %s, traceID: %s", req.VerifyCode, traceID)
 		httputil.SetErrorResponse(&resp, errors.CodeTokenExpire, errors.GetErrorMessage(errors.CodeTokenExpire))
 		return
@@ -211,7 +207,7 @@ func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
 
 	user.Phone = req.Phone
 	user.Name = req.Name
-	err = u.user.SaveUser(ctx, user)
+	err = u.user.SaveUser(ctx, user, true)
 	if err != nil {
 		log.Errorf("VerifyAndUpdatePhone update user error: %v, traceID: %s", err, traceID)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())

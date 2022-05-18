@@ -45,8 +45,7 @@ func Sha1(str string) string {
 }
 
 // GenVerifySmsCode 生成随机短信验证码
-func GenVerifySmsCode() (verifyCodeID string, verifyCodeAnswer string) {
-	verifyCodeID = consts.RedisKeyVerifyCodeSmsID
+func GenVerifySmsCode() (verifyCodeAnswer string) {
 	verifyCodeAnswer = strconv.Itoa(rand.Intn(900000) + 1e5)
 	return
 }
