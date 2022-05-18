@@ -96,6 +96,38 @@
           }
         }
       }
+    },
+    "/user": {
+      "get": {
+        "description": "description: 获取用户列表",
+        "tags": [
+          "用户管理"
+        ],
+        "operationId": "ListUser",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/APIListUser"
+          },
+          "400": {
+            "$ref": "#/responses/badRequest"
+          },
+          "401": {
+            "$ref": "#/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/notfound"
+          },
+          "409": {
+            "$ref": "#/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/responses/serverError"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -113,10 +145,58 @@
     "SendTmplMsgResp": {
       "type": "object",
       "properties": {
+        "failure_send_phones": {
+          "description": "发送失败手机号",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "FailureSendPhones"
+        },
         "msg": {
           "description": "发送状态",
           "type": "string",
           "x-go-name": "Msg"
+        }
+      },
+      "x-go-package": "git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
+    },
+    "User": {
+      "description": "User 用户表",
+      "type": "object",
+      "properties": {
+        "create_time": {
+          "description": "创建时间",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "CreateTime"
+        },
+        "delete_time": {
+          "description": "删除时间",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "DeleteTime"
+        },
+        "id": {
+          "description": "主键ID",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ID"
+        },
+        "name": {
+          "description": "用户名",
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "open_id": {
+          "description": "用户open id",
+          "type": "string",
+          "x-go-name": "OpenID"
+        },
+        "phone": {
+          "description": "联系号码",
+          "type": "string",
+          "x-go-name": "Phone"
         }
       },
       "x-go-package": "git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
@@ -133,6 +213,15 @@
       "description": "",
       "schema": {
         "$ref": "#/definitions/SendTmplMsgResp"
+      }
+    },
+    "ListUser": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/User"
+        }
       }
     },
     "badRequest": {
