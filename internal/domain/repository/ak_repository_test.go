@@ -1,11 +1,12 @@
 package repository
 
 import (
-	"bou.ke/monkey"
 	"context"
+	"testing"
+
+	"bou.ke/monkey"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
 	. "github.com/smartystreets/goconvey/convey"
-	"testing"
 )
 
 func TestAccessTokenRepository_GetAccessToken(t *testing.T) {
