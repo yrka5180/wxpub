@@ -89,7 +89,7 @@
             "$ref": "#/responses/notfound"
           },
           "409": {
-            "$ref": "#/responses/conflict"
+            "$ref": "#/responses/APISendTmplMessage"
           },
           "500": {
             "$ref": "#/responses/serverError"
