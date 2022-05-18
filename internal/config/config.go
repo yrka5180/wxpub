@@ -40,10 +40,10 @@ var (
 	WXMsgTmplSendURL = config.DefaultString("wx_msg_tmpl_send_url", WXBaseURL+"/cgi-bin/message/template/send")
 
 	RedisAddresses   []string
-	AppID            = config.MustString("app_id")
-	AppSecret        = config.MustString("app_secret")
-	TmplMsgID        = config.MustString("tmpl_msg_id")
-	VerifyProfileURL = config.MustString("verify_profile_url")
+	AppID            string
+	AppSecret        string
+	TmplMsgID        string
+	VerifyProfileURL string
 )
 
 func Init() {
@@ -63,4 +63,9 @@ func Init() {
 
 	// InternalAPISecret = config.MustString("internal_api_secret")
 	RedisAddresses = strings.Split(config.MustString("redis_addresses"), ",")
+
+	AppID = config.MustString("app_id")
+	AppSecret = config.MustString("app_secret")
+	TmplMsgID = config.MustString("tmpl_msg_id")
+	VerifyProfileURL = config.MustString("verify_profile_url")
 }

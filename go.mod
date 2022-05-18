@@ -3,6 +3,7 @@ module git.nova.net.cn/nova/misc/wx-public/proxy
 go 1.17
 
 require (
+	bou.ke/monkey v1.0.2
 	git.nova.net.cn/nova/go-common/config2 v0.0.0-20220331073514-eaa8a56c82fc
 	git.nova.net.cn/nova/go-common/logrus-extra v0.0.0-20220331073514-eaa8a56c82fc
 	git.nova.net.cn/nova/go-common/uuid v0.0.0-20220331073514-eaa8a56c82fc
@@ -16,6 +17,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
+	github.com/smartystreets/goconvey v1.6.4
 	google.golang.org/grpc v1.36.1
 )
 
@@ -30,6 +32,7 @@ require (
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.3.0 // indirect
 	github.com/hashicorp/go-uuid v1.0.2 // indirect
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible // indirect
@@ -40,6 +43,7 @@ require (
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
+	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/klauspost/compress v1.14.4 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
@@ -47,6 +51,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
+	github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
