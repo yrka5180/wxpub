@@ -209,19 +209,19 @@
         "$ref": "#/definitions/GetAccessTokenResp"
       }
     },
-    "APISendTmplMessage": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/SendTmplMsgResp"
-      }
-    },
-    "ListUser": {
+    "APIListUser": {
       "description": "",
       "schema": {
         "type": "array",
         "items": {
           "$ref": "#/definitions/User"
         }
+      }
+    },
+    "APISendTmplMessage": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/SendTmplMsgResp"
       }
     },
     "badRequest": {

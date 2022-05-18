@@ -19,3 +19,8 @@ type User struct {
 func (u User) TableName() string {
 	return "user"
 }
+
+//
+// type ListUserResp struct {
+// 	Users []User `json:"users"`
+// }
