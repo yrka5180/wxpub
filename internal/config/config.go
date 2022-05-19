@@ -46,7 +46,7 @@ var (
 	VerifyProfileURL string
 )
 
-func init() {
+func Init() {
 	DBHost = config.MustString("db_host")
 	DBUser = config.MustString("db_user")
 	DBPassword = config.MustString("db_password")

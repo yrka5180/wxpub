@@ -26,8 +26,11 @@ var (
 )
 
 func main() {
+	config.Init()
 	extra.Default(config.LogLevel)
 	globalCtx, globalCancel = context.WithCancel(context.Background())
+	// init
+	InitService()
 	tasks.ConsumerTask(globalCtx)
 
 	engine := internal.Run()
@@ -65,7 +68,7 @@ func gracefulShutdown(srv *http.Server) {
 	log.Infoln("Server exiting")
 }
 
-func init() {
+func InitService() {
 	debugMode := config.SMode == consts.ServerModeDebug
 	dbConf := persistence.DBConfig{
 		DBUser:      config.DBUser,
