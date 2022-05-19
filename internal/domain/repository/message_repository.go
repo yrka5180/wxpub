@@ -96,7 +96,7 @@ func (t *MessageRepository) SendTmplMsg(ctx context.Context, users []entity.User
 				log.Errorf("SendTmplMsg SendTmplMsgToMQ failed,param is %s,traceID:%s,err:%v", string(bs), traceID, err)
 				return
 			}
-			log.Debugf("send msg success,msg is %v", string(bs))
+			log.Infof("send msg success,msg is %v", string(bs))
 		}(idx)
 	}
 	wg.Wait()

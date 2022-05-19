@@ -97,17 +97,6 @@ func (r *SendTmplMsgReq) TransferPerSendTmplMsg(toUser string) SendTmplMsgRemote
 	}
 }
 
-func (r *SendTmplMsgRemoteReq) TransferSendRetryMsgLog(errMsg string, sendCreateTime int64) FailureMsgLog {
-	return FailureMsgLog{
-		ToUser:     r.ToUser,
-		TemplateID: r.TemplateID,
-		Content:    r.Data,
-		Cause:      errMsg,
-		Status:     consts.SendRetry,
-		CreateTime: sendCreateTime,
-	}
-}
-
 func (f *FailureMsgLog) TransferSendTmplMsgRemoteReq() SendTmplMsgRemoteReq {
 	return SendTmplMsgRemoteReq{
 		ToUser:     f.ToUser,
@@ -122,5 +111,18 @@ func (r SendTmplMsgRemoteReq) TransferKafkaTmplReq(sendMsgID string) KafkaTmplMs
 		SendMsgID:            sendMsgID,
 		AcceptedTime:         time.Now().Unix(),
 		FailureCount:         1,
+	}
+}
+
+func (k KafkaTmplMsg) TransferFailureMsgLog(errMsg string, sendCreateTime int64) FailureMsgLog {
+	return FailureMsgLog{
+		SendMsgID:  k.SendMsgID,
+		ToUser:     k.ToUser,
+		TemplateID: k.TemplateID,
+		Content:    k.Data,
+		Cause:      errMsg,
+		Status:     consts.SendRetry,
+		Count:      k.FailureCount,
+		CreateTime: sendCreateTime,
 	}
 }

@@ -115,7 +115,7 @@ func handleMsg(ctx context.Context) {
 			log.Debugf("recv msg is %s", msg)
 			// 失败次数判断，状态重试
 			item, err := validKafkaTmplMsg(msg)
-			log.Debugf("item is %v", item)
+			log.Infof("item is %v", item)
 			if err != nil {
 				continue
 			}
@@ -127,7 +127,7 @@ func handleMsg(ctx context.Context) {
 				var failureMsg entity.FailureMsgLog
 				// 发送时间
 				sendCreateTime := time.Now().Unix()
-				failureMsg = item.SendTmplMsgRemoteReq.TransferSendRetryMsgLog("", sendCreateTime)
+				failureMsg = item.TransferFailureMsgLog("", sendCreateTime)
 				failureCount := item.FailureCount
 
 				// 获取access token
@@ -137,7 +137,7 @@ func handleMsg(ctx context.Context) {
 				resp, err = msgRepo.SendTmplMsgFromRequest(ctx, item.SendTmplMsgRemoteReq)
 				if err != nil {
 					// 记录当前错误状态为重试中
-					failureMsg = item.SendTmplMsgRemoteReq.TransferSendRetryMsgLog(err.Error(), sendCreateTime)
+					failureMsg = item.TransferFailureMsgLog(err.Error(), sendCreateTime)
 					// 回写
 					retryToQueue(item)
 				}
