@@ -18,10 +18,10 @@ type SendTmplMsgReq struct {
 }
 
 type SendTmplMsgResp struct {
+	// 发送消息id
+	SendMsgID string `json:"send_msg_id"`
 	// 发送失败手机号
 	FailureSendPhones []string `json:"failure_send_phones"`
-	// 发送状态
-	Msg string `json:"msg"`
 }
 
 type SendTmplMsgRemoteReq struct {
@@ -42,6 +42,8 @@ type SendTmplMsgRemoteResp struct {
 
 type KafkaTmplMsg struct {
 	SendTmplMsgRemoteReq
+	// 发送消息id
+	SendMsgID string `json:"send_msg_id"`
 	// 接收消息时间
 	AcceptedTime int64 `json:"accepted_time"`
 	// 处理失败次数
@@ -51,7 +53,9 @@ type KafkaTmplMsg struct {
 // FailureMsgLog 消息发送失败日志表
 type FailureMsgLog struct {
 	ID int `json:"id" gorm:"id"`
-	// 消息id
+	// 发送消息id
+	SendMsgID string `json:"send_msg_id" gorm:"send_msg_id"`
+	// 微信回调消息id
 	MsgID int64 `json:"msg_id" gorm:"msg_id"`
 	// 接收者openid
 	ToUser string `json:"to_user" gorm:"to_user"`
@@ -112,9 +116,10 @@ func (f *FailureMsgLog) TransferSendTmplMsgRemoteReq() SendTmplMsgRemoteReq {
 	}
 }
 
-func (r SendTmplMsgRemoteReq) TransferKafkaTmplReq() KafkaTmplMsg {
+func (r SendTmplMsgRemoteReq) TransferKafkaTmplReq(sendMsgID string) KafkaTmplMsg {
 	return KafkaTmplMsg{
 		SendTmplMsgRemoteReq: r,
+		SendMsgID:            sendMsgID,
 		AcceptedTime:         time.Now().Unix(),
 		FailureCount:         1,
 	}

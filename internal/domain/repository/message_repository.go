@@ -43,7 +43,7 @@ func (t *MessageRepository) GetMissingUsers(ctx context.Context, param entity.Se
 	users, err := t.user.ListUserByPhones(ctx, param.ToUsersPhone)
 	if err != nil {
 		log.Errorf("SendTmplMsg UserRepo ListUserByPhones failed,traceID:%s,err:%v", traceID, err)
-		return entity.SendTmplMsgResp{Msg: "system failed"}, nil, err
+		return entity.SendTmplMsgResp{}, nil, err
 	}
 	userPhoneMap := make(map[string]struct{})
 	for _, user := range users {
@@ -57,7 +57,6 @@ func (t *MessageRepository) GetMissingUsers(ctx context.Context, param entity.Se
 		}
 	}
 	if len(resp.FailureSendPhones) > 0 {
-		resp.Msg = "phones have partial not found in request"
 		return resp, nil, errors.NewCustomError(nil, errors.CodeResourcesPartialNotFound, errors.GetErrorMessage(errors.CodeResourcesPartialNotFound))
 	}
 	return resp, users, nil
@@ -66,7 +65,14 @@ func (t *MessageRepository) GetMissingUsers(ctx context.Context, param entity.Se
 func (t *MessageRepository) SendTmplMsg(ctx context.Context, users []entity.User, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("SendTmplMsg traceID:%s", traceID)
+	var resp entity.SendTmplMsgResp
 	var err error
+	sendMsgID, err := utils.GetUUID()
+	if err != nil {
+		log.Errorf("SendTmplMsg MessageRepository GetUUID failed,traceID:%s,err:%v", traceID, err)
+		return resp, err
+	}
+	resp.SendMsgID = sendMsgID
 	wg := new(sync.WaitGroup)
 	// 批量写入到kafka做消息推送
 	ch := make(chan struct{}, 100)
@@ -80,7 +86,7 @@ func (t *MessageRepository) SendTmplMsg(ctx context.Context, users []entity.User
 				<-ch
 			}()
 			var bs []byte
-			bs, err = json.Marshal(param.TransferPerSendTmplMsg(users[idx].OpenID).TransferKafkaTmplReq())
+			bs, err = json.Marshal(param.TransferPerSendTmplMsg(users[idx].OpenID).TransferKafkaTmplReq(sendMsgID))
 			if err != nil {
 				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent json marshal tmpl msg failed,traceID:%s,err:%v", traceID, err)
 				return
@@ -90,9 +96,9 @@ func (t *MessageRepository) SendTmplMsg(ctx context.Context, users []entity.User
 				log.Errorf("SendTmplMsg SendTmplMsgToMQ failed,param is %s,traceID:%s,err:%v", string(bs), traceID, err)
 				return
 			}
-			log.Info("send msg success")
+			log.Debugf("send msg success,msg is %v", string(bs))
 		}(idx)
 	}
 	wg.Wait()
-	return entity.SendTmplMsgResp{Msg: "success"}, nil
+	return resp, nil
 }

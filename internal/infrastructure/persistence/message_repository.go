@@ -135,7 +135,7 @@ func (a *MessageRepo) GetMaxCountFailureMsgByMsgID(ctx context.Context, msgID in
 	var m entity.FailureMsgLog
 	err := a.DB.Where("msg_id = ?", msgID).Order("`count` DESC").First(&m).Error
 	if err != nil {
-		log.Errorf("GetMaxCountFailureMsgByMsgID failed to get max count,traceID:%s,err:%v", traceID, err)
+		log.Errorf("GetMaxCountFailureMsgByMsgID failed to get max count,msgID:%d,traceID:%s,err:%v", msgID, traceID, err)
 		return entity.FailureMsgLog{}, err
 	}
 	return m, err

@@ -115,19 +115,21 @@ func handleMsg(ctx context.Context) {
 			log.Debugf("recv msg is %s", msg)
 			// 失败次数判断，状态重试
 			item, err := validKafkaTmplMsg(msg)
+			log.Debugf("item is %v", item)
 			if err != nil {
 				continue
 			}
 			g.Add(1)
-			go func() {
+			go func(item entity.KafkaTmplMsg) {
 				defer g.Done()
 				// 业务处理
 				var resp entity.SendTmplMsgRemoteResp
 				var failureMsg entity.FailureMsgLog
 				// 发送时间
 				sendCreateTime := time.Now().Unix()
-				failureMsg = item.TransferSendRetryMsgLog("", sendCreateTime)
-				failureMsg.Count = item.FailureCount
+				failureMsg = item.SendTmplMsgRemoteReq.TransferSendRetryMsgLog("", sendCreateTime)
+				failureCount := item.FailureCount
+
 				// 获取access token
 				var ak string
 				ak, err = akRepository.GetAccessToken(ctx)
@@ -135,18 +137,20 @@ func handleMsg(ctx context.Context) {
 				resp, err = msgRepo.SendTmplMsgFromRequest(ctx, item.SendTmplMsgRemoteReq)
 				if err != nil {
 					// 记录当前错误状态为重试中
-					failureMsg = item.TransferSendRetryMsgLog(err.Error(), sendCreateTime)
+					failureMsg = item.SendTmplMsgRemoteReq.TransferSendRetryMsgLog(err.Error(), sendCreateTime)
 					// 回写
-					retryToQueue(&item)
+					retryToQueue(item)
 				}
+				failureMsg.SendMsgID = item.SendMsgID
+				failureMsg.Count = failureCount
 				failureMsg.MsgID = resp.MsgID
-				log.Debugf("resp msg id is %v", resp.MsgID)
+				log.Debugf("failure msg is %v,item.FailureCount is %d", failureMsg, item.FailureCount)
 				err = msgRepo.SaveFailureMsgLog(context.TODO(), failureMsg)
 				if err != nil {
 					log.Errorf("handleMsg SaveFailureMsgLog failed,err:%v", err)
 				}
 				log.Debugf("consumer msg success,msg is %v", msg)
-			}()
+			}(item)
 		}
 	}
 }
@@ -175,7 +179,7 @@ func validKafkaTmplMsg(m string) (entity.KafkaTmplMsg, error) {
 }
 
 // 消费失败重写回队列
-func retryToQueue(msg *entity.KafkaTmplMsg) {
+func retryToQueue(msg entity.KafkaTmplMsg) {
 	msg.FailureCount++
 	msg.AcceptedTime = time.Now().Unix()
 	body, err := json.Marshal(msg)
@@ -187,4 +191,5 @@ func retryToQueue(msg *entity.KafkaTmplMsg) {
 	if err != nil {
 		log.Errorf("retryToQueue failed, msg:%v, err:%v", msg, err)
 	}
+	log.Infof("retry to queue msg is %v", string(body))
 }

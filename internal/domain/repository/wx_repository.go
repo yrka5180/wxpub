@@ -229,6 +229,7 @@ func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, re
 			}
 			// 增加重发记录条目
 			item := entity.FailureMsgLog{
+				SendMsgID:  msg.SendMsgID,
 				MsgID:      msg.MsgID,
 				ToUser:     msg.ToUser,
 				TemplateID: msg.TemplateID,

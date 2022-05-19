@@ -153,10 +153,10 @@
           },
           "x-go-name": "FailureSendPhones"
         },
-        "msg": {
-          "description": "发送状态",
+        "send_msg_id": {
+          "description": "发送消息id",
           "type": "string",
-          "x-go-name": "Msg"
+          "x-go-name": "SendMsgID"
         }
       },
       "x-go-package": "git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"

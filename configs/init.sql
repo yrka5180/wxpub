@@ -21,7 +21,7 @@ CREATE TABLE `user`  (
                         `create_time` int(11) NOT NULL DEFAULT 0 COMMENT '创建时间',
                         `delete_time` int(11) NOT NULL DEFAULT 0 COMMENT '删除时间',
                         PRIMARY KEY (`id`) USING BTREE,
-                        UNIQUE INDEX `app_name`(`open_id`) USING BTREE
+                        UNIQUE INDEX `open_id`(`open_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户user表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -30,7 +30,8 @@ CREATE TABLE `user`  (
 DROP TABLE IF EXISTS `failure_msg_log`;
 CREATE TABLE `failure_msg_log`  (
                          `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键id',
-                         `msg_id` bigint(64) NOT NULL DEFAULT 0 COMMENT '消息id',
+                         `send_msg_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '发送消息id',
+                         `msg_id` bigint(64) NOT NULL DEFAULT 0 COMMENT '微信回调消息id',
                          `to_user` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收者openid',
                          `template_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '模板id',
                          `content` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '模板内容',
