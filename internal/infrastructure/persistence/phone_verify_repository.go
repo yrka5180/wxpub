@@ -109,8 +109,7 @@ func (r *PhoneVerifyRepo) SetVerifyCodeSmsStorage(ctx context.Context, challenge
 	verifyCodeSmsRedisValue.VerifyCodeAnswer = verifyCodeAnswer
 
 	smsRedisValue, _ := json.Marshal(verifyCodeSmsRedisValue)
-
-	// redis存放verifyCodeID:{verifyCodeAnswer,smsCreateTime}到相应的challenge的hashset上，过期时间为30分钟
+	// redis存放open_id+phone:{verifyCodeAnswer,smsCreateTime}，过期时间为30分钟
 	err = redis.RSet(consts.RedisKeyPrefixChallenge+challenge, smsRedisValue, consts.VerifyCodeSmsChallengeTTL)
 	if err != nil {
 		log.Errorf("failed to do redis Set, error: %+v, traceID: %s", err, traceID)
@@ -123,10 +122,7 @@ func (r *PhoneVerifyRepo) SetVerifyCodeSmsStorage(ctx context.Context, challenge
 func (r *PhoneVerifyRepo) VerifySmsCode(ctx context.Context, challenge, verifyCodeAnswer string, ttl int64) (ok, isExpire bool, err error) {
 	var value []byte
 	var verifyCodeValue entity.VerifyCodeRedisValue
-	ok = false
-	isExpire = false
 	now := time.Now().UnixNano()
-
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("VerifySmsCode traceID:%s", traceID)
 
