@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/config"
 
-	config "git.nova.net.cn/nova/go-common/config2"
 	"github.com/sirupsen/logrus"
 )
 

@@ -8,15 +8,15 @@ import (
 	"syscall"
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/g"
-
-	extra "git.nova.net.cn/nova/go-common/logrus-extra"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/g"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/extra"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks"
+
 	log "github.com/sirupsen/logrus"
 )
 
