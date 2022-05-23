@@ -22,7 +22,7 @@ func NewMessageController(msg application.MessageInterface) *Message {
 	}
 }
 
-// swagger:route POST /message/push/tmpl 消息推送 SendTmplMessage
+// swagger:route POST /message/tmpl-push 消息推送 SendTmplMessage
 //
 // description: 模板消息推送
 //
@@ -55,17 +55,49 @@ func (a *Message) SendTmplMessage(c *gin.Context) {
 		return
 	}
 	var msgResp entity.SendTmplMsgResp
-	msgResp, users, err := a.message.GetMissingUsers(ctx, param)
+	msgResp, err := a.message.SendTmplMsg(ctx, param)
 	if err != nil {
-		log.Errorf("SendTmplMessage GetMissingUsers failed,traceID:%s,err:%v", traceID, err)
-		httputil.SetSuccessfulResponseWithError(&resp, err, msgResp)
-		return
-	}
-	msgResp, err = a.message.SendTmplMsg(ctx, users, param)
-	if err != nil {
-		log.Errorf("SendMessage MessageInterface send msg failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("SendTmplMessage MessageInterface send msg failed,traceID:%s,err:%v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())
 		return
 	}
 	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, msgResp)
+}
+
+// swagger:route GET /message/status/:id 消息推送 TmplMsgStatus
+//
+// description: 查看消息发送状态,资源id为request_id
+//
+// responses:
+//   200: APITmplMsgStatusResp
+//   400: badRequest
+//   401: unauthorized
+//   403: forbidden
+//   404: notfound
+//   409: APISendTmplMessage
+//   500: serverError
+func (a *Message) TmplMsgStatus(c *gin.Context) {
+	ctx := middleware.DefaultTodoNovaContext(c)
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("%s", traceID)
+
+	resp := httputil.DefaultResponse()
+	defer httputil.HTTPJSONResponse(ctx, c, &resp)
+
+	var param entity.TmplMsgStatusReq
+	param.RequestID = c.Param("id")
+	errMsg := param.Validate()
+	if len(errMsg) > 0 {
+		log.Errorf("TmplMsgStatus validate req param failed, traceID:%s, errMsg:%s", traceID, errMsg)
+		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, errMsg)
+		return
+	}
+	var msgStatusResp entity.TmplMsgStatusResp
+	msgStatusResp, err := a.message.TmplMsgStatus(ctx, param.RequestID)
+	if err != nil {
+		log.Errorf("TmplMsgStatus MessageInterface tmpl msg status failed,traceID:%s,err:%v", traceID, err)
+		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())
+		return
+	}
+	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, msgStatusResp)
 }

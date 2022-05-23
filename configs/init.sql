@@ -25,20 +25,26 @@ CREATE TABLE `user`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户user表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for failure_msg_log
+-- Table structure for msg_log
 -- ----------------------------
-DROP TABLE IF EXISTS `failure_msg_log`;
-CREATE TABLE `failure_msg_log`  (
+DROP TABLE IF EXISTS `msg_log`;
+CREATE TABLE `msg_log`  (
                          `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键id',
-                         `send_msg_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '发送消息id',
-                         `msg_id` bigint(64) NOT NULL DEFAULT 0 COMMENT '微信回调消息id',
+                         `request_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '请求id',
+                         `msg_id` bigint(64) NOT NULL DEFAULT 0 COMMENT '微信消息id',
                          `to_user` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '接收者openid',
+                         `phone` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '用户号码',
                          `template_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '模板id',
-                         `content` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '模板内容',
+                         `content` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '发送模板内容',
                          `cause` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '失败原因',
-                         `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '发送状态，1为正常，2为重试中，3为失败',
+                         `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '发送状态，0为pending判定中，1为sending发送中，2为success成功，3为failure失败',
                          `count` tinyint(1) NOT NULL DEFAULT 0 COMMENT '发送次数',
                          `create_time` int(11) NOT NULL DEFAULT 0 COMMENT '创建时间',
-                         `update_time` int(11) NOT NULL DEFAULT 0 COMMENT '回调更新时间',
-                         PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '消息发送失败日志表' ROW_FORMAT = DYNAMIC;
+                         `update_time` int(11) NOT NULL DEFAULT 0 COMMENT '更新时间',
+                         PRIMARY KEY (`id`) USING BTREE,
+                         INDEX `request_id`(`request_id`) USING BTREE,
+                         INDEX `msg_id`(`msg_id`) USING BTREE,
+                         INDEX `count`(`count`) USING BTREE,
+                         INDEX `create_time`(`create_time`) USING BTREE,
+                         INDEX `update_time`(`update_time`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '消息日志表' ROW_FORMAT = DYNAMIC;

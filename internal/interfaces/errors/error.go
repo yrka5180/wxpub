@@ -21,7 +21,8 @@ const (
 )
 
 const (
-	CodeRIDExpired = 42001 // token过期
+	CodeRIDExpired      = 42001 // token过期
+	CodeRIDUnauthorized = 48001 // token失效
 )
 
 var StatusCode = map[int]int{

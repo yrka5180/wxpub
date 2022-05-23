@@ -40,8 +40,8 @@ func main() {
 	}
 	startServer(srv)
 	gracefulShutdown(srv)
-	globalCancel()
-	g.Wait()
+	go g.Wait()
+	waitWithCtx(g.QuitC)
 }
 
 func startServer(srv *http.Server) {
@@ -68,6 +68,21 @@ func gracefulShutdown(srv *http.Server) {
 	log.Infoln("Server exiting")
 }
 
+// waitWithCtx returns when timeout or when all goroutine is quited
+func waitWithCtx(c chan struct{}) {
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+	select {
+	case <-c:
+		log.Info("server exiting")
+		return
+	case <-ticker.C:
+		globalCancel()
+		log.Fatal("server timeout to force to shutdown")
+		return
+	}
+}
+
 func InitService() {
 	debugMode := config.SMode == consts.ServerModeDebug
 	dbConf := persistence.DBConfig{
@@ -78,14 +93,7 @@ func InitService() {
 		MaxIdleConn: config.DBMaxIdleConn,
 		MaxOpenConn: config.DBMaxOpenConn,
 	}
-	kafkaConf := persistence.KafkaConfig{
-		Config:          nil,
-		Brokers:         config.KafkaBrokers,
-		ConsumerGroupID: config.KafkaGroup,
-		Topics:          config.KafkaTopics,
-		KafkaVersion:    config.KafkaVersion,
-	}
-	err := persistence.NewRepositories(kafkaConf, dbConf, config.RedisAddresses, config.SmsRPCAddr, config.CaptchaRPCAddr, debugMode)
+	err := persistence.NewRepositories(dbConf, config.RedisAddresses, config.SmsRPCAddr, config.CaptchaRPCAddr, debugMode)
 	if err != nil {
 		panic(err)
 	}
@@ -98,6 +106,4 @@ func InitService() {
 		persistence.DefaultUserRepo(), persistence.DefaultPhoneVerifyRepo())
 	repository.NewMessageRepository(
 		persistence.DefaultMessageRepo(), persistence.DefaultUserRepo())
-	repository.NewPassportRepository(
-		persistence.DefaultPassportRepo())
 }

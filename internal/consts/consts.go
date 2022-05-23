@@ -44,7 +44,6 @@ const (
 	RedisKeyAccessToken  = Module + "-access_token"
 	RedisLockAccessToken = DLockPrefix + RedisKeyAccessToken
 	RedisKeyMsgID        = Module + "-msg_id-"
-	RedisKeyAuthN        = Module + "-authN_"
 
 	RedisKeyVerifyCodeSmsID = "sms"
 	RedisKeyPrefixChallenge = Module + "-challenge_"
@@ -80,13 +79,15 @@ const (
 )
 
 const (
-	MaxRetryCount = 3        // 消息最大失败重试次数，实际调用接口次数为3*3(http client repeated count)=9
-	MaxExpireTime = 3 * 3600 // 消息最大过期时间
+	MaxRetryCount     = 3        // 消息最大失败重试次数，实际调用接口次数为3*3(http client repeated count)=9
+	MaxWXCallBackTime = 15       // 微信回调最大时间
+	MaxExpireTime     = 3 * 3600 // 消息最大过期时间
 )
 
 const (
-	SendSuccess = iota + 1
-	SendRetry
+	SendPending = iota
+	Sending
+	SendSuccess
 	SendFailure
 )
 

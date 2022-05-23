@@ -2,36 +2,30 @@ package persistence
 
 import (
 	"fmt"
+	oslog "log"
+	"os"
+
+	"gorm.io/gorm/logger"
+
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/kafka"
+	"gorm.io/gorm"
+
 	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/redis"
 
-	config2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
 	captchaPb "git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace"
-	"github.com/Shopify/sarama"
 	"github.com/go-redis/redis/v7"
-	_ "github.com/go-sql-driver/mysql" // for gorm
-	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"gorm.io/driver/mysql"
 )
 
 type Repositories struct {
-	MQ                *kafka.MQ
 	DB                *gorm.DB
 	Redis             *redis.UniversalClient
 	SmsGRPCClient     smsPb.SenderClient
 	CaptchaGRPCClient captchaPb.CaptchaServiceClient
-}
-
-type KafkaConfig struct {
-	Config          *sarama.Config
-	Brokers         []string
-	ConsumerGroupID string
-	Topics          []string
-	KafkaVersion    string
 }
 
 type DBConfig struct {
@@ -39,18 +33,10 @@ type DBConfig struct {
 	MaxIdleConn, MaxOpenConn                     int
 }
 
-const (
-	mysqlType = "mysql"
-)
-
 var CommonRepositories Repositories
 
-func NewRepositories(KafkaConfig KafkaConfig, DBConfig DBConfig, redisAddresses []string, smsRPCAddr, captchaRPCAddr string, debugMode bool) error {
+func NewRepositories(DBConfig DBConfig, redisAddresses []string, smsRPCAddr, captchaRPCAddr string, debugMode bool) error {
 	err := NewDBRepositories(DBConfig, debugMode)
-	if err != nil {
-		return err
-	}
-	err = NewMQRepositories(KafkaConfig, debugMode)
 	if err != nil {
 		return err
 	}
@@ -69,53 +55,40 @@ func NewRepositories(KafkaConfig KafkaConfig, DBConfig DBConfig, redisAddresses 
 
 	// persistence repo init
 	NewAkRepo()
-	NewMessageRepo(config2.KafkaTopics)
-	NewPassportRepo()
+	NewMessageRepo()
 	NewUserRepo()
 	NewWxRepo()
 	NewPhoneVerifyRepo()
 	return nil
 }
 
-func NewMQRepositories(conf KafkaConfig, debugMode bool) error {
-	config, brokers, consumerGroupID, kafkaVersion := conf.Config, conf.Brokers, conf.ConsumerGroupID, conf.KafkaVersion
-	// 生产者
-	producer, err := kafka.InitProducer(config, brokers, kafkaVersion, debugMode)
-	if err != nil {
-		return err
-	}
-
-	// 正常业务消费者
-	consumer, err := kafka.InitKafkaConsumerGroup(config, brokers, consumerGroupID, kafkaVersion, false)
-	if err != nil {
-		return err
-	}
-
-	CommonRepositories.MQ = &kafka.MQ{
-		Producer:      producer,
-		ConsumerGroup: consumer,
-	}
-
-	return nil
-}
-
 func NewDBRepositories(config DBConfig, debugMode bool) error {
 	dbUser, dbPassword, dbHost, dbName := config.DBUser, config.DBPassword, config.DBHost, config.DBName
+	dataSource := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&interpolateParams=true", dbUser, dbPassword, dbHost, dbName)
 
-	dataSource := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4", dbUser, dbPassword, dbHost, dbName)
-	db, err := gorm.Open(mysqlType, dataSource)
+	db, err := gorm.Open(mysql.Open(dataSource), &gorm.Config{})
 	if err != nil {
 		return err
 	}
+	sqlDB, _ := db.DB()
 	if config.MaxIdleConn > 0 {
-		db.DB().SetMaxIdleConns(config.MaxIdleConn)
+		sqlDB.SetMaxIdleConns(config.MaxIdleConn)
 	}
 	if config.MaxOpenConn > 0 {
-		db.DB().SetMaxOpenConns(config.MaxOpenConn)
-		db.DB().SetConnMaxLifetime(time.Hour) // 设置最大连接超时
+		sqlDB.SetMaxOpenConns(config.MaxOpenConn)
+		sqlDB.SetConnMaxLifetime(time.Hour) // 设置最大连接超时
 	}
 	if debugMode {
-		db.LogMode(true)
+		newLogger := logger.New(
+			oslog.New(os.Stdout, "\r\n", oslog.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold:             time.Second,   // Slow SQL threshold
+				LogLevel:                  logger.Silent, // Log level
+				IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
+				Colorful:                  false,         // Disable color
+			},
+		)
+		db.Logger = newLogger
 	}
 
 	CommonRepositories.DB = db

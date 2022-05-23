@@ -8,35 +8,22 @@ import (
 )
 
 var (
-	wx          *controller.WX
-	accessToken *controller.AccessToken
-	user        *controller.User
-	msg         *controller.Message
-)
-
-var (
-	auth *middleware.Passport
+	wx   *controller.WX
+	user *controller.User
+	msg  *controller.Message
 )
 
 func registerController() {
 	wx = controller.NewWXController(
 		repository.DefaultWXRepository())
-	accessToken = controller.NewAccessTokenController(
-		repository.DefaultAccessTokenRepository())
 	user = controller.NewUserController(
 		repository.DefaultUserRepository())
 	msg = controller.NewMessageController(
 		repository.DefaultMessageRepository())
 }
 
-func registerMiddleware() {
-	auth = middleware.NewPassportMiddleware(
-		repository.DefaultPassportRepository())
-}
-
 func Run() *gin.Engine {
 	registerController()
-	registerMiddleware()
 	engine := gin.Default()
 	initRouter(engine)
 	return engine
@@ -50,16 +37,9 @@ func initRouter(router *gin.Engine) {
 	routerVerify(open)
 
 	router.Use(middleware.NovaContext)
-	interval := router.Group("/interval/v1", auth.VerifyToken)
 
-	// access token
-	routerAccessToken(interval)
-
-	// 获取wx user info
-	routerUser(interval)
-
-	// 消息推送
-	routerMsgPush(interval)
+	// msg handler
+	routerMsg(open)
 }
 
 func routerWX(router *gin.RouterGroup) {
@@ -69,7 +49,7 @@ func routerWX(router *gin.RouterGroup) {
 		wxGroup.GET("", wx.GetWXCheckSign)
 		// todo: 暂时先用明文传输，后续补充aes加密传输
 		// wx开放平台事件接收
-		wxGroup.POST("", wx.GetEventXML)
+		wxGroup.POST("", wx.HandleEventXML)
 	}
 }
 
@@ -82,32 +62,18 @@ func routerVerify(router *gin.RouterGroup) {
 	}
 }
 
-func routerAccessToken(router *gin.RouterGroup) {
-	akGroup := router.Group("/access_token")
+func routerMsg(router *gin.RouterGroup) {
+	msgGroup := router.Group("/message")
 	{
-		// 获取wx access token
-		akGroup.GET("", accessToken.GetAccessToken)
-		// 刷新wx access token
-		// todo:接口限频，微信日调用次数2000次，如果access token缓存值没失效则被视为有效调用（获取ak时ak不存在也会调用），调用次数记录，1分钟1次
-		akGroup.GET("/fresh", accessToken.FreshAccessToken)
-	}
-}
-
-func routerUser(router *gin.RouterGroup) {
-	userGroup := router.Group("/user")
-	{
-		userGroup.GET("", user.ListUser)
-		userGroup.GET("/:id", user.GetUser)
-	}
-}
-
-func routerMsgPush(router *gin.RouterGroup) {
-	msgPushGroup := router.Group("/message/push")
-	{
-		// 模板消息推送
-		tmplSubGroup := msgPushGroup.Group("/tmpl")
+		// tmpl msg pusher
+		pushSubGroup := msgGroup.Group("/tmpl-push")
 		{
-			tmplSubGroup.POST("", msg.SendTmplMessage)
+			pushSubGroup.POST("", msg.SendTmplMessage)
+		}
+		// tmpl msg status
+		statusSubGroup := msgGroup.Group("/status")
+		{
+			statusSubGroup.GET("/:id", msg.TmplMsgStatus)
 		}
 	}
 }

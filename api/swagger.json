@@ -1,16 +1,41 @@
 {
   "swagger": "2.0",
   "paths": {
-    "/access_token": {
+    "/message/status/:id": {
       "get": {
-        "description": "description: 获取access token",
+        "description": "description: 查看消息发送状态,资源id为request_id",
         "tags": [
-          "accessToken"
+          "消息推送"
         ],
-        "operationId": "GetAccessToken",
+        "operationId": "TmplMsgStatus",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "TraceID",
+            "description": "所有请求必须携带一个随机产生的 id，采用标准 UUID 格式，如：123e4567-e89b-12d3-a456-426655440000",
+            "name": "x-nova-trace-id",
+            "in": "header"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Timeout",
+            "description": "超时时间，以秒为单位，如：10",
+            "name": "x-nova-timeout",
+            "in": "header"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
-            "$ref": "#/responses/APIGetAccessTokenResp"
+            "$ref": "#/responses/APITmplMsgStatusResp"
           },
           "400": {
             "$ref": "#/responses/badRequest"
@@ -25,7 +50,7 @@
             "$ref": "#/responses/notfound"
           },
           "409": {
-            "$ref": "#/responses/conflict"
+            "$ref": "#/responses/APISendTmplMessage"
           },
           "500": {
             "$ref": "#/responses/serverError"
@@ -33,80 +58,41 @@
         }
       }
     },
-    "/access_token/fresh": {
-      "get": {
-        "description": "description: 刷新access token",
-        "tags": [
-          "accessToken"
-        ],
-        "operationId": "FreshAccessToken",
-        "responses": {
-          "200": {
-            "$ref": "#/responses/APIGetAccessTokenResp"
-          },
-          "400": {
-            "$ref": "#/responses/badRequest"
-          },
-          "401": {
-            "$ref": "#/responses/unauthorized"
-          },
-          "403": {
-            "$ref": "#/responses/forbidden"
-          },
-          "404": {
-            "$ref": "#/responses/notfound"
-          },
-          "409": {
-            "$ref": "#/responses/conflict"
-          },
-          "500": {
-            "$ref": "#/responses/serverError"
-          }
-        }
-      }
-    },
-    "/message/push/tmpl": {
+    "/message/tmpl-push": {
       "post": {
         "description": "description: 模板消息推送",
         "tags": [
           "消息推送"
         ],
         "operationId": "SendTmplMessage",
-        "responses": {
-          "200": {
-            "$ref": "#/responses/APISendTmplMessage"
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "TraceID",
+            "description": "所有请求必须携带一个随机产生的 id，采用标准 UUID 格式，如：123e4567-e89b-12d3-a456-426655440000",
+            "name": "x-nova-trace-id",
+            "in": "header"
           },
-          "400": {
-            "$ref": "#/responses/badRequest"
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Timeout",
+            "description": "超时时间，以秒为单位，如：10",
+            "name": "x-nova-timeout",
+            "in": "header"
           },
-          "401": {
-            "$ref": "#/responses/unauthorized"
-          },
-          "403": {
-            "$ref": "#/responses/forbidden"
-          },
-          "404": {
-            "$ref": "#/responses/notfound"
-          },
-          "409": {
-            "$ref": "#/responses/APISendTmplMessage"
-          },
-          "500": {
-            "$ref": "#/responses/serverError"
+          {
+            "x-go-name": "Data",
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/SendTmplMsgReq"
+            }
           }
-        }
-      }
-    },
-    "/user": {
-      "get": {
-        "description": "description: 获取用户列表",
-        "tags": [
-          "用户管理"
         ],
-        "operationId": "ListUser",
         "responses": {
           "200": {
-            "$ref": "#/responses/APIListUser"
+            "$ref": "#/responses/APISendTmplMessage"
           },
           "400": {
             "$ref": "#/responses/badRequest"
@@ -121,7 +107,7 @@
             "$ref": "#/responses/notfound"
           },
           "409": {
-            "$ref": "#/responses/conflict"
+            "$ref": "#/responses/APISendTmplMessage"
           },
           "500": {
             "$ref": "#/responses/serverError"
@@ -131,13 +117,26 @@
     }
   },
   "definitions": {
-    "GetAccessTokenResp": {
+    "SendTmplMsgReq": {
       "type": "object",
       "properties": {
-        "access_token": {
-          "description": "请求wx凭证ak",
+        "data": {
+          "description": "模板数据",
+          "type": "object",
+          "x-go-name": "Data"
+        },
+        "phones": {
+          "description": "接收者手机号",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Phones"
+        },
+        "tmpl_msg_id": {
+          "description": "模板id",
           "type": "string",
-          "x-go-name": "AccessToken"
+          "x-go-name": "TmplMsgID"
         }
       },
       "x-go-package": "git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
@@ -145,83 +144,89 @@
     "SendTmplMsgResp": {
       "type": "object",
       "properties": {
-        "failure_send_phones": {
-          "description": "发送失败手机号",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "FailureSendPhones"
-        },
-        "send_msg_id": {
-          "description": "发送消息id",
+        "request_id": {
+          "description": "发送请求消息id",
           "type": "string",
-          "x-go-name": "SendMsgID"
+          "x-go-name": "RequestID"
         }
       },
       "x-go-package": "git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
     },
-    "User": {
-      "description": "User 用户表",
+    "TmplMsgStatusItem": {
       "type": "object",
       "properties": {
+        "cause": {
+          "description": "失败原因",
+          "type": "string",
+          "x-go-name": "Cause"
+        },
+        "content": {
+          "description": "发送模板内容",
+          "type": "object",
+          "x-go-name": "Content"
+        },
         "create_time": {
           "description": "创建时间",
           "type": "integer",
           "format": "int64",
           "x-go-name": "CreateTime"
         },
-        "delete_time": {
-          "description": "删除时间",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "DeleteTime"
-        },
         "id": {
-          "description": "主键ID",
+          "description": "主键id",
           "type": "integer",
           "format": "int64",
           "x-go-name": "ID"
         },
-        "name": {
-          "description": "用户名",
-          "type": "string",
-          "x-go-name": "Name"
-        },
-        "open_id": {
-          "description": "用户open id",
-          "type": "string",
-          "x-go-name": "OpenID"
-        },
         "phone": {
-          "description": "联系号码",
+          "description": "用户号码",
           "type": "string",
           "x-go-name": "Phone"
+        },
+        "status": {
+          "description": "发送状态，0为pending判定中，1为sending发送中，2为success成功，3为failure失败",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Status"
+        },
+        "template_id": {
+          "description": "模板id",
+          "type": "string",
+          "x-go-name": "TemplateID"
+        }
+      },
+      "x-go-package": "git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
+    },
+    "TmplMsgStatusResp": {
+      "description": "TmplMsgStatusResp 模板消息状态返回",
+      "type": "object",
+      "properties": {
+        "lists": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TmplMsgStatusItem"
+          },
+          "x-go-name": "Lists"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Total"
         }
       },
       "x-go-package": "git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
     }
   },
   "responses": {
-    "APIGetAccessTokenResp": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/GetAccessTokenResp"
-      }
-    },
-    "APIListUser": {
-      "description": "",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/User"
-        }
-      }
-    },
     "APISendTmplMessage": {
       "description": "",
       "schema": {
         "$ref": "#/definitions/SendTmplMsgResp"
+      }
+    },
+    "APITmplMsgStatusResp": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/TmplMsgStatusResp"
       }
     },
     "badRequest": {
