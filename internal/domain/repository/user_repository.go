@@ -32,14 +32,6 @@ func DefaultUserRepository() *UserRepository {
 	return defaultUserRepository
 }
 
-func (a *UserRepository) ListUser(ctx context.Context) ([]entity.User, error) {
-	return a.user.ListUser(ctx)
-}
-
-func (a *UserRepository) GetUserByID(ctx context.Context, id int) (entity.User, error) {
-	return a.user.GetUserByID(ctx, id)
-}
-
 func (a *UserRepository) GetUserByOpenID(ctx context.Context, openID string) (entity.User, error) {
 	return a.user.GetUserByOpenID(ctx, openID)
 }

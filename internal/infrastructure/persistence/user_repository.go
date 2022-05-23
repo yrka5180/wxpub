@@ -117,26 +117,6 @@ func (a *UserRepo) UpdateUserTime(ctx context.Context, user entity.User) error {
 	return nil
 }
 
-func (a *UserRepo) ListUser(ctx context.Context) (users []entity.User, err error) {
-	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("ListUser traceID:%s", traceID)
-	if err = a.DB.Where("delete_time = 0").Find(&users).Error; err != nil {
-		log.Errorf("ListUser find list users failed,traceID:%s,err:%v", traceID, err)
-		return nil, err
-	}
-	return users, nil
-}
-
-func (a *UserRepo) GetUserByID(ctx context.Context, id int) (user entity.User, err error) {
-	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("GetUserByID traceID:%s", traceID)
-	if err = a.DB.Where("id = ?", id).First(&user).Error; err != nil {
-		log.Errorf("GetUserByID get user by id failed,traceID:%s,err:%v", traceID, err)
-		return
-	}
-	return
-}
-
 func (a *UserRepo) GetUserByOpenID(ctx context.Context, openID string) (user entity.User, err error) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("GetUserByID traceID:%s", traceID)
