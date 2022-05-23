@@ -2,10 +2,6 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
-	"sync"
-
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
@@ -34,71 +30,64 @@ func DefaultMessageRepository() *MessageRepository {
 	return defaultMessageRepository
 }
 
-func (t *MessageRepository) GetMissingUsers(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, []entity.User, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("GetMissingUsers traceID:%s", traceID)
-	var resp entity.SendTmplMsgResp
-	resp.FailureSendPhones = make([]string, 0)
-	// 先拿到接收者的open_id列表
-	users, err := t.user.ListUserByPhones(ctx, param.ToUsersPhone)
-	if err != nil {
-		log.Errorf("SendTmplMsg UserRepo ListUserByPhones failed,traceID:%s,err:%v", traceID, err)
-		return entity.SendTmplMsgResp{}, nil, err
-	}
-	userPhoneMap := make(map[string]struct{})
-	for _, user := range users {
-		userPhoneMap[user.Phone] = struct{}{}
-	}
-	// 判断手机号是否不存在
-	for _, phone := range param.ToUsersPhone {
-		// 手机号不存在记录
-		if _, ok := userPhoneMap[phone]; !ok {
-			resp.FailureSendPhones = append(resp.FailureSendPhones, phone)
-		}
-	}
-	if len(resp.FailureSendPhones) > 0 {
-		return resp, nil, errors.NewCustomError(nil, errors.CodeResourcesPartialNotFound, errors.GetErrorMessage(errors.CodeResourcesPartialNotFound))
-	}
-	return resp, users, nil
-}
-
-func (t *MessageRepository) SendTmplMsg(ctx context.Context, users []entity.User, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error) {
+func (t *MessageRepository) SendTmplMsg(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("SendTmplMsg traceID:%s", traceID)
 	var resp entity.SendTmplMsgResp
 	var err error
-	sendMsgID, err := utils.GetUUID()
+	// 生成request id
+	requestID, err := utils.GetUUID()
 	if err != nil {
 		log.Errorf("SendTmplMsg MessageRepository GetUUID failed,traceID:%s,err:%v", traceID, err)
-		return resp, err
+		return entity.SendTmplMsgResp{}, err
 	}
-	resp.SendMsgID = sendMsgID
-	wg := new(sync.WaitGroup)
-	// 批量写入到kafka做消息推送
-	ch := make(chan struct{}, 100)
-	defer close(ch)
-	for idx := range users {
-		ch <- struct{}{}
-		wg.Add(1)
-		go func(idx int) {
-			defer func() {
-				wg.Done()
-				<-ch
-			}()
-			var bs []byte
-			bs, err = json.Marshal(param.TransferPerSendTmplMsg(users[idx].OpenID).TransferKafkaTmplReq(sendMsgID))
-			if err != nil {
-				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent json marshal tmpl msg failed,traceID:%s,err:%v", traceID, err)
-				return
-			}
-			err = t.msg.SendTmplMsgToMQ(ctx, t.msg.GetTopic(), string(bs))
-			if err != nil {
-				log.Errorf("SendTmplMsg SendTmplMsgToMQ failed,param is %s,traceID:%s,err:%v", string(bs), traceID, err)
-				return
-			}
-			log.Infof("send msg success,msg is %v", string(bs))
-		}(idx)
+	resp.RequestID = requestID
+	users, err := t.user.ListUserByPhones(ctx, param.Phones)
+	if err != nil {
+		log.Errorf("SendTmplMsg ListUserByPhones failed,traceID:%s,err:%v", traceID, err)
+		return entity.SendTmplMsgResp{}, err
 	}
-	wg.Wait()
+	userPhoneMap := make(map[string]entity.User)
+	for _, user := range users {
+		userPhoneMap[user.Phone] = user
+	}
+	msgLogs := make([]entity.MsgLog, 0)
+	for _, phone := range param.Phones {
+		if user, ok := userPhoneMap[phone]; ok {
+			msgLogs = append(msgLogs, param.TransferPendingMsgLog(requestID, user.OpenID, user.Phone))
+		} else {
+			msgLogs = append(msgLogs, param.TransferFailureMsgLog(requestID, "", phone))
+		}
+	}
+	// 消息批量存入db
+	err = t.msg.BatchSaveMsgLog(ctx, msgLogs)
+	if err != nil {
+		log.Errorf("SendTmplMsg BatchSaveMsgLog failed,traceID:%s,err:%v", traceID, err)
+		return entity.SendTmplMsgResp{}, err
+	}
+	return resp, nil
+}
+
+func (t *MessageRepository) TmplMsgStatus(ctx context.Context, requestID string) (entity.TmplMsgStatusResp, error) {
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("TmplMsgStatus traceID:%s", traceID)
+	var resp entity.TmplMsgStatusResp
+	resp.Lists = make([]entity.TmplMsgStatusItem, 0)
+	var count int64
+	var err error
+	count, err = t.msg.ListMsgLogsByReqIDCnt(ctx, requestID)
+	if err != nil {
+		log.Errorf("TmplMsgStatus ListMsgLogsByReqIDCnt failed,traceID:%s,err:%v", traceID, err)
+		return entity.TmplMsgStatusResp{}, err
+	}
+	items, err := t.msg.ListMsgLogsByReqID(ctx, requestID)
+	if err != nil {
+		log.Errorf("TmplMsgStatus ListMsgLogsByRequestID failed,traceID:%s,err:%v", traceID, err)
+		return entity.TmplMsgStatusResp{}, err
+	}
+	for _, item := range items {
+		resp.Lists = append(resp.Lists, item.TransferTmplMsgStatusItem())
+	}
+	resp.Total = int(count)
 	return resp, nil
 }

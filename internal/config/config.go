@@ -15,21 +15,12 @@ var (
 	// SMode 服务端运行状态，已知影响 gin 框架日志输出等级
 	SMode = consts.ServerMode(config.DefaultString("server_mode", string(consts.ServerModeRelease)))
 
-	KafkaBrokers []string
-	KafkaTopics  []string
-	KafkaVersion string
-	KafkaTopic   = config.DefaultString("kafka_topic", "public-platform-msg")
-	KafkaGroup   = config.DefaultString("kafka_group", "public-platform-msg")
-
 	DBHost        string
 	DBUser        string
 	DBPassword    string
 	DBName        = config.DefaultString("db_name", "pub_platform_mgr")
 	DBMaxIdleConn = config.DefaultInt("max_db_idle_conn", 1000)
 	DBMaxOpenConn = config.DefaultInt("max_db_open_conn", 1000)
-
-	PassportBaseURL           = config.DefaultString("passport_base_url", "https://passport.nova.net.cn")
-	PassportOIDCIntrospectURL = config.DefaultString("passport_oidc_oauth2_introspect", PassportBaseURL+"/apis/v1/oidc/oauth2/introspect")
 
 	CaptchaRPCAddr       = config.DefaultString("captcha_rpc_addr", "captcha.common:80")
 	SmsRPCAddr           = config.DefaultString("sms_rpc_addr", "sms-xuanwu.misc-pub:80")
@@ -42,7 +33,6 @@ var (
 	RedisAddresses   []string
 	AppID            string
 	AppSecret        string
-	TmplMsgID        string
 	VerifyProfileURL string
 )
 
@@ -57,15 +47,10 @@ func Init() {
 		LogLevel = logrus.InfoLevel
 	}
 
-	KafkaBrokers = strings.Split(config.MustString("kafka_brokers"), ",")
-	KafkaTopics = strings.Split(KafkaTopic, ",")
-	KafkaVersion = config.DefaultString("kafka_version", "1.1.1")
-
 	// InternalAPISecret = config.MustString("internal_api_secret")
 	RedisAddresses = strings.Split(config.MustString("redis_addresses"), ",")
 
 	AppID = config.MustString("app_id")
 	AppSecret = config.MustString("app_secret")
-	TmplMsgID = config.MustString("tmpl_msg_id")
 	VerifyProfileURL = config.MustString("verify_profile_url")
 }

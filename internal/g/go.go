@@ -6,7 +6,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var wg sync.WaitGroup
+var (
+	wg    *sync.WaitGroup
+	QuitC chan struct{}
+)
+
+func init() {
+	wg = new(sync.WaitGroup)
+	QuitC = make(chan struct{})
+}
 
 func Go(f func()) {
 	wg.Add(1)
@@ -31,4 +39,5 @@ func Done() {
 
 func Wait() {
 	wg.Wait()
+	QuitC <- struct{}{}
 }

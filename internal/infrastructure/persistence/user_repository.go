@@ -2,14 +2,16 @@ package persistence
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"github.com/go-redis/redis/v7"
-	"github.com/jinzhu/gorm"
+
 	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 type UserRepo struct {
@@ -39,7 +41,7 @@ func (a *UserRepo) IsExistUserMsgFromDB(ctx context.Context, fromUserName string
 	err := a.DB.Where("open_id = ? AND create_time = ?", fromUserName, createTime).First(&user).Error
 	if err != nil {
 		// 不存在记录
-		if gorm.IsRecordNotFoundError(err) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil
 		}
 		return false, err
@@ -54,7 +56,7 @@ func (a *UserRepo) IsExistUserFromDB(ctx context.Context, fromUserName string) (
 	err := a.DB.Where("open_id = ?", fromUserName).First(&user).Error
 	if err != nil {
 		// 不存在记录
-		if gorm.IsRecordNotFoundError(err) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil
 		}
 		return false, err
@@ -81,7 +83,7 @@ func (a *UserRepo) SaveUser(ctx context.Context, user entity.User, isUpdateAll b
 	if !isUpdateAll {
 		err = a.UpdateUserTime(ctx, user)
 	} else {
-		err = a.DB.Model(&entity.User{}).Where("open_id=?", user.OpenID).Update(&user).Error
+		err = a.DB.Model(&entity.User{}).Where("open_id=?", user.OpenID).Updates(&user).Error
 	}
 	if err != nil {
 		log.Errorf("SaveUser UpdateUser failed, traceID: %s,err: %v", traceID, err)
@@ -95,7 +97,7 @@ func (a *UserRepo) DelUser(ctx context.Context, user entity.User) error {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("DelUser traceID:%s", traceID)
 	user.DeleteTime = time.Now().Unix()
-	if err := a.DB.Model(&entity.User{}).Where("open_id = ?", user.OpenID).Update(&user).Error; err != nil {
+	if err := a.DB.Model(&entity.User{}).Where("open_id = ?", user.OpenID).Updates(&user).Error; err != nil {
 		log.Errorf("DelUser delete user failed,traceID:%s,err:%v", traceID, err)
 		return err
 	}

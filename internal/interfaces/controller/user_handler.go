@@ -26,58 +26,6 @@ func NewUserController(user application.UserInterface) *User {
 	}
 }
 
-// swagger:route GET /user 用户管理 ListUser
-//
-// description: 获取用户列表
-//
-// responses:
-//   200: APIListUser
-//   400: badRequest
-//   401: unauthorized
-//   403: forbidden
-//   404: notfound
-//   409: conflict
-//   500: serverError
-func (u *User) ListUser(c *gin.Context) {
-	ctx := middleware.DefaultTodoNovaContext(c)
-	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("%s", traceID)
-
-	resp := httputil.DefaultResponse()
-	defer httputil.HTTPJSONResponse(ctx, c, &resp)
-
-	users, err := u.user.ListUser(ctx)
-	if err != nil {
-		log.Errorf("ListUser UserInterface get list user by id failed,traceID:%s,err:%v", traceID, err)
-		httputil.SetErrorResponseWithError(&resp, err)
-		return
-	}
-	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, users)
-}
-
-func (u *User) GetUser(c *gin.Context) {
-	ctx := middleware.DefaultTodoNovaContext(c)
-	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("%s", traceID)
-
-	resp := httputil.DefaultResponse()
-	defer httputil.HTTPJSONResponse(ctx, c, &resp)
-
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil || id <= 0 {
-		log.Errorf("validate param id failed, traceID:%s, err:%v", traceID, err)
-		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, "Invalid id provided")
-		return
-	}
-	user, err := u.user.GetUserByID(ctx, id)
-	if err != nil {
-		log.Errorf("GetUser UserInterface get user by id failed,traceID:%s,err:%v", traceID, err)
-		httputil.SetErrorResponseWithError(&resp, err)
-		return
-	}
-	httputil.SetSuccessfulResponse(&resp, errors.CodeOK, user)
-}
-
 func (u *User) GenCaptcha(c *gin.Context) {
 	ctx := middleware.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)

@@ -15,22 +15,12 @@ type userApp struct {
 var _ UserInterface = &userApp{}
 
 type UserInterface interface {
-	ListUser(ctx context.Context) ([]entity.User, error)
-	GetUserByID(ctx context.Context, id int) (entity.User, error)
 	GetUserByOpenID(ctx context.Context, openID string) (entity.User, error)
 	SaveUser(ctx context.Context, user entity.User, isUpdateAll bool) error
 	GenCaptcha(ctx context.Context, width int32, height int32) (string, string, error)
 	VerifyCaptcha(ctx context.Context, captchaID string, captchaAnswer string) (bool, error)
 	SendSms(ctx context.Context, req entity.SendSmsReq) error
 	VerifySmsCode(ctx context.Context, req entity.VerifyCodeReq) (bool, bool, error)
-}
-
-func (u *userApp) ListUser(ctx context.Context) ([]entity.User, error) {
-	return u.user.ListUser(ctx)
-}
-
-func (u *userApp) GetUserByID(ctx context.Context, id int) (entity.User, error) {
-	return u.user.GetUserByID(ctx, id)
 }
 
 func (u *userApp) GetUserByOpenID(ctx context.Context, openID string) (entity.User, error) {

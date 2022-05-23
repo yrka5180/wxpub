@@ -15,14 +15,14 @@ type messageApp struct {
 var _ MessageInterface = &messageApp{}
 
 type MessageInterface interface {
-	GetMissingUsers(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, []entity.User, error)
-	SendTmplMsg(ctx context.Context, users []entity.User, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error)
+	SendTmplMsg(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error)
+	TmplMsgStatus(ctx context.Context, requestID string) (entity.TmplMsgStatusResp, error)
 }
 
-func (u *messageApp) GetMissingUsers(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, []entity.User, error) {
-	return u.message.GetMissingUsers(ctx, param)
+func (u *messageApp) SendTmplMsg(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error) {
+	return u.message.SendTmplMsg(ctx, param)
 }
 
-func (u *messageApp) SendTmplMsg(ctx context.Context, users []entity.User, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error) {
-	return u.message.SendTmplMsg(ctx, users, param)
+func (u *messageApp) TmplMsgStatus(ctx context.Context, requestID string) (entity.TmplMsgStatusResp, error) {
+	return u.message.TmplMsgStatus(ctx, requestID)
 }
