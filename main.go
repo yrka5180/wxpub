@@ -54,7 +54,11 @@ func startServer(srv *http.Server) {
 
 func gracefulShutdown(srv *http.Server) {
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(quit,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
 	<-quit
 
 	log.Infoln("Shutting down server...")
@@ -70,16 +74,15 @@ func gracefulShutdown(srv *http.Server) {
 
 // waitWithCtx returns when timeout or when all goroutine is quited
 func waitWithCtx(c chan struct{}) {
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(3 * time.Second)
 	defer ticker.Stop()
 	select {
 	case <-c:
 		log.Info("server exiting")
-		return
+		os.Exit(0)
 	case <-ticker.C:
 		globalCancel()
 		log.Fatal("server timeout to force to shutdown")
-		return
 	}
 }
 
