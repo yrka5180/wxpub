@@ -87,7 +87,7 @@ func (u *User) SendSms(c *gin.Context) {
 
 	ok, err := u.user.VerifyCaptcha(ctx, req.CaptchaID, req.CaptchaAnswer)
 	if err != nil {
-		log.Errorf("VerifyCaptcha failed, traceID:%s, err:%v", traceID, err)
+		log.Errorf("VerifyCaptcha failed, traceID:%s, err:%+v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, errors.GetErrorMessage(errors.CodeInternalServerError))
 		return
 	}
@@ -99,7 +99,7 @@ func (u *User) SendSms(c *gin.Context) {
 
 	err = u.user.SendSms(ctx, req)
 	if err != nil {
-		log.Errorf("SendSms failed, traceID:%s, err:%v", traceID, err)
+		log.Errorf("SendSms failed, traceID:%s, err:%+v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, errors.GetErrorMessage(errors.CodeInternalServerError))
 		return
 	}
@@ -131,7 +131,7 @@ func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
 
 	ok, isExpire, err := u.user.VerifySmsCode(ctx, req)
 	if err != nil {
-		log.Errorf("user VerifySmsCode failed, traceID:%s, err:%v", traceID, err)
+		log.Errorf("user VerifySmsCode failed, traceID:%s, err:%+v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, errors.GetErrorMessage(errors.CodeInternalServerError))
 		return
 	}
@@ -148,7 +148,7 @@ func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
 
 	user, err := u.user.GetUserByOpenID(ctx, req.OpenID)
 	if err != nil {
-		log.Errorf("VerifyAndUpdatePhone get user by open_id error: %v, traceID: %s", err, traceID)
+		log.Errorf("VerifyAndUpdatePhone get user by open_id error: %+v, traceID: %s", err, traceID)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())
 		return
 	}
@@ -157,7 +157,7 @@ func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
 	user.Name = req.Name
 	err = u.user.SaveUser(ctx, user, true)
 	if err != nil {
-		log.Errorf("VerifyAndUpdatePhone update user error: %v, traceID: %s", err, traceID)
+		log.Errorf("VerifyAndUpdatePhone update user error: %+v, traceID: %s", err, traceID)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())
 		return
 	}

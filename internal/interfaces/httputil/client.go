@@ -58,7 +58,7 @@ func request(ctx context.Context, client *http.Client, req RequestProperty) (int
 	// 判断url是否有效
 	_, err := url.ParseRequestURI(uri)
 	if err != nil {
-		return 0, nil, nil, fmt.Errorf("invalid request url:%s, error: %v", uri, err)
+		return 0, nil, nil, fmt.Errorf("invalid request url:%s, error: %+v", uri, err)
 	}
 
 	request, err := http.NewRequest(method, uri, bytes.NewReader(payload))
@@ -67,7 +67,7 @@ func request(ctx context.Context, client *http.Client, req RequestProperty) (int
 	}
 
 	if err != nil {
-		return 0, nil, nil, fmt.Errorf("new request failed, url:%s, error: %v", uri, err)
+		return 0, nil, nil, fmt.Errorf("new request failed, url:%s, error: %+v", uri, err)
 	}
 
 	for key, value := range header {
@@ -84,7 +84,7 @@ func request(ctx context.Context, client *http.Client, req RequestProperty) (int
 		break
 	}
 	if err != nil {
-		return 0, nil, nil, fmt.Errorf("failed to send request, method:%s, url:%s, err: %v", method, uri, err)
+		return 0, nil, nil, fmt.Errorf("failed to send request, method:%s, url:%s, err: %+v", method, uri, err)
 	}
 	defer func() {
 		resp.Body.Close()
@@ -96,12 +96,12 @@ func request(ctx context.Context, client *http.Client, req RequestProperty) (int
 	if len(errCode) > 0 || len(errMsg) > 0 {
 		customErr, err := GetNovaServiceErrorResponseFromHeader(resp.Header)
 		if err != nil {
-			return 0, nil, resp.Header, fmt.Errorf("request errCode:%s strconv atoi failed, method:%s, url:%s, err: %v", errCode, method, uri, err)
+			return 0, nil, resp.Header, fmt.Errorf("request errCode:%s strconv atoi failed, method:%s, url:%s, err: %+v", errCode, method, uri, err)
 		}
 		if customErr != nil {
 			body, err := json.Marshal(customErr)
 			if err != nil {
-				return 0, nil, nil, fmt.Errorf("request custom error marshal failed, method:%s, url:%s, err: %v", method, uri, err)
+				return 0, nil, nil, fmt.Errorf("request custom error marshal failed, method:%s, url:%s, err: %+v", method, uri, err)
 			}
 			return resp.StatusCode, body, resp.Header, nil
 		}
@@ -109,7 +109,7 @@ func request(ctx context.Context, client *http.Client, req RequestProperty) (int
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return resp.StatusCode, nil, resp.Header, fmt.Errorf("failed to read response payload, method:%s, url:%s, err: %v", method, uri, err)
+		return resp.StatusCode, nil, resp.Header, fmt.Errorf("failed to read response payload, method:%s, url:%s, err: %+v", method, uri, err)
 	}
 
 	return resp.StatusCode, body, resp.Header, nil
@@ -127,7 +127,7 @@ func RequestWithRepeat(traceID string, method, uri string, payload []byte, heade
 	var start = time.Now()
 
 	defer func() {
-		log.Debugf("get http request response, traceID:%s, statusCode:%d, use time: %d, err: %v", traceID, statusCode, time.Since(start).Milliseconds(), err)
+		log.Debugf("get http request response, traceID:%s, statusCode:%d, use time: %d, err: %+v", traceID, statusCode, time.Since(start).Milliseconds(), err)
 	}()
 	if len(header[consts.HTTPTraceIDHeader]) == 0 {
 		header[consts.HTTPTraceIDHeader] = traceID
@@ -141,7 +141,7 @@ func RequestWithContextAndRepeat(ctx context.Context, req RequestProperty, trace
 	var start = time.Now()
 
 	defer func() {
-		log.Debugf("get http context request response, traceID:%s, statusCode:%d, use time: %d, err: %v", traceID, statusCode, time.Since(start).Milliseconds(), err)
+		log.Debugf("get http context request response, traceID:%s, statusCode:%d, use time: %d, err: %+v", traceID, statusCode, time.Since(start).Milliseconds(), err)
 	}()
 	if len(req.Header[consts.HTTPTraceIDHeader]) == 0 {
 		req.Header[consts.HTTPTraceIDHeader] = traceID

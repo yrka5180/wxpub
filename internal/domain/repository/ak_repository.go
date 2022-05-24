@@ -38,7 +38,7 @@ func (a *AccessTokenRepository) GetAccessToken(ctx context.Context) (string, err
 	var err error
 	ak, err = a.ak.GetAccessTokenFromRedis(ctx)
 	if err != nil {
-		log.Errorf("GetAccessToken AccessTokenRepository GetAccessTokenFromRedis failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("GetAccessToken AccessTokenRepository GetAccessTokenFromRedis failed,traceID:%s,err:%+v", traceID, err)
 		return "", err
 	}
 	if len(ak) > 0 {
@@ -55,7 +55,7 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 	// 先获取旧ak
 	oldAk, err = a.ak.GetAccessTokenFromRedis(ctx)
 	if err != nil {
-		log.Errorf("FreshAccessToken AccessTokenRepository GetAccessToken failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("FreshAccessToken AccessTokenRepository GetAccessToken failed,traceID:%s,err:%+v", traceID, err)
 	}
 	// redis lock for access token to avoid racing to cover ak value from redis
 	rLock := redis2.NewRLock(*a.ak.Redis, consts.RedisLockAccessToken)
@@ -68,7 +68,7 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 	for i := 0; i < 5; i++ {
 		ok, e = rLock.Acquire()
 		if !ok || e != nil {
-			log.Errorf("FreshAccessToken get redis lock failed,traceID:%s, ok:%v,err:%v", traceID, ok, e)
+			log.Errorf("FreshAccessToken get redis lock failed,traceID:%s, ok:%v,err:%+v", traceID, ok, e)
 			time.Sleep(time.Millisecond * 100)
 			continue
 		}
@@ -82,7 +82,7 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 				for i := 0; i < 5; i++ {
 					ok, err = rLock.Release()
 					if !ok || err != nil {
-						log.Errorf("getAccessTokenAndReleaseLock delete redis lock failed,traceID:%s, ok:%v,err:%v", traceID, ok, err)
+						log.Errorf("getAccessTokenAndReleaseLock delete redis lock failed,traceID:%s, ok:%v,err:%+v", traceID, ok, err)
 						time.Sleep(time.Millisecond * 100)
 						continue
 					}
@@ -91,7 +91,7 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 			}()
 			newAk, err = a.getAccessTokenFromRemote(ctx)
 			if err != nil {
-				log.Errorf("getAccessTokenAndReleaseLock AccessTokenRepository getAccessTokenFromRemote failed,traceID:%s,err:%v", traceID, err)
+				log.Errorf("getAccessTokenAndReleaseLock AccessTokenRepository getAccessTokenFromRemote failed,traceID:%s,err:%+v", traceID, err)
 				return "", err
 			}
 			return newAk, nil
@@ -103,7 +103,7 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 		// 获取新的accessToken
 		newAk, err = a.ak.GetAccessTokenFromRedis(ctx)
 		if err != nil {
-			log.Errorf("GetAccessTokenFromRedis AkRepo GetAccessToken failed,traceID:%s,err:%v", traceID, err)
+			log.Errorf("GetAccessTokenFromRedis AkRepo GetAccessToken failed,traceID:%s,err:%+v", traceID, err)
 			time.Sleep(time.Millisecond * 100)
 			continue
 		}
@@ -120,12 +120,12 @@ func (a *AccessTokenRepository) getAccessTokenFromRemote(ctx context.Context) (s
 	log.Debugf("FreshAccessToken traceID:%s", traceID)
 	akResp, err := a.ak.GetAccessTokenFromRequest(ctx)
 	if err != nil {
-		log.Errorf("getAccessTokenFromRemote AccessTokenRepository GetAccessTokenFromRequest failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("getAccessTokenFromRemote AccessTokenRepository GetAccessTokenFromRequest failed,traceID:%s,err:%+v", traceID, err)
 		return "", err
 	}
 	err = a.ak.SetAccessTokenToRedis(ctx, akResp.AccessToken, int(akResp.ExpiresIn))
 	if err != nil {
-		log.Errorf("getAccessTokenFromRemote AccessTokenRepository  SetAccessTokenToRedis failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("getAccessTokenFromRemote AccessTokenRepository  SetAccessTokenToRedis failed,traceID:%s,err:%+v", traceID, err)
 		return "", err
 	}
 	return akResp.AccessToken, nil

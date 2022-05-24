@@ -37,7 +37,7 @@ func (a *WxRepo) SetMsgIDToRedis(ctx context.Context, msgID string) error {
 	for i := 0; i < 3; i++ {
 		err = redis2.RSet(consts.RedisKeyMsgID+msgID, "", consts.RedisMsgIDTTL)
 		if err != nil {
-			log.Errorf("SetMsgIDToRedis WxRepo redis set msg id failed,traceID:%s,err:%v", traceID, err)
+			log.Errorf("SetMsgIDToRedis WxRepo redis set msg id failed,traceID:%s,err:%+v", traceID, err)
 			continue
 		}
 		break
@@ -61,7 +61,7 @@ func (a *WxRepo) IsExistMsgIDFromRedis(ctx context.Context, msgID string) (bool,
 		break
 	}
 	if err != nil {
-		log.Errorf("IsExistMsgIDFromRedis get wx msg id from redis failed,traceID:%s, err:%v", traceID, err)
+		log.Errorf("IsExistMsgIDFromRedis get wx msg id from redis failed,traceID:%s, err:%+v", traceID, err)
 		return false, err
 	}
 	return true, nil

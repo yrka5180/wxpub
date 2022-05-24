@@ -32,7 +32,7 @@ func (a *WX) GetWXCheckSign(c *gin.Context) {
 	defer httputil.HTTPResponse(ctx, c, &resp)
 	var param entity.WXCheckReq
 	if err := c.ShouldBindQuery(&param); err != nil {
-		log.Errorf("validate WXCheckReq ShouldBindQuery failed, traceID:%s, err:%v", traceID, err)
+		log.Errorf("validate WXCheckReq ShouldBindQuery failed, traceID:%s, err:%+v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, "Invalid query provided")
 		return
 	}
@@ -55,7 +55,7 @@ func (a *WX) HandleEventXML(c *gin.Context) {
 	defer httputil.HTTPResponse(ctx, c, &resp)
 	var param entity.WXCheckReq
 	if err := c.ShouldBindQuery(&param); err != nil {
-		log.Errorf("validate HandleEventXML ShouldBindQuery failed, traceID:%s, err:%v", traceID, err)
+		log.Errorf("validate HandleEventXML ShouldBindQuery failed, traceID:%s, err:%+v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, "Invalid query provided")
 		return
 	}
@@ -67,14 +67,14 @@ func (a *WX) HandleEventXML(c *gin.Context) {
 	}
 	var reqBody *entity.TextRequestBody
 	if err := c.ShouldBindXML(&reqBody); err != nil {
-		log.Errorf("validate HandleEventXML ShouldBindXML failed, traceID:%s, err:%v", traceID, err)
+		log.Errorf("validate HandleEventXML ShouldBindXML failed, traceID:%s, err:%+v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, "Invalid xml body provided")
 		return
 	}
 	// 事件xml返回
 	respBody, err := a.wx.HandleEventXML(ctx, reqBody)
 	if err != nil {
-		log.Errorf("wx public platform HandleEventXML access failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("wx public platform HandleEventXML access failed,traceID:%s,err:%+v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, "wx public platform GetEventXML access failed!")
 		return
 	}

@@ -45,17 +45,17 @@ func (a *AkRepo) GetAccessTokenFromRequest(ctx context.Context) (entity.AccessTo
 		nil, make(map[string]string))
 	statusCode, body, _, err := httputil.RequestWithContextAndRepeat(ctx, requestProperty, traceID)
 	if err != nil {
-		log.Errorf("request wx access token failed, traceID:%s, error:%v", traceID, err)
+		log.Errorf("request wx access token failed, traceID:%s, error:%+v", traceID, err)
 		return entity.AccessTokenResp{}, err
 	}
 	if statusCode != http.StatusOK {
-		log.Errorf("request wx access token failed, statusCode:%d,traceID:%s, error:%v", statusCode, traceID, err)
+		log.Errorf("request wx access token failed, statusCode:%d,traceID:%s, error:%+v", statusCode, traceID, err)
 		return entity.AccessTokenResp{}, err
 	}
 	var akResp entity.AccessTokenResp
 	err = json.Unmarshal(body, &akResp)
 	if err != nil {
-		log.Errorf("get wx access token failed by unmarshal, resp:%s, traceID:%s, err:%v", string(body), traceID, err)
+		log.Errorf("get wx access token failed by unmarshal, resp:%s, traceID:%s, err:%+v", string(body), traceID, err)
 		return entity.AccessTokenResp{}, err
 	}
 	// 获取失败
@@ -83,7 +83,7 @@ func (a *AkRepo) GetAccessTokenFromRedis(ctx context.Context) (string, error) {
 	if err == nil || err == redis.Nil {
 		return string(oldAk), nil
 	}
-	log.Errorf("GetAccessTokenFromRedis get wx access token from redis failed by redis,traceID:%s, err:%v", traceID, err)
+	log.Errorf("GetAccessTokenFromRedis get wx access token from redis failed by redis,traceID:%s, err:%+v", traceID, err)
 	return "", err
 }
 
@@ -92,7 +92,7 @@ func (a *AkRepo) SetAccessTokenToRedis(ctx context.Context, accessToken string, 
 	log.Debugf("SetAccessTokenToRedis traceID:%s", traceID)
 	err := redis2.RSet(consts.RedisKeyAccessToken, accessToken, expiresIn)
 	if err != nil {
-		log.Errorf("SetAccessTokenToRedis AkRepo redis set new ak failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("SetAccessTokenToRedis AkRepo redis set new ak failed,traceID:%s,err:%+v", traceID, err)
 		return err
 	}
 	return nil
