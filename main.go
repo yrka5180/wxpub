@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	extra2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/extra"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,7 +15,6 @@ import (
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/g"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/extra"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/tasks"
 
 	log "github.com/sirupsen/logrus"
@@ -27,7 +27,7 @@ var (
 
 func main() {
 	config.Init()
-	extra.Default(config.LogLevel)
+	extra2.Default(config.LogLevel)
 	globalCtx, globalCancel = context.WithCancel(context.Background())
 	// init
 	InitService()

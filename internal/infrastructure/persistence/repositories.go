@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"fmt"
+	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 	oslog "log"
 	"os"
 
@@ -10,8 +11,6 @@ import (
 	"time"
 
 	"gorm.io/gorm"
-
-	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/redis"
 
 	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
 	captchaPb "git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace"
@@ -97,7 +96,7 @@ func NewDBRepositories(config DBConfig, debugMode bool) error {
 }
 
 func NewRedisRepositories(addresses []string) error {
-	redisClient := redis2.NewRedisClient(addresses)
+	redisClient := redis3.NewRedisClient(addresses)
 	err := redisClient.Ping().Err()
 	if err != nil {
 		return err

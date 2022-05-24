@@ -2,11 +2,11 @@ package repository
 
 import (
 	"context"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 	"time"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/persistence"
-	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/redis"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	log "github.com/sirupsen/logrus"
@@ -58,7 +58,7 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 		log.Errorf("FreshAccessToken AccessTokenRepository GetAccessToken failed,traceID:%s,err:%+v", traceID, err)
 	}
 	// redis lock for access token to avoid racing to cover ak value from redis
-	rLock := redis2.NewRLock(*a.ak.Redis, consts.RedisLockAccessToken)
+	rLock := redis.NewRLock(*a.ak.Redis, consts.RedisLockAccessToken)
 	// init redis lock time 2 seconds
 	rLock.SetExpire(2)
 	var ok bool

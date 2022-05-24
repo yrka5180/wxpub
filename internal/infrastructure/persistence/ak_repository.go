@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 	"net/http"
 	"time"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
-	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/redis"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/httputil"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
@@ -73,7 +73,7 @@ func (a *AkRepo) GetAccessTokenFromRedis(ctx context.Context) (string, error) {
 	var oldAk []byte
 	var err error
 	for i := 0; i < 3; i++ {
-		oldAk, err = redis2.RGet(consts.RedisKeyAccessToken)
+		oldAk, err = redis3.RGet(consts.RedisKeyAccessToken)
 		if err != nil && err != redis.Nil {
 			time.Sleep(10 * time.Millisecond)
 			continue
@@ -90,7 +90,7 @@ func (a *AkRepo) GetAccessTokenFromRedis(ctx context.Context) (string, error) {
 func (a *AkRepo) SetAccessTokenToRedis(ctx context.Context, accessToken string, expiresIn int) error {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("SetAccessTokenToRedis traceID:%s", traceID)
-	err := redis2.RSet(consts.RedisKeyAccessToken, accessToken, expiresIn)
+	err := redis3.RSet(consts.RedisKeyAccessToken, accessToken, expiresIn)
 	if err != nil {
 		log.Errorf("SetAccessTokenToRedis AkRepo redis set new ak failed,traceID:%s,err:%+v", traceID, err)
 		return err

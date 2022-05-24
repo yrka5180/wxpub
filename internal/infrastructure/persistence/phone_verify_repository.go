@@ -3,11 +3,11 @@ package persistence
 import (
 	"context"
 	"encoding/json"
+	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 	"time"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/infrastructure/pkg/redis"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"git.nova.net.cn/nova/go-common/uuid"
@@ -110,7 +110,7 @@ func (r *PhoneVerifyRepo) SetVerifyCodeSmsStorage(ctx context.Context, challenge
 
 	smsRedisValue, _ := json.Marshal(verifyCodeSmsRedisValue)
 	// redis存放open_id+phone:{verifyCodeAnswer,smsCreateTime}，过期时间为30分钟
-	err = redis.RSet(consts.RedisKeyPrefixChallenge+challenge, smsRedisValue, consts.VerifyCodeSmsChallengeTTL)
+	err = redis2.RSet(consts.RedisKeyPrefixChallenge+challenge, smsRedisValue, consts.VerifyCodeSmsChallengeTTL)
 	if err != nil {
 		log.Errorf("failed to do redis Set, error: %+v, traceID: %s", err, traceID)
 		return
@@ -126,7 +126,7 @@ func (r *PhoneVerifyRepo) VerifySmsCode(ctx context.Context, challenge, verifyCo
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("VerifySmsCode traceID:%s", traceID)
 
-	value, err = redis.RGet(consts.RedisKeyPrefixChallenge + challenge)
+	value, err = redis2.RGet(consts.RedisKeyPrefixChallenge + challenge)
 	if err != nil {
 		log.Errorf("failed to do redis HGet, error: %+v, traceID: %s", err, traceID)
 		return
