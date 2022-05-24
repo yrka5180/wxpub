@@ -110,7 +110,7 @@ func NewRedisRepositories(addresses []string) error {
 func NewSmsGRPCClientRepositories(smsRPCAddr string) error {
 	smsConn, err := grpc.Dial(smsRPCAddr, grpc.WithInsecure())
 	if err != nil {
-		log.Errorf("failed to dial sms grpc server: %v", err)
+		log.Errorf("failed to dial sms grpc server: %+v", err)
 		return err
 	}
 	smsClient := smsPb.NewSenderClient(smsConn)
@@ -121,7 +121,7 @@ func NewSmsGRPCClientRepositories(smsRPCAddr string) error {
 func NewCaptchaGRPCClientRepositories(captchaRPCAddr string) error {
 	captchaConn, err := grpc.Dial(captchaRPCAddr, grpc.WithInsecure())
 	if err != nil {
-		log.Errorf("failed to dial captcha grpc server: %v", err)
+		log.Errorf("failed to dial captcha grpc server: %+v", err)
 		return err
 	}
 

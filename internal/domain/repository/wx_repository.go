@@ -64,7 +64,7 @@ func (a *WXRepository) HandleEventXML(ctx context.Context, reqBody *entity.TextR
 	}
 	responseTextBody, err := a.handlerEvent(ctx, reqBody)
 	if err != nil {
-		log.Errorf("HandleEventXML handlerEvent failed traceID:%s,err:%v", traceID, err)
+		log.Errorf("HandleEventXML handlerEvent failed traceID:%s,err:%+v", traceID, err)
 		return nil, err
 	}
 	return responseTextBody, nil
@@ -102,7 +102,7 @@ func (a *WXRepository) handlerSubscribeEvent(ctx context.Context, reqBody *entit
 	msgID := fmt.Sprintf("%s%d", reqBody.FromUserName, reqBody.CreateTime)
 	exist, err := a.isExistUserMsgID(ctx, msgID, reqBody.FromUserName, reqBody.CreateTime)
 	if err != nil {
-		log.Errorf("handlerSubscribeEvent WXRepository wx repo isExistUserMsgID traceID:%s,err:%v", traceID, err)
+		log.Errorf("handlerSubscribeEvent WXRepository wx repo isExistUserMsgID traceID:%s,err:%+v", traceID, err)
 		return "", err
 	}
 	if exist {
@@ -116,12 +116,12 @@ func (a *WXRepository) handlerSubscribeEvent(ctx context.Context, reqBody *entit
 	}
 	err = a.user.SaveUser(ctx, u, false)
 	if err != nil {
-		log.Errorf("handlerSubscribeEvent WXRepository wx repo SaveUser traceID:%s,err:%v", traceID, err)
+		log.Errorf("handlerSubscribeEvent WXRepository wx repo SaveUser traceID:%s,err:%+v", traceID, err)
 		return "", err
 	}
 	err = a.wx.SetMsgIDToRedis(ctx, msgID)
 	if err != nil {
-		log.Errorf("handlerSubscribeEvent WXRepository wx repo set msg id to redis failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("handlerSubscribeEvent WXRepository wx repo set msg id to redis failed,traceID:%s,err:%+v", traceID, err)
 	}
 	return fmt.Sprintf("%s%s", consts.SubscribeRespContent, config.VerifyProfileURL), nil
 }
@@ -133,7 +133,7 @@ func (a *WXRepository) handlerUnSubscribeEvent(ctx context.Context, reqBody *ent
 	msgID := fmt.Sprintf("%s%d", reqBody.FromUserName, reqBody.CreateTime)
 	exist, err := a.isExistUserMsgID(ctx, msgID, reqBody.FromUserName, reqBody.CreateTime)
 	if err != nil {
-		log.Errorf("handlerUnSubscribeEvent WXRepository wx repo isExistUserMsgID traceID:%s,err:%v", traceID, err)
+		log.Errorf("handlerUnSubscribeEvent WXRepository wx repo isExistUserMsgID traceID:%s,err:%+v", traceID, err)
 		return "", err
 	}
 	if exist {
@@ -145,12 +145,12 @@ func (a *WXRepository) handlerUnSubscribeEvent(ctx context.Context, reqBody *ent
 	}
 	err = a.user.DelUser(ctx, u)
 	if err != nil {
-		log.Errorf("handlerUnSubscribeEvent WXRepository wx repo SaveUser traceID:%s,err:%v", traceID, err)
+		log.Errorf("handlerUnSubscribeEvent WXRepository wx repo SaveUser traceID:%s,err:%+v", traceID, err)
 		return "", err
 	}
 	err = a.wx.SetMsgIDToRedis(ctx, msgID)
 	if err != nil {
-		log.Errorf("handlerUnSubscribeEvent WXRepository wx repo set msg id to redis failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("handlerUnSubscribeEvent WXRepository wx repo set msg id to redis failed,traceID:%s,err:%+v", traceID, err)
 	}
 	return consts.UnSubscribeRespContent, nil
 }
@@ -162,7 +162,7 @@ func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, re
 	msgID := fmt.Sprintf("%s%d", reqBody.FromUserName, reqBody.CreateTime)
 	exist, err := a.isExistTemplateSendJobMsgID(ctx, msgID, reqBody.FromUserName, reqBody.CreateTime)
 	if err != nil {
-		log.Errorf("handlerTEMPLATESENDJOBFINISHEvent WXRepository wx repo isExistTemplateSendJobMsgID traceID:%s,err:%v", traceID, err)
+		log.Errorf("handlerTEMPLATESENDJOBFINISHEvent WXRepository wx repo isExistTemplateSendJobMsgID traceID:%s,err:%+v", traceID, err)
 		return "", err
 	}
 	if exist {
@@ -172,7 +172,7 @@ func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, re
 	// 判断当前发送次数是否小于等于最大重发次数,是则重发
 	msg, err := a.msg.GetMsgLogByMsgID(ctx, reqBody.MsgID)
 	if err != nil {
-		log.Errorf("handlerTEMPLATESENDJOBFINISHEvent GetMsgLogByMsgID failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("handlerTEMPLATESENDJOBFINISHEvent GetMsgLogByMsgID failed,traceID:%s,err:%+v", traceID, err)
 		return consts.TEMPLATESENDJOBFINISHRespContent, err
 	}
 	if reqBody.Status == consts.TemplateSendSuccessStatus { // 发送成功，改状态
@@ -184,7 +184,7 @@ func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, re
 		}
 		err = a.msg.UpdateMsgLog(ctx, updateItem)
 		if err != nil {
-			log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateMsgLog TemplateSendSuccessStatus failed,traceID:%s,err:%v", traceID, err)
+			log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateMsgLog TemplateSendSuccessStatus failed,traceID:%s,err:%+v", traceID, err)
 			return consts.TEMPLATESENDJOBFINISHRespContent, err
 		}
 	} else if reqBody.Status == consts.TemplateSendUserBlockStatus { // 发送失败，用户拒接
@@ -196,7 +196,7 @@ func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, re
 		}
 		err = a.msg.UpdateMsgLog(ctx, updateItem)
 		if err != nil {
-			log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateMsgLog TemplateSendUserBlockStatus failed,traceID:%s,err:%v", traceID, err)
+			log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateMsgLog TemplateSendUserBlockStatus failed,traceID:%s,err:%+v", traceID, err)
 			return consts.TEMPLATESENDJOBFINISHRespContent, err
 		}
 	} else if reqBody.Status == consts.TemplateSendFailedStatus { // 发送失败，内部错误，重发，改变发送状态为0，重试次数+1
@@ -211,7 +211,7 @@ func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, re
 			}
 			err = a.msg.UpdateMsgLogSendStatus(ctx, updateItem)
 			if err != nil {
-				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateMsgLogSendStatus TemplateSendFailedStatus failed,item:%v,traceID:%s,err:%v", updateItem, traceID, err)
+				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateMsgLogSendStatus TemplateSendFailedStatus failed,item:%+v,traceID:%s,err:%+v", updateItem, traceID, err)
 				return consts.TEMPLATESENDJOBFINISHRespContent, err
 			}
 		} else {
@@ -224,7 +224,7 @@ func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, re
 			}
 			err = a.msg.UpdateMsgLog(ctx, updateItem)
 			if err != nil {
-				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateMsgLog send status TemplateSendFailedStatus failed,traceID:%s,err:%v", traceID, err)
+				log.Errorf("handlerTEMPLATESENDJOBFINISHEvent UpdateMsgLog send status TemplateSendFailedStatus failed,traceID:%s,err:%+v", traceID, err)
 				return consts.TEMPLATESENDJOBFINISHRespContent, err
 			}
 		}
@@ -237,7 +237,7 @@ func (a *WXRepository) isExistUserMsgID(ctx context.Context, msgID string, fromU
 	log.Debugf("IsExistUserMsgID traceID:%s", traceID)
 	exist, err := a.wx.IsExistMsgIDFromRedis(ctx, msgID)
 	if err != nil {
-		log.Errorf("isExistUserMsgID IsExistMsgIDFromRedis failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("isExistUserMsgID IsExistMsgIDFromRedis failed,traceID:%s,err:%+v", traceID, err)
 		return false, err
 	}
 	// 若存在返回空串,不存在则持久化存储,并保存msg id 到 redis
@@ -247,14 +247,14 @@ func (a *WXRepository) isExistUserMsgID(ctx context.Context, msgID string, fromU
 	// 从db上找，存在则返回空串
 	exist, err = a.user.IsExistUserMsgFromDB(ctx, fromUserName, createTime)
 	if err != nil {
-		log.Errorf("isExistUserMsgID IsExistUserFromDB failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("isExistUserMsgID IsExistUserFromDB failed,traceID:%s,err:%+v", traceID, err)
 		return false, err
 	}
 	if exist {
 		// 回写到redis中
 		err = a.wx.SetMsgIDToRedis(ctx, msgID)
 		if err != nil {
-			log.Errorf("isExistUserMsgID WXRepository wx repo set msg id to redis failed,traceID:%s,err:%v", traceID, err)
+			log.Errorf("isExistUserMsgID WXRepository wx repo set msg id to redis failed,traceID:%s,err:%+v", traceID, err)
 		}
 		return true, nil
 	}
@@ -266,7 +266,7 @@ func (a *WXRepository) isExistTemplateSendJobMsgID(ctx context.Context, msgID st
 	log.Debugf("isExistTemplateSendJobMsgID traceID:%s", traceID)
 	exist, err := a.wx.IsExistMsgIDFromRedis(ctx, msgID)
 	if err != nil {
-		log.Errorf("isExistTemplateSendJobMsgID IsExistMsgIDFromRedis exist msg id from redis,traceID:%s,err:%v", traceID, err)
+		log.Errorf("isExistTemplateSendJobMsgID IsExistMsgIDFromRedis exist msg id from redis,traceID:%s,err:%+v", traceID, err)
 		return false, err
 	}
 	if exist {
@@ -275,14 +275,14 @@ func (a *WXRepository) isExistTemplateSendJobMsgID(ctx context.Context, msgID st
 	// db查当前消息是否存在
 	exist, err = a.msg.IsExistMsgLogFromDB(ctx, fromUserName, createTime)
 	if err != nil {
-		log.Errorf("isExistTemplateSendJobMsgID IsExistMsgLogFromDB failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("isExistTemplateSendJobMsgID IsExistMsgLogFromDB failed,traceID:%s,err:%+v", traceID, err)
 		return false, err
 	}
 	if exist {
 		// 回写到redis
 		err = a.wx.SetMsgIDToRedis(ctx, msgID)
 		if err != nil {
-			log.Errorf("isExistUserMsgID WXRepository wx repo set msg id to redis failed,traceID:%s,err:%v", traceID, err)
+			log.Errorf("isExistUserMsgID WXRepository wx repo set msg id to redis failed,traceID:%s,err:%+v", traceID, err)
 		}
 		return true, nil
 	}

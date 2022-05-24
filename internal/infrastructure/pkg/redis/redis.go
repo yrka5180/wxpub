@@ -26,7 +26,7 @@ func NewRedisClient(addresses []string) redis.UniversalClient {
 func RSet(key string, value interface{}, ttl int) (err error) {
 	r := RClient.Set(key, value, time.Second*time.Duration(ttl))
 	if err = r.Err(); err != nil {
-		log.Errorf("failed to RSet,err:%v", err)
+		log.Errorf("failed to RSet,err:%+v", err)
 		return
 	}
 	return
@@ -35,7 +35,7 @@ func RSet(key string, value interface{}, ttl int) (err error) {
 func RGet(key string) (value []byte, err error) {
 	value, err = RClient.Get(key).Bytes()
 	if err != nil && err != redis.Nil {
-		log.Errorf("get key from redis failed, key:%s, err:%v", key, err)
+		log.Errorf("get key from redis failed, key:%s, err:%+v", key, err)
 		return
 	}
 	return

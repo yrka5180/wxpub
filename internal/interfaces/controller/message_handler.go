@@ -44,7 +44,7 @@ func (a *Message) SendTmplMessage(c *gin.Context) {
 
 	var param entity.SendTmplMsgReq
 	if err := c.ShouldBindJSON(&param); err != nil {
-		log.Errorf("SendTmplMessage validate sendmsg req ShouldBindJSON failed, traceID:%s, err:%v", traceID, err)
+		log.Errorf("SendTmplMessage validate sendmsg req ShouldBindJSON failed, traceID:%s, err:%+v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInvalidParams, "Invalid json provided")
 		return
 	}
@@ -57,7 +57,7 @@ func (a *Message) SendTmplMessage(c *gin.Context) {
 	var msgResp entity.SendTmplMsgResp
 	msgResp, err := a.message.SendTmplMsg(ctx, param)
 	if err != nil {
-		log.Errorf("SendTmplMessage MessageInterface send msg failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("SendTmplMessage MessageInterface send msg failed,traceID:%s,err:%+v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())
 		return
 	}
@@ -95,7 +95,7 @@ func (a *Message) TmplMsgStatus(c *gin.Context) {
 	var msgStatusResp entity.TmplMsgStatusResp
 	msgStatusResp, err := a.message.TmplMsgStatus(ctx, param.RequestID)
 	if err != nil {
-		log.Errorf("TmplMsgStatus MessageInterface tmpl msg status failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("TmplMsgStatus MessageInterface tmpl msg status failed,traceID:%s,err:%+v", traceID, err)
 		httputil.SetErrorResponse(&resp, errors.CodeInternalServerError, err.Error())
 		return
 	}

@@ -90,7 +90,7 @@ func (rl *RLock) Acquire() (bool, error) {
 		go rl.WatchDog()
 		return true, nil
 	}
-	log.Errorf("Unknown reply when acquiring lock for %s: %v", rl.key, resp)
+	log.Errorf("Unknown reply when acquiring lock for %s: %+v", rl.key, resp)
 	return false, nil
 }
 
@@ -133,9 +133,9 @@ func (rl *RLock) WatchDog() {
 				rl.id, strconv.Itoa(int(rl.seconds) * millisPerSecond),
 			}).Result()
 			if err != nil {
-				log.Errorf("WatchDog watchdog failed,err:%v", err)
+				log.Errorf("WatchDog watchdog failed,err:%+v", err)
 			}
-			log.Infof("WatchDog redis lock!!! resp is %v", resp)
+			log.Infof("WatchDog redis lock!!! resp is %+v", resp)
 		}
 	}
 }

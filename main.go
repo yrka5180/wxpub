@@ -62,7 +62,7 @@ func gracefulShutdown(srv *http.Server) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+		log.Fatalf("Server forced to shutdown: %+v", err)
 	}
 
 	log.Infoln("Server exiting")

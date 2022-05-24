@@ -38,13 +38,13 @@ func (t *MessageRepository) SendTmplMsg(ctx context.Context, param entity.SendTm
 	// 生成request id
 	requestID, err := utils.GetUUID()
 	if err != nil {
-		log.Errorf("SendTmplMsg MessageRepository GetUUID failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("SendTmplMsg MessageRepository GetUUID failed,traceID:%s,err:%+v", traceID, err)
 		return entity.SendTmplMsgResp{}, err
 	}
 	resp.RequestID = requestID
 	users, err := t.user.ListUserByPhones(ctx, param.Phones)
 	if err != nil {
-		log.Errorf("SendTmplMsg ListUserByPhones failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("SendTmplMsg ListUserByPhones failed,traceID:%s,err:%+v", traceID, err)
 		return entity.SendTmplMsgResp{}, err
 	}
 	userPhoneMap := make(map[string]entity.User)
@@ -62,7 +62,7 @@ func (t *MessageRepository) SendTmplMsg(ctx context.Context, param entity.SendTm
 	// 消息批量存入db
 	err = t.msg.BatchSaveMsgLog(ctx, msgLogs)
 	if err != nil {
-		log.Errorf("SendTmplMsg BatchSaveMsgLog failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("SendTmplMsg BatchSaveMsgLog failed,traceID:%s,err:%+v", traceID, err)
 		return entity.SendTmplMsgResp{}, err
 	}
 	return resp, nil
@@ -77,12 +77,12 @@ func (t *MessageRepository) TmplMsgStatus(ctx context.Context, requestID string)
 	var err error
 	count, err = t.msg.ListMsgLogsByReqIDCnt(ctx, requestID)
 	if err != nil {
-		log.Errorf("TmplMsgStatus ListMsgLogsByReqIDCnt failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("TmplMsgStatus ListMsgLogsByReqIDCnt failed,traceID:%s,err:%+v", traceID, err)
 		return entity.TmplMsgStatusResp{}, err
 	}
 	items, err := t.msg.ListMsgLogsByReqID(ctx, requestID)
 	if err != nil {
-		log.Errorf("TmplMsgStatus ListMsgLogsByRequestID failed,traceID:%s,err:%v", traceID, err)
+		log.Errorf("TmplMsgStatus ListMsgLogsByRequestID failed,traceID:%s,err:%+v", traceID, err)
 		return entity.TmplMsgStatusResp{}, err
 	}
 	for _, item := range items {

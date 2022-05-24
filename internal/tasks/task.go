@@ -47,13 +47,13 @@ func handleMsg(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Infof("handleMsg exit..., err:%v", ctx.Err())
+			log.Infof("handleMsg exit..., err:%+v", ctx.Err())
 			return
 		case <-ticker.C:
 			// 扫全表状态为pending的消息
 			msgLogs, err := msgRepo.ListPendingMsgLogs(ctx)
 			if err != nil {
-				log.Errorf("handleMsg GetListPendingMsgLogs failed,err:%v", err)
+				log.Errorf("handleMsg GetListPendingMsgLogs failed,err:%+v", err)
 				break
 			}
 			// 发送消息并修改发送状态，允许消息重复消费
@@ -69,7 +69,7 @@ func handleMsg(ctx context.Context) {
 					var ak string
 					ak, err = akRepository.GetAccessToken(ctx)
 					if err != nil {
-						log.Errorf("handleMsg GetAccessToken failed,err:%v", err)
+						log.Errorf("handleMsg GetAccessToken failed,err:%+v", err)
 						return
 					}
 					msgSendReq := msgLog.TransferSendTmplMsgRemoteReq()
@@ -78,12 +78,12 @@ func handleMsg(ctx context.Context) {
 					var resp entity.SendTmplMsgRemoteResp
 					resp, err = msgRepo.SendTmplMsgFromRequest(ctx, msgSendReq)
 					if err != nil {
-						log.Errorf("handleMsg SendTmplMsgFromRequest failed,msgLog:%v,err:%v", msgLog, err)
+						log.Errorf("handleMsg SendTmplMsgFromRequest failed,msgLog:%+v,err:%+v", msgLog, err)
 						// token过期重试或者失效重新刷新ak去请求重试，不记录重试次数
 						if resp.ErrCode == errors.CodeRIDExpired || resp.ErrCode == errors.CodeRIDUnauthorized {
 							ak, err = akRepository.FreshAccessToken(ctx)
 							if err != nil {
-								log.Errorf("handleMsg FreshAccessToken failed,err:%v", err)
+								log.Errorf("handleMsg FreshAccessToken failed,err:%+v", err)
 								return
 							}
 						}
@@ -91,7 +91,7 @@ func handleMsg(ctx context.Context) {
 						msgLog.Count++
 						err = msgRepo.UpdateMsgLog(ctx, msgLog)
 						if err != nil {
-							log.Errorf("handleMsg UpdateMsgLog failed,msgLog:%v,err:%v", msgLog, err)
+							log.Errorf("handleMsg UpdateMsgLog failed,msgLog:%+v,err:%+v", msgLog, err)
 							return
 						}
 						return
@@ -102,7 +102,7 @@ func handleMsg(ctx context.Context) {
 					msgLog.Count++
 					err = msgRepo.UpdateMsgLog(ctx, msgLog)
 					if err != nil {
-						log.Errorf("handleMsg UpdateMsgLog failed,msgLog:%v,err:%v", msgLog, err)
+						log.Errorf("handleMsg UpdateMsgLog failed,msgLog:%+v,err:%+v", msgLog, err)
 						return
 					}
 				}(msgLog)
@@ -119,18 +119,18 @@ func handleFailSendMsg(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Infof("handleFailSendMsg exit..., err:%v", ctx.Err())
+			log.Infof("handleFailSendMsg exit..., err:%+v", ctx.Err())
 			return
 		case <-ticker.C:
 			// 待发送错误重试消息处理
 			err := msgRepo.UpdateMaxRetryCntMsgLogsStatus(ctx)
 			if err != nil {
-				log.Errorf("handleFailSendMsg UpdateMaxRetryCntMsgLogsStatus failed,err:%v", err)
+				log.Errorf("handleFailSendMsg UpdateMaxRetryCntMsgLogsStatus failed,err:%+v", err)
 			}
 			// 发送中回调最大时间消息处理
 			err = msgRepo.UpdateTimeoutMsgLogsStatus(ctx)
 			if err != nil {
-				log.Errorf("handleFailSendMsg UpdateTimeoutMsgLogsStatus failed,err:%v", err)
+				log.Errorf("handleFailSendMsg UpdateTimeoutMsgLogsStatus failed,err:%+v", err)
 			}
 		}
 	}

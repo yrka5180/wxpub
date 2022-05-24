@@ -48,7 +48,7 @@ func (r *PhoneVerifyRepo) GenCaptcha(ctx context.Context, width int32, height in
 		ShowLineOptions: 2,
 	})
 	if err != nil {
-		log.Errorf("GenCaptcha get captcha error: %v, traceID: %s", err, traceID)
+		log.Errorf("GenCaptcha get captcha error: %+v, traceID: %s", err, traceID)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (r *PhoneVerifyRepo) VerifyCaptcha(ctx context.Context, captchaID string, c
 		Answer: captchaAnswer,
 	})
 	if err != nil {
-		log.Errorf("VerifyCaptcha Verify error: %v, traceID: %s", err, traceID)
+		log.Errorf("VerifyCaptcha Verify error: %+v, traceID: %s", err, traceID)
 		return
 	}
 
@@ -134,7 +134,7 @@ func (r *PhoneVerifyRepo) VerifySmsCode(ctx context.Context, challenge, verifyCo
 
 	err = json.Unmarshal(value, &verifyCodeValue)
 	if err != nil {
-		log.Errorf("VerifySmsCode json unmarshal failed, error: %v, traceID: %s", err, traceID)
+		log.Errorf("VerifySmsCode json unmarshal failed, error: %+v, traceID: %s", err, traceID)
 		return
 	}
 
