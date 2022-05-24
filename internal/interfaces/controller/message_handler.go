@@ -82,23 +82,14 @@ func (a *Message) TmplMsgStatus(c *gin.Context) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
-	resp := httputil2.DefaultResponse()
-	defer httputil2.HTTPJSONResponse(ctx, c, &resp)
-
 	var param entity.TmplMsgStatusReq
 	param.RequestID = ginx.URLParamStr(c, "id")
 	errMsg := param.Validate()
 	if len(errMsg) > 0 {
 		log.Errorf("TmplMsgStatus validate req param failed, traceID:%s, errMsg:%s", traceID, errMsg)
-		httputil2.SetErrorResponse(&resp, errors2.CodeInvalidParams, errMsg)
-		return
+		ginx.BombErr(errors2.CodeInvalidParams, errMsg)
 	}
 	var msgStatusResp entity.TmplMsgStatusResp
 	msgStatusResp, err := a.message.TmplMsgStatus(ctx, param.RequestID)
-	if err != nil {
-		log.Errorf("TmplMsgStatus MessageInterface tmpl msg status failed,traceID:%s,err:%+v", traceID, err)
-		httputil2.SetErrorResponse(&resp, errors2.CodeInternalServerError, err.Error())
-		return
-	}
-	httputil2.SetSuccessfulResponse(&resp, errors2.CodeOK, msgStatusResp)
+	ginx.NewRender(c).Data(msgStatusResp, err)
 }

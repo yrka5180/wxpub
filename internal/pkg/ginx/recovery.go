@@ -15,9 +15,10 @@ import (
 	"strings"
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
 	httputil2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx/httputil"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
+
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -45,12 +46,12 @@ func RecoveryWithWriter(out io.Writer) gin.HandlerFunc {
 				// custom error
 				if e, ok := err.(errorx.CustomError); ok {
 					if e.ErrorCode != 200 {
+						c.String(errorx.GetStatusCode(e.ErrorCode), e.ErrorMsg)
+					} else {
 						c.Header(errorx.XCode, strconv.Itoa(e.ErrorCode))
 						c.Header(errorx.XMsg, e.ErrorMsg)
 						c.Header(errorx.XTraceID, utils.ShouldGetTraceID(httputil2.DefaultTodoNovaContext(c)))
-						c.String(e.ErrorCode, e.ErrorMsg)
-					} else {
-						c.JSON(e.ErrorCode, gin.H{"err": e.ErrorMsg})
+						c.JSON(errorx.GetStatusCode(e.ErrorCode), gin.H{"err": e.ErrorMsg})
 					}
 					c.Abort()
 					return

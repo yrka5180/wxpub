@@ -96,7 +96,7 @@ type MsgLog struct {
 }
 
 func (m *TmplMsgStatusReq) Validate() string {
-	if len(m.RequestID) <= 0 {
+	if len(m.RequestID) <= 5 {
 		return "request_id is empty"
 	}
 	return ""
