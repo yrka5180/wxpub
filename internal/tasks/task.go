@@ -81,7 +81,7 @@ func handleMsg(ctx context.Context) {
 						log.Errorf("handleMsg SendTmplMsgFromRequest failed,msgLog:%+v,err:%+v", msgLog, err)
 						// token过期重试或者失效重新刷新ak去请求重试，不记录重试次数
 						if resp.ErrCode == errors.CodeRIDExpired || resp.ErrCode == errors.CodeRIDUnauthorized {
-							ak, err = akRepository.FreshAccessToken(ctx)
+							_, err = akRepository.FreshAccessToken(ctx)
 							if err != nil {
 								log.Errorf("handleMsg FreshAccessToken failed,err:%+v", err)
 								return
