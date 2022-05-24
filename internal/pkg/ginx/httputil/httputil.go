@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	error2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"github.com/gin-gonic/gin"
@@ -35,9 +36,9 @@ func (resp *GenericResponse) String() string {
 func HTTPJSONResponse(ctx context.Context, c *gin.Context, resp *GenericResponse) {
 	log.Debugf("%s, resp: %+v", utils.ShouldGetTraceID(ctx), resp)
 
-	c.Header(error2.XCode, strconv.Itoa(resp.ErrMsg.XCode))
-	c.Header(error2.XMsg, resp.ErrMsg.XMsg)
-	c.Header(error2.XTraceID, utils.ShouldGetTraceID(ctx))
+	c.Header(errorx.XCode, strconv.Itoa(resp.ErrMsg.XCode))
+	c.Header(errorx.XMsg, resp.ErrMsg.XMsg)
+	c.Header(errorx.XTraceID, utils.ShouldGetTraceID(ctx))
 
 	if resp.Body != nil {
 		c.JSON(resp.StatusCode, resp.Body)
@@ -63,51 +64,43 @@ func SetSuccessfulResponse(resp *GenericResponse, code int, body interface{}) {
 	setResponse(resp, code, "", body)
 }
 
-func SetSuccessfulResponseWithError(resp *GenericResponse, err error, body interface{}) {
-	if customErr, ok := err.(error2.CustomError); ok {
-		setResponse(resp, customErr.ErrorCode, customErr.ErrorMsg, body)
-		return
-	}
-	setResponse(resp, error2.CodeInternalServerError, error2.GetErrorMessage(error2.CodeInternalServerError), body)
-}
-
 func SetErrorResponse(resp *GenericResponse, errCode int, errMsg string) {
 	setResponse(resp, errCode, errMsg, nil)
 }
 
 func SetErrorResponseWithError(resp *GenericResponse, err error) {
-	if customErr, ok := err.(error2.CustomError); ok {
+	if customErr, ok := err.(errorx.CustomError); ok {
 		setResponse(resp, customErr.ErrorCode, customErr.ErrorMsg, nil)
 		return
 	}
-	setResponse(resp, error2.CodeInternalServerError, error2.GetErrorMessage(error2.CodeInternalServerError), nil)
+	setResponse(resp, errorx.CodeInternalServerError, errorx.GetErrorMessage(errorx.CodeInternalServerError), nil)
 }
 
 func DefaultResponse() GenericResponse {
 	return GenericResponse{
 		ErrMsg: &ErrorMessage{
-			XCode: error2.CodeOK,
-			XMsg:  error2.GetErrorMessage(error2.CodeOK),
+			XCode: errorx.CodeOK,
+			XMsg:  errorx.GetErrorMessage(errorx.CodeOK),
 		},
 	}
 }
 
 func setResponse(resp *GenericResponse, errCode int, errMsg string, body interface{}) {
-	resp.StatusCode = error2.GetStatusCode(errCode)
+	resp.StatusCode = errorx.GetStatusCode(errCode)
 	if body != nil {
 		resp.Body = body
 	} else {
 		resp.ErrMsg.XCode = errCode
 		if len(errMsg) == 0 {
-			errMsg = error2.GetErrorMessage(errCode)
+			errMsg = errorx.GetErrorMessage(errCode)
 		}
 		resp.ErrMsg.XMsg = errMsg
 	}
 }
 
 func Abort(ctx *gin.Context, errCode int, errMsg string, traceID string) {
-	ctx.Header(error2.XCode, fmt.Sprintf("%d", errCode))
-	ctx.Header(error2.XMsg, errMsg)
-	ctx.Header(error2.XTraceID, traceID)
-	ctx.AbortWithStatus(error2.GetStatusCode(errCode))
+	ctx.Header(errorx.XCode, fmt.Sprintf("%d", errCode))
+	ctx.Header(errorx.XMsg, errMsg)
+	ctx.Header(errorx.XTraceID, traceID)
+	ctx.AbortWithStatus(errorx.GetStatusCode(errCode))
 }

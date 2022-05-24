@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	errors2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
-
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/g"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
@@ -80,7 +80,7 @@ func handleMsg(ctx context.Context) {
 					if err != nil {
 						log.Errorf("handleMsg SendTmplMsgFromRequest failed,msgLog:%+v,err:%+v", msgLog, err)
 						// token过期重试或者失效重新刷新ak去请求重试，不记录重试次数
-						if resp.ErrCode == errors.CodeRIDExpired || resp.ErrCode == errors.CodeRIDUnauthorized {
+						if resp.ErrCode == errors2.CodeRIDExpired || resp.ErrCode == errors2.CodeRIDUnauthorized {
 							_, err = akRepository.FreshAccessToken(ctx)
 							if err != nil {
 								log.Errorf("handleMsg FreshAccessToken failed,err:%+v", err)

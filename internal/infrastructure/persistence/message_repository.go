@@ -7,14 +7,15 @@ import (
 	"net/http"
 	"time"
 
+	errors3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
+	httputil2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx/httputil"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 
 	"gorm.io/gorm"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/httputil"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	errors2 "errors"
@@ -49,9 +50,9 @@ func (a *MessageRepo) SendTmplMsgFromRequest(ctx context.Context, param entity.S
 		log.Errorf("SendTmplMsgFromRequest json marshal send msg req failed,traceID:%s,err:%+v", traceID, err)
 		return entity.SendTmplMsgRemoteResp{}, err
 	}
-	requestProperty := httputil.GetRequestProperty(http.MethodPost, config.WXMsgTmplSendURL+fmt.Sprintf("?access_token=%s", param.AccessToken),
+	requestProperty := httputil2.GetRequestProperty(http.MethodPost, config.WXMsgTmplSendURL+fmt.Sprintf("?access_token=%s", param.AccessToken),
 		bs, make(map[string]string))
-	statusCode, body, _, err := httputil.RequestWithContextAndRepeat(ctx, requestProperty, traceID)
+	statusCode, body, _, err := httputil2.RequestWithContextAndRepeat(ctx, requestProperty, traceID)
 	if err != nil {
 		log.Errorf("SendTmplMsgFromRequest request wx msg send failed, traceID:%s, error:%+v", traceID, err)
 		return entity.SendTmplMsgRemoteResp{}, err
@@ -67,7 +68,7 @@ func (a *MessageRepo) SendTmplMsgFromRequest(ctx context.Context, param entity.S
 		return entity.SendTmplMsgRemoteResp{}, err
 	}
 	// 获取失败
-	if msgResp.ErrCode != errors.CodeOK {
+	if msgResp.ErrCode != errors3.CodeOK {
 		log.Errorf("SendTmplMsgFromRequest get wx msg send failed,resp:%s,traceID:%s,errMsg:%s", string(body), traceID, msgResp.ErrMsg)
 		return msgResp, fmt.Errorf("get wx msg send failed,errMsg:%s", msgResp.ErrMsg)
 	}

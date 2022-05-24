@@ -2,8 +2,9 @@ package persistence
 
 import (
 	"context"
-	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 	"time"
+
+	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"

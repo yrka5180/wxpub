@@ -3,8 +3,9 @@ package persistence
 import (
 	"context"
 	"encoding/json"
-	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 	"time"
+
+	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"

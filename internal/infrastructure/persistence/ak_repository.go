@@ -4,15 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 	"net/http"
 	"time"
+
+	errors2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
+	httputil2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx/httputil"
+	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/errors"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/httputil"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"github.com/go-redis/redis/v7"
@@ -41,9 +42,9 @@ func (a *AkRepo) GetAccessTokenFromRequest(ctx context.Context) (entity.AccessTo
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("getAccessTokenFromRequest traceID:%s", traceID)
 	// 请求wx access token
-	requestProperty := httputil.GetRequestProperty(http.MethodGet, config.WXAccessTokenURL+fmt.Sprintf("?grant_type=%s&appid=%s&secret=%s", consts.Credential, config.AppID, config.AppSecret),
+	requestProperty := httputil2.GetRequestProperty(http.MethodGet, config.WXAccessTokenURL+fmt.Sprintf("?grant_type=%s&appid=%s&secret=%s", consts.Credential, config.AppID, config.AppSecret),
 		nil, make(map[string]string))
-	statusCode, body, _, err := httputil.RequestWithContextAndRepeat(ctx, requestProperty, traceID)
+	statusCode, body, _, err := httputil2.RequestWithContextAndRepeat(ctx, requestProperty, traceID)
 	if err != nil {
 		log.Errorf("request wx access token failed, traceID:%s, error:%+v", traceID, err)
 		return entity.AccessTokenResp{}, err
@@ -59,7 +60,7 @@ func (a *AkRepo) GetAccessTokenFromRequest(ctx context.Context) (entity.AccessTo
 		return entity.AccessTokenResp{}, err
 	}
 	// 获取失败
-	if akResp.ErrCode != errors.CodeOK {
+	if akResp.ErrCode != errors2.CodeOK {
 		log.Errorf("get wx access token failed,resp:%s,traceID:%s,errMsg:%s", string(body), traceID, akResp.ErrMsg)
 		return entity.AccessTokenResp{}, fmt.Errorf("get wx ak failed,errMsg:%s", akResp.ErrMsg)
 	}

@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	extra2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/extra"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	extra2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/extra"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"

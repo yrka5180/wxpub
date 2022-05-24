@@ -1,8 +1,9 @@
 package config
 
 import (
-	config2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/config"
 	"strings"
+
+	config2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/config"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"github.com/sirupsen/logrus"

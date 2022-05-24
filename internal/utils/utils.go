@@ -28,7 +28,7 @@ func GetUUID() (string, error) {
 func ShouldGetTraceID(c context.Context) (traceID string) {
 	it := c.Value(consts.ContextTraceID)
 	if it == nil {
-		log.Warnln("Could not get trace id from context")
+		// log.Warnln("Could not get trace id from context")
 		return
 	}
 	var ok bool

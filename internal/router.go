@@ -1,9 +1,13 @@
 package internal
 
 import (
+	"strings"
+
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/repository"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/controller"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/interfaces/middleware"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,9 +26,22 @@ func registerController() {
 		repository.DefaultMessageRepository())
 }
 
+func New() *gin.Engine {
+	gin.SetMode(string(config.SMode))
+
+	if strings.ToLower(string(config.SMode)) == gin.ReleaseMode {
+		ginx.DisableConsoleColor()
+	}
+
+	engine := gin.New()
+	engine.Use(ginx.Recovery())
+
+	return engine
+}
+
 func Run() *gin.Engine {
 	registerController()
-	engine := gin.Default()
+	engine := New()
 	initRouter(engine)
 	return engine
 }

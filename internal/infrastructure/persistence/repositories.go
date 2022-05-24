@@ -2,9 +2,10 @@ package persistence
 
 import (
 	"fmt"
-	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 	oslog "log"
 	"os"
+
+	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 
 	"gorm.io/gorm/logger"
 
