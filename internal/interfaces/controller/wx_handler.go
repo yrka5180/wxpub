@@ -5,7 +5,6 @@ import (
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx"
-	httputil2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx/httputil"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +22,7 @@ func NewWXController(awApp application.WXInterface) *WX {
 }
 
 func (a *WX) GetWXCheckSign(c *gin.Context) {
-	ctx := httputil2.DefaultTodoNovaContext(c)
+	ctx := ginx.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
@@ -40,7 +39,7 @@ func (a *WX) GetWXCheckSign(c *gin.Context) {
 }
 
 func (a *WX) HandleEventXML(c *gin.Context) {
-	ctx := httputil2.DefaultTodoNovaContext(c)
+	ctx := ginx.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 

@@ -3,6 +3,8 @@ package controller
 import (
 	"strconv"
 
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx"
+
 	errors2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
 	httputil2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx/httputil"
 
@@ -27,7 +29,7 @@ func NewUserController(user application.UserInterface) *User {
 }
 
 func (u *User) GenCaptcha(c *gin.Context) {
-	ctx := httputil2.DefaultTodoNovaContext(c)
+	ctx := ginx.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
@@ -64,7 +66,7 @@ func (u *User) GenCaptcha(c *gin.Context) {
 }
 
 func (u *User) SendSms(c *gin.Context) {
-	ctx := httputil2.DefaultTodoNovaContext(c)
+	ctx := ginx.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
@@ -108,7 +110,7 @@ func (u *User) SendSms(c *gin.Context) {
 }
 
 func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
-	ctx := httputil2.DefaultTodoNovaContext(c)
+	ctx := ginx.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 

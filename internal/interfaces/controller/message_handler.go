@@ -5,7 +5,6 @@ import (
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
 	errors2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx"
-	httputil2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx/httputil"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
 	"github.com/gin-gonic/gin"
@@ -35,7 +34,7 @@ func NewMessageController(msg application.MessageInterface) *Message {
 //   409: APISendTmplMessage
 //   500: serverError
 func (a *Message) SendTmplMessage(c *gin.Context) {
-	ctx := httputil2.DefaultTodoNovaContext(c)
+	ctx := ginx.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
@@ -64,7 +63,7 @@ func (a *Message) SendTmplMessage(c *gin.Context) {
 //   409: APISendTmplMessage
 //   500: serverError
 func (a *Message) TmplMsgStatus(c *gin.Context) {
-	ctx := httputil2.DefaultTodoNovaContext(c)
+	ctx := ginx.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
