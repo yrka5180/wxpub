@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	extra2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/extra"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/extra"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
@@ -28,7 +28,7 @@ var (
 
 func main() {
 	config.Init()
-	extra2.Default(config.LogLevel)
+	extra.Default(config.LogLevel)
 	globalCtx, globalCancel = context.WithCancel(context.Background())
 	// init
 	InitService()
