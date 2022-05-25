@@ -57,3 +57,16 @@ func (r Render) Data(data interface{}, err interface{}, a ...interface{}) {
 
 	r.Message(err, a...)
 }
+
+func (r Render) DataString(data string, err interface{}, a ...interface{}) {
+	if err == nil {
+		r.ctx.String(r.code, data)
+		return
+	}
+
+	r.Message(err, a...)
+}
+
+func (r Render) RawString(data string) {
+	r.ctx.String(r.code, data)
+}

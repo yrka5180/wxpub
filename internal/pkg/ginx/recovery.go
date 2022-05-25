@@ -46,11 +46,11 @@ func RecoveryWithWriter(out io.Writer) gin.HandlerFunc {
 				// custom error
 				if e, ok := err.(errorx.CustomError); ok {
 					if e.ErrorCode != 200 {
-						c.String(errorx.GetStatusCode(e.ErrorCode), e.ErrorMsg)
-					} else {
 						c.Header(errorx.XCode, strconv.Itoa(e.ErrorCode))
 						c.Header(errorx.XMsg, e.ErrorMsg)
 						c.Header(errorx.XTraceID, utils.ShouldGetTraceID(httputil2.DefaultTodoNovaContext(c)))
+						c.String(errorx.GetStatusCode(e.ErrorCode), e.ErrorMsg)
+					} else {
 						c.JSON(errorx.GetStatusCode(e.ErrorCode), gin.H{"err": e.ErrorMsg})
 					}
 					c.Abort()

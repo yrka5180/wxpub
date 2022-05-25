@@ -4,7 +4,7 @@ import (
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/application"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/domain/entity"
-	errors2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx"
 	httputil2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx/httputil"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/utils"
 
@@ -27,14 +27,8 @@ func (a *WX) GetWXCheckSign(c *gin.Context) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
-	resp := httputil2.DefaultResponse()
-	defer httputil2.HTTPResponse(ctx, c, &resp)
 	var param entity.WXCheckReq
-	if err := c.ShouldBindQuery(&param); err != nil {
-		log.Errorf("validate WXCheckReq ShouldBindQuery failed, traceID:%s, err:%+v", traceID, err)
-		httputil2.SetErrorResponse(&resp, errors2.CodeInvalidParams, "Invalid query provided")
-		return
-	}
+	ginx.BindQuery(c, &param)
 	// wx开放平台验证
 	ok := a.wx.GetWXCheckSign(param.Signature, param.TimeStamp, param.Nonce, consts.Token)
 	if !ok {
@@ -42,7 +36,7 @@ func (a *WX) GetWXCheckSign(c *gin.Context) {
 		return
 	}
 	// 原样返回
-	httputil2.SetSuccessfulResponse(&resp, errors2.CodeOK, param.EchoStr)
+	ginx.NewRender(c).RawString(param.EchoStr)
 }
 
 func (a *WX) HandleEventXML(c *gin.Context) {
@@ -50,14 +44,8 @@ func (a *WX) HandleEventXML(c *gin.Context) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
-	resp := httputil2.DefaultResponse()
-	defer httputil2.HTTPResponse(ctx, c, &resp)
 	var param entity.WXCheckReq
-	if err := c.ShouldBindQuery(&param); err != nil {
-		log.Errorf("validate HandleEventXML ShouldBindQuery failed, traceID:%s, err:%+v", traceID, err)
-		httputil2.SetErrorResponse(&resp, errors2.CodeInvalidParams, "Invalid query provided")
-		return
-	}
+	ginx.BindQuery(c, &param)
 	// wx开放平台验证
 	ok := a.wx.GetWXCheckSign(param.Signature, param.TimeStamp, param.Nonce, consts.Token)
 	if !ok {
@@ -65,18 +53,8 @@ func (a *WX) HandleEventXML(c *gin.Context) {
 		return
 	}
 	var reqBody *entity.TextRequestBody
-	if err := c.ShouldBindXML(&reqBody); err != nil {
-		log.Errorf("validate HandleEventXML ShouldBindXML failed, traceID:%s, err:%+v", traceID, err)
-		httputil2.SetErrorResponse(&resp, errors2.CodeInvalidParams, "Invalid xml body provided")
-		return
-	}
+	ginx.BindXML(c, &reqBody)
 	// 事件xml返回
 	respBody, err := a.wx.HandleEventXML(ctx, reqBody)
-	if err != nil {
-		log.Errorf("wx public platform HandleEventXML access failed,traceID:%s,err:%+v", traceID, err)
-		httputil2.SetErrorResponse(&resp, errors2.CodeInternalServerError, "wx public platform GetEventXML access failed!")
-		return
-	}
-	// 原样返回
-	httputil2.SetSuccessfulResponse(&resp, errors2.CodeOK, string(respBody))
+	ginx.NewRender(c).DataString(string(respBody), err)
 }

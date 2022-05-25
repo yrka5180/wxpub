@@ -39,30 +39,16 @@ func (a *Message) SendTmplMessage(c *gin.Context) {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
-	resp := httputil2.DefaultResponse()
-	defer httputil2.HTTPJSONResponse(ctx, c, &resp)
-
 	var param entity.SendTmplMsgReq
-	if err := c.ShouldBindJSON(&param); err != nil {
-		log.Errorf("SendTmplMessage validate sendmsg req ShouldBindJSON failed, traceID:%s, err:%+v", traceID, err)
-		httputil2.SetErrorResponse(&resp, errors2.CodeInvalidParams, "Invalid json provided")
-		return
-	}
-	// ginx.BindJSON(c,param)
+	ginx.BindJSON(c, &param)
 	errMsg := param.Validate()
 	if len(errMsg) > 0 {
 		log.Errorf("SendTmplMessage validate sendmsg req param failed, traceID:%s, errMsg:%s", traceID, errMsg)
-		httputil2.SetErrorResponse(&resp, errors2.CodeInvalidParams, errMsg)
-		return
+		ginx.BombErr(errors2.CodeInvalidParams, errMsg)
 	}
 	var msgResp entity.SendTmplMsgResp
 	msgResp, err := a.message.SendTmplMsg(ctx, param)
-	if err != nil {
-		log.Errorf("SendTmplMessage MessageInterface send msg failed,traceID:%s,err:%+v", traceID, err)
-		httputil2.SetErrorResponse(&resp, errors2.CodeInternalServerError, err.Error())
-		return
-	}
-	httputil2.SetSuccessfulResponse(&resp, errors2.CodeOK, msgResp)
+	ginx.NewRender(c).Data(msgResp, err)
 }
 
 // swagger:route GET /message/status/:id 消息推送 TmplMsgStatus
