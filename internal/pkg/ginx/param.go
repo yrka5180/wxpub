@@ -40,7 +40,7 @@ func URLParamInt64(c *gin.Context, field string) int64 {
 	strVal := URLParamStr(c, field)
 	intVal, err := strconv.ParseInt(strVal, 10, 64)
 	if err != nil {
-		errorx.BombErr(errorx.CodeInvalidParams, "cannot convert %s to int64", intVal)
+		errorx.BombErr(errorx.CodeInvalidParams, "cannot convert %d to int64", intVal)
 	}
 	return intVal
 }
