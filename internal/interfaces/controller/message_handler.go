@@ -31,7 +31,7 @@ func NewMessageController(msg application.MessageInterface) *Message {
 //   401: unauthorized
 //   403: forbidden
 //   404: notfound
-//   409: APISendTmplMessage
+//   409: conflict
 //   500: serverError
 func (a *Message) SendTmplMessage(c *gin.Context) {
 	ctx := ginx.DefaultTodoNovaContext(c)
@@ -60,7 +60,7 @@ func (a *Message) SendTmplMessage(c *gin.Context) {
 //   401: unauthorized
 //   403: forbidden
 //   404: notfound
-//   409: APISendTmplMessage
+//   409: conflict
 //   500: serverError
 func (a *Message) TmplMsgStatus(c *gin.Context) {
 	ctx := ginx.DefaultTodoNovaContext(c)

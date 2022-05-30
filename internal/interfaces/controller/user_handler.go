@@ -26,6 +26,18 @@ func NewUserController(user application.UserInterface) *User {
 	}
 }
 
+// swagger:route GET /user/captcha 用户信息绑定 GenCaptcha
+//
+// description: 生成随机验证码图片
+//
+// responses:
+//   200: APICaptchaResp
+//   400: badRequest
+//   401: unauthorized
+//   403: forbidden
+//   404: notfound
+//   409: conflict
+//   500: serverError
 func (u *User) GenCaptcha(c *gin.Context) {
 	ctx := ginx.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
@@ -57,6 +69,18 @@ func (u *User) GenCaptcha(c *gin.Context) {
 	ginx.NewRender(c).Data(CaptchaResp, nil)
 }
 
+// swagger:route GET /user/send-sms 用户信息绑定 SendSms
+//
+// description: 发送短信验证码
+//
+// responses:
+//   200: success
+//   400: badRequest
+//   401: unauthorized
+//   403: forbidden
+//   404: notfound
+//   409: conflict
+//   500: serverError
 func (u *User) SendSms(c *gin.Context) {
 	ctx := ginx.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
@@ -88,6 +112,18 @@ func (u *User) SendSms(c *gin.Context) {
 	ginx.NewRender(c).Message(nil)
 }
 
+// swagger:route POST /user/verify-sms 用户信息绑定 VerifyAndUpdatePhone
+//
+// description: 验证短信验证码
+//
+// responses:
+//   200: success
+//   400: badRequest
+//   401: unauthorized
+//   403: forbidden
+//   404: notfound
+//   409: conflict
+//   500: serverError
 func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
 	ctx := ginx.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
