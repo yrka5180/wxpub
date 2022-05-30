@@ -11,11 +11,17 @@ type SendTmplMessageRequest struct {
 // swagger:response APISendTmplMessage
 type APISendTmplMessage struct {
 	// in: body
-	Data entity.SendTmplMsgResp `json:"data"`
+	Body struct {
+		Dat entity.SendTmplMsgResp `json:"dat"`
+		Err string                 `json:"err"`
+	}
 }
 
 // swagger:response APITmplMsgStatusResp
 type APITmplMsgStatusResp struct {
 	// in: body
-	Data entity.TmplMsgStatusResp `json:"data"`
+	Body struct {
+		Dat entity.TmplMsgStatusResp `json:"dat"`
+		Err string                   `json:"err"`
+	}
 }

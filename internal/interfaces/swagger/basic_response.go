@@ -2,9 +2,16 @@ package swagger
 
 type BasicError struct {
 	// 错误信息，用于前端展示或者辅助定位错误源
-	// in: header
 	XCode int    `json:"x-code"` // x-code
 	XMsg  string `json:"x-msg"`  // x-msg
+}
+
+type BasicRender struct {
+	// 统一返回体
+	// data struct
+	Dat interface{} `json:"dat"` // data struct
+	// err msg
+	Err string `json:"err"` // err msg
 }
 
 // SuccessResp 操作成功(不需要返回内容，比如删除)
@@ -12,6 +19,10 @@ type BasicError struct {
 type SuccessResp struct {
 	// in: header
 	BasicError
+	// in: body
+	Body struct {
+		BasicRender
+	}
 }
 
 // NoContentResp 操作成功(不需要返回内容，比如删除)
@@ -24,6 +35,10 @@ type NoContentResp struct {
 type ErrBadRequest struct {
 	// in: header
 	BasicError
+	// in: body
+	Body struct {
+		BasicRender
+	}
 }
 
 // ErrRedirect 重定向
@@ -31,6 +46,10 @@ type ErrBadRequest struct {
 type ErrRedirect struct {
 	// in: header
 	BasicError
+	// in: body
+	Body struct {
+		BasicRender
+	}
 }
 
 // ErrExpectationFailed 请求异常，请求格式错误或者参数异常
@@ -38,6 +57,10 @@ type ErrRedirect struct {
 type ErrExpectationFailed struct {
 	// in: header
 	BasicError
+	// in: body
+	Body struct {
+		BasicRender
+	}
 }
 
 // ErrForbidden 没有权限访问
@@ -45,6 +68,10 @@ type ErrExpectationFailed struct {
 type ErrForbidden struct {
 	// in: header
 	BasicError
+	// in: body
+	Body struct {
+		BasicRender
+	}
 }
 
 // ErrUnauthorized 无法识别用户身份，令牌过期或者令牌被篡改
@@ -52,6 +79,10 @@ type ErrForbidden struct {
 type ErrUnauthorized struct {
 	// in: header
 	BasicError
+	// in: body
+	Body struct {
+		BasicRender
+	}
 }
 
 // ErrNotFound 找不到该资源
@@ -59,6 +90,10 @@ type ErrUnauthorized struct {
 type ErrNotFound struct {
 	// in: header
 	BasicError
+	// in: body
+	Body struct {
+		BasicRender
+	}
 }
 
 // ErrConflict 资源状态冲突
@@ -66,6 +101,10 @@ type ErrNotFound struct {
 type ErrConflict struct {
 	// in: header
 	BasicError
+	// in: body
+	Body struct {
+		BasicRender
+	}
 }
 
 // ErrServerInternal 服务器内部错误
@@ -73,4 +112,8 @@ type ErrConflict struct {
 type ErrServerInternal struct {
 	// in: header
 	BasicError
+	// in: body
+	Body struct {
+		BasicRender
+	}
 }

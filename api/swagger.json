@@ -220,22 +220,55 @@
     "APISendTmplMessage": {
       "description": "",
       "schema": {
-        "$ref": "#/definitions/SendTmplMsgResp"
+        "type": "object",
+        "properties": {
+          "dat": {
+            "$ref": "#/definitions/SendTmplMsgResp"
+          },
+          "err": {
+            "type": "string",
+            "x-go-name": "Err"
+          }
+        }
       }
     },
     "APITmplMsgStatusResp": {
       "description": "",
       "schema": {
-        "$ref": "#/definitions/TmplMsgStatusResp"
+        "type": "object",
+        "properties": {
+          "dat": {
+            "$ref": "#/definitions/TmplMsgStatusResp"
+          },
+          "err": {
+            "type": "string",
+            "x-go-name": "Err"
+          }
+        }
       }
     },
     "badRequest": {
       "description": "ErrBadRequest 请求异常，请求格式错误或者参数异常",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "dat": {
+            "description": "统一返回体\ndata struct",
+            "type": "object",
+            "x-go-name": "Dat"
+          },
+          "err": {
+            "description": "err msg",
+            "type": "string",
+            "x-go-name": "Err"
+          }
+        }
+      },
       "headers": {
         "x-code": {
           "type": "integer",
           "format": "int64",
-          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+          "description": "错误信息，用于前端展示或者辅助定位错误源"
         },
         "x-msg": {
           "type": "string"
@@ -244,11 +277,26 @@
     },
     "conflict": {
       "description": "ErrConflict 资源状态冲突",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "dat": {
+            "description": "统一返回体\ndata struct",
+            "type": "object",
+            "x-go-name": "Dat"
+          },
+          "err": {
+            "description": "err msg",
+            "type": "string",
+            "x-go-name": "Err"
+          }
+        }
+      },
       "headers": {
         "x-code": {
           "type": "integer",
           "format": "int64",
-          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+          "description": "错误信息，用于前端展示或者辅助定位错误源"
         },
         "x-msg": {
           "type": "string"
@@ -257,11 +305,26 @@
     },
     "expectationFailed": {
       "description": "ErrExpectationFailed 请求异常，请求格式错误或者参数异常",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "dat": {
+            "description": "统一返回体\ndata struct",
+            "type": "object",
+            "x-go-name": "Dat"
+          },
+          "err": {
+            "description": "err msg",
+            "type": "string",
+            "x-go-name": "Err"
+          }
+        }
+      },
       "headers": {
         "x-code": {
           "type": "integer",
           "format": "int64",
-          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+          "description": "错误信息，用于前端展示或者辅助定位错误源"
         },
         "x-msg": {
           "type": "string"
@@ -270,11 +333,26 @@
     },
     "forbidden": {
       "description": "ErrForbidden 没有权限访问",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "dat": {
+            "description": "统一返回体\ndata struct",
+            "type": "object",
+            "x-go-name": "Dat"
+          },
+          "err": {
+            "description": "err msg",
+            "type": "string",
+            "x-go-name": "Err"
+          }
+        }
+      },
       "headers": {
         "x-code": {
           "type": "integer",
           "format": "int64",
-          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+          "description": "错误信息，用于前端展示或者辅助定位错误源"
         },
         "x-msg": {
           "type": "string"
@@ -286,11 +364,26 @@
     },
     "notfound": {
       "description": "ErrNotFound 找不到该资源",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "dat": {
+            "description": "统一返回体\ndata struct",
+            "type": "object",
+            "x-go-name": "Dat"
+          },
+          "err": {
+            "description": "err msg",
+            "type": "string",
+            "x-go-name": "Err"
+          }
+        }
+      },
       "headers": {
         "x-code": {
           "type": "integer",
           "format": "int64",
-          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+          "description": "错误信息，用于前端展示或者辅助定位错误源"
         },
         "x-msg": {
           "type": "string"
@@ -299,11 +392,26 @@
     },
     "redirect": {
       "description": "ErrRedirect 重定向",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "dat": {
+            "description": "统一返回体\ndata struct",
+            "type": "object",
+            "x-go-name": "Dat"
+          },
+          "err": {
+            "description": "err msg",
+            "type": "string",
+            "x-go-name": "Err"
+          }
+        }
+      },
       "headers": {
         "x-code": {
           "type": "integer",
           "format": "int64",
-          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+          "description": "错误信息，用于前端展示或者辅助定位错误源"
         },
         "x-msg": {
           "type": "string"
@@ -312,11 +420,26 @@
     },
     "serverError": {
       "description": "ErrServerInternal 服务器内部错误",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "dat": {
+            "description": "统一返回体\ndata struct",
+            "type": "object",
+            "x-go-name": "Dat"
+          },
+          "err": {
+            "description": "err msg",
+            "type": "string",
+            "x-go-name": "Err"
+          }
+        }
+      },
       "headers": {
         "x-code": {
           "type": "integer",
           "format": "int64",
-          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+          "description": "错误信息，用于前端展示或者辅助定位错误源"
         },
         "x-msg": {
           "type": "string"
@@ -325,11 +448,26 @@
     },
     "success": {
       "description": "SuccessResp 操作成功(不需要返回内容，比如删除)",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "dat": {
+            "description": "统一返回体\ndata struct",
+            "type": "object",
+            "x-go-name": "Dat"
+          },
+          "err": {
+            "description": "err msg",
+            "type": "string",
+            "x-go-name": "Err"
+          }
+        }
+      },
       "headers": {
         "x-code": {
           "type": "integer",
           "format": "int64",
-          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+          "description": "错误信息，用于前端展示或者辅助定位错误源"
         },
         "x-msg": {
           "type": "string"
@@ -338,11 +476,26 @@
     },
     "unauthorized": {
       "description": "ErrUnauthorized 无法识别用户身份，令牌过期或者令牌被篡改",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "dat": {
+            "description": "统一返回体\ndata struct",
+            "type": "object",
+            "x-go-name": "Dat"
+          },
+          "err": {
+            "description": "err msg",
+            "type": "string",
+            "x-go-name": "Err"
+          }
+        }
+      },
       "headers": {
         "x-code": {
           "type": "integer",
           "format": "int64",
-          "description": "错误信息，用于前端展示或者辅助定位错误源\nin: header"
+          "description": "错误信息，用于前端展示或者辅助定位错误源"
         },
         "x-msg": {
           "type": "string"

@@ -44,6 +44,7 @@ CREATE TABLE `msg_log`  (
                          PRIMARY KEY (`id`) USING BTREE,
                          INDEX `request_id`(`request_id`) USING BTREE,
                          INDEX `msg_id`(`msg_id`) USING BTREE,
+                         INDEX `status`(`status`) USING BTREE,
                          INDEX `count`(`count`) USING BTREE,
                          INDEX `create_time`(`create_time`) USING BTREE,
                          INDEX `update_time`(`update_time`) USING BTREE
