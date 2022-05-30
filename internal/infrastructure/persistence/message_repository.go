@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	errors3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
-	httputil2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx/httputil"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/httputil"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
+	errors3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
 
 	"gorm.io/gorm"
 
@@ -50,9 +50,9 @@ func (a *MessageRepo) SendTmplMsgFromRequest(ctx context.Context, param entity.S
 		log.Errorf("SendTmplMsgFromRequest json marshal send msg req failed,traceID:%s,err:%+v", traceID, err)
 		return entity.SendTmplMsgRemoteResp{}, err
 	}
-	requestProperty := httputil2.GetRequestProperty(http.MethodPost, config.WXMsgTmplSendURL+fmt.Sprintf("?access_token=%s", param.AccessToken),
+	requestProperty := httputil.GetRequestProperty(http.MethodPost, config.WXMsgTmplSendURL+fmt.Sprintf("?access_token=%s", param.AccessToken),
 		bs, make(map[string]string))
-	statusCode, body, _, err := httputil2.RequestWithContextAndRepeat(ctx, requestProperty, traceID)
+	statusCode, body, _, err := httputil.RequestWithContextAndRepeat(ctx, requestProperty, traceID)
 	if err != nil {
 		log.Errorf("SendTmplMsgFromRequest request wx msg send failed, traceID:%s, error:%+v", traceID, err)
 		return entity.SendTmplMsgRemoteResp{}, err

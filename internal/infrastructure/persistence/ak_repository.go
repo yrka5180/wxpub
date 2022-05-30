@@ -7,8 +7,9 @@ import (
 	"net/http"
 	"time"
 
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/httputil"
+
 	errors2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/errorx"
-	httputil2 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/ginx/httputil"
 	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/internal/pkg/redis"
 
 	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/config"
@@ -42,9 +43,9 @@ func (a *AkRepo) GetAccessTokenFromRequest(ctx context.Context) (entity.AccessTo
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("getAccessTokenFromRequest traceID:%s", traceID)
 	// 请求wx access token
-	requestProperty := httputil2.GetRequestProperty(http.MethodGet, config.WXAccessTokenURL+fmt.Sprintf("?grant_type=%s&appid=%s&secret=%s", consts.Credential, config.AppID, config.AppSecret),
+	requestProperty := httputil.GetRequestProperty(http.MethodGet, config.WXAccessTokenURL+fmt.Sprintf("?grant_type=%s&appid=%s&secret=%s", consts.Credential, config.AppID, config.AppSecret),
 		nil, make(map[string]string))
-	statusCode, body, _, err := httputil2.RequestWithContextAndRepeat(ctx, requestProperty, traceID)
+	statusCode, body, _, err := httputil.RequestWithContextAndRepeat(ctx, requestProperty, traceID)
 	if err != nil {
 		log.Errorf("request wx access token failed, traceID:%s, error:%+v", traceID, err)
 		return entity.AccessTokenResp{}, err
