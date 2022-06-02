@@ -1,8 +1,8 @@
 FROM python:2
 
-WORKDIR /app
-ADD n9e /app
-
-COPY ./mybin ./
-RUN chmod 0755 ./mybin
+WORKDIR ./
+COPY conf ./conf
+ADD mybin ./
+RUN chmod +x ./mybin
+EXPOSE 80
 ENTRYPOINT [ "./mybin" ]

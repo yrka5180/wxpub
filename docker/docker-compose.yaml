@@ -1,4 +1,4 @@
-version: "1.0"
+version: "3.7"
 
 networks:
   pubplatform:
@@ -11,9 +11,10 @@ services:
     hostname: mysql
     restart: always
     ports:
-      - "3306:3306"
+      - "13306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=1234
     volumes:
       - ./mysqldata:/var/lib/mysql/
       - ./initsql:/docker-entrypoint-initdb.d/
@@ -27,32 +28,48 @@ services:
     hostname: redis
     restart: always
     ports:
-      - "6379:6379"
+      - "16379:6379"
     environment:
-
+      - TZ=Asia/Shanghai
     networks:
       - pubplatform
 
-#  nwebapi:
-#    image: ulric2019/nightingale:5.7.1
-#    container_name: nwebapi
-#    hostname: nwebapi
-#    restart: always
-#    environment:
-#      GIN_MODE: release
-#      WAIT_HOSTS: mysql:3306, redis:6379
-#    volumes:
-#      - ./n9eetc:/app/etc
-#    ports:
-#      - "18000:18000"
-#    networks:
-#      - pubplatform
-#    depends_on:
-#      - mysql
-#      - redis
-#      - ibex
-#    links:
-#      - mysql:mysql
-#      - redis:redis
-#    command: >
-#      sh -c "/wait && /app/n9e webapi"
+  pubplatform:
+    image: leeoj2/pubplatform:1.0
+    container_name: pubplatform
+    hostname: pubplatform
+    restart: always
+    environment:
+      - GIN_MODE=release
+      - TZ=Asia/Shanghai
+      - WAIT_HOSTS=mysql:3306, redis:6379
+      - redis_addresses=redis:6379
+      - db_user=root
+      - db_password=1234
+      - db_host=mysql:3306
+      - verify_profile_url=www.baidu.com
+      - captcha_rpc_addr=10.75.6.22:30463
+      - sms_rpc_addr=10.75.8.3:32571
+      - app_id=wx1738373100645b72
+      - app_secret=715393c00c9e96c9053cfa0fd55251cc
+    ports:
+      - "8100:80"
+    networks:
+      - pubplatform
+    depends_on:
+      - mysql
+      - redis
+    links:
+      - mysql:mysql
+      - redis:redis
+    command: >
+      /bin/bash -c '
+      while ! nc -z mysql 3306;
+      do
+       echo "wait for mysql";
+       sleep 1;
+      done;
+
+      echo "database is ready!";
+      echo "start pubplatform service here";
+      '
