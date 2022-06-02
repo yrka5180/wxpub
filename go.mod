@@ -4,12 +4,9 @@ go 1.17
 
 require (
 	bou.ke/monkey v1.0.2
-	git.nova.net.cn/nova/go-common/config2 v0.0.0-20220331073514-eaa8a56c82fc
-	git.nova.net.cn/nova/go-common/logrus-extra v0.0.0-20220331073514-eaa8a56c82fc
 	git.nova.net.cn/nova/go-common/uuid v0.0.0-20220331073514-eaa8a56c82fc
 	git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace v0.0.0-20210406140908-c976b41ebd96
 	git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace v0.0.0-20210406140912-7c6267b0a662
-	github.com/Shopify/sarama v1.32.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/google/uuid v1.3.0

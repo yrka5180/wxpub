@@ -1,0 +1,58 @@
+version: "1.0"
+
+networks:
+  pubplatform:
+    driver: bridge
+
+services:
+  mysql:
+    image: "mysql:5.7"
+    container_name: mysql
+    hostname: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+    volumes:
+      - ./mysqldata:/var/lib/mysql/
+      - ./initsql:/docker-entrypoint-initdb.d/
+      - ./mysqletc/my.cnf:/etc/my.cnf
+    networks:
+      - pubplatform
+
+  redis:
+    image: "redis:6.2"
+    container_name: redis
+    hostname: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    environment:
+
+    networks:
+      - pubplatform
+
+#  nwebapi:
+#    image: ulric2019/nightingale:5.7.1
+#    container_name: nwebapi
+#    hostname: nwebapi
+#    restart: always
+#    environment:
+#      GIN_MODE: release
+#      WAIT_HOSTS: mysql:3306, redis:6379
+#    volumes:
+#      - ./n9eetc:/app/etc
+#    ports:
+#      - "18000:18000"
+#    networks:
+#      - pubplatform
+#    depends_on:
+#      - mysql
+#      - redis
+#      - ibex
+#    links:
+#      - mysql:mysql
+#      - redis:redis
+#    command: >
+#      sh -c "/wait && /app/n9e webapi"
