@@ -5,6 +5,8 @@ import (
 	oslog "log"
 	"os"
 
+	"google.golang.org/grpc/credentials/insecure"
+
 	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/redis"
 
 	"gorm.io/gorm/logger"
@@ -116,7 +118,7 @@ func NewRedisRepositories(addresses []string) (func(), error) {
 }
 
 func NewSmsGRPCClientRepositories(smsRPCAddr string) (func(), error) {
-	smsConn, err := grpc.Dial(smsRPCAddr, grpc.WithInsecure())
+	smsConn, err := grpc.Dial(smsRPCAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Errorf("failed to dial sms grpc server: %+v", err)
 		return nil, err
@@ -129,7 +131,7 @@ func NewSmsGRPCClientRepositories(smsRPCAddr string) (func(), error) {
 }
 
 func NewCaptchaGRPCClientRepositories(captchaRPCAddr string) (func(), error) {
-	captchaConn, err := grpc.Dial(captchaRPCAddr, grpc.WithInsecure())
+	captchaConn, err := grpc.Dial(captchaRPCAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Errorf("failed to dial captcha grpc server: %+v", err)
 		return nil, err
