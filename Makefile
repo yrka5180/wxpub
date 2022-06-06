@@ -3,6 +3,7 @@
 NOW = $(shell date -u '+%Y%m%d%I%M%S')
 
 RELEASE_VERSION = 5.7.1
+MAIN_DIR = /builds/nova/misc/wx-public/proxy/src
 
 APP 			= mybin
 SERVER_BIN  	= $(APP)

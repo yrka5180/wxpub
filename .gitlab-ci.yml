@@ -2,3 +2,6 @@ include:
   - project: nova/cicd/go
     file: /templates/.nova.gitlab-ci.yml
     ref: master
+
+variables:
+  MAIN_DIR: $CI_PROJECT_DIR/src
