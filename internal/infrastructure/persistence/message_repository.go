@@ -164,10 +164,13 @@ func (a *MessageRepo) ListPendingMsgLogs(ctx context.Context) ([]entity.MsgLog, 
 	return msgLogs, err
 }
 
-func (a *MessageRepo) UpdateMaxRetryCntMsgLogsStatus(ctx context.Context) error {
+func (a *MessageRepo) UpdateMaxRetryCntMsgLogs(ctx context.Context) error {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("UpdateMaxRetryCntMsgLogsStatus traceID:%s", traceID)
-	err := a.DB.Model(&entity.MsgLog{}).Where("status = ? AND count >= ?", consts.SendPending, consts.MaxRetryCount).Update("status", consts.SendFailure).Error
+	err := a.DB.Model(&entity.MsgLog{}).Where("status = ? AND count >= ?", consts.SendPending, consts.MaxRetryCount).Updates(map[string]interface{}{
+		"cause":  consts.SendMaxRetryFailureCause,
+		"status": consts.SendFailure,
+	}).Error
 	if err != nil {
 		log.Errorf("UpdateMaxRetryCntMsgLogsStatus update max retry msg logs failed,traceID:%s,err:%+v", traceID, err)
 		return err
@@ -175,11 +178,14 @@ func (a *MessageRepo) UpdateMaxRetryCntMsgLogsStatus(ctx context.Context) error 
 	return nil
 }
 
-func (a *MessageRepo) UpdateTimeoutMsgLogsStatus(ctx context.Context) error {
+func (a *MessageRepo) UpdateTimeoutMsgLogs(ctx context.Context) error {
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("UpdateTimeoutMsgLogsStatus traceID:%s", traceID)
 	err := a.DB.Model(&entity.MsgLog{}).Where("status = ? AND count >= ? AND create_time <= ?", consts.Sending, consts.MaxRetryCount, time.Now().Unix()-consts.MaxWXCallBackTime).
-		Update("status", consts.SendFailure).Error
+		Updates(map[string]interface{}{
+			"cause":  consts.SendMaxExpireFailureCause,
+			"status": consts.SendFailure,
+		}).Error
 	if err != nil {
 		log.Errorf("UpdateTimeoutMsgLogsStatus update time out msg log failed,traceID:%s,err:%+v", traceID, err)
 		return err

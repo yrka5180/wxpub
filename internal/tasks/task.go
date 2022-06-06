@@ -123,14 +123,14 @@ func handleFailSendMsg(ctx context.Context) {
 			return
 		case <-ticker.C:
 			// 待发送错误重试消息处理
-			err := msgRepo.UpdateMaxRetryCntMsgLogsStatus(ctx)
+			err := msgRepo.UpdateMaxRetryCntMsgLogs(ctx)
 			if err != nil {
-				log.Errorf("handleFailSendMsg UpdateMaxRetryCntMsgLogsStatus failed,err:%+v", err)
+				log.Errorf("handleFailSendMsg UpdateMaxRetryCntMsgLogs failed,err:%+v", err)
 			}
 			// 发送中回调最大时间消息处理
-			err = msgRepo.UpdateTimeoutMsgLogsStatus(ctx)
+			err = msgRepo.UpdateTimeoutMsgLogs(ctx)
 			if err != nil {
-				log.Errorf("handleFailSendMsg UpdateTimeoutMsgLogsStatus failed,err:%+v", err)
+				log.Errorf("handleFailSendMsg UpdateTimeoutMsgLogs failed,err:%+v", err)
 			}
 		}
 	}

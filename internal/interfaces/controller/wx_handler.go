@@ -38,7 +38,7 @@ func (a *WX) GetWXCheckSign(c *gin.Context) {
 	ginx.NewRender(c).RawString(param.EchoStr)
 }
 
-func (a *WX) HandleEventXML(c *gin.Context) {
+func (a *WX) HandleXML(c *gin.Context) {
 	ctx := ginx.DefaultTodoNovaContext(c)
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
@@ -54,6 +54,6 @@ func (a *WX) HandleEventXML(c *gin.Context) {
 	var reqBody *entity.TextRequestBody
 	ginx.BindXML(c, &reqBody)
 	// 事件xml返回
-	respBody, err := a.wx.HandleEventXML(ctx, reqBody)
+	respBody, err := a.wx.HandleXML(ctx, reqBody)
 	ginx.NewRender(c).DataString(string(respBody), err)
 }

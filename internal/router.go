@@ -66,7 +66,7 @@ func routerWX(router *gin.RouterGroup) {
 		wxGroup.GET("", wx.GetWXCheckSign)
 		// todo: 暂时先用明文传输，后续补充aes加密传输
 		// wx开放平台事件接收
-		wxGroup.POST("", wx.HandleEventXML)
+		wxGroup.POST("", wx.HandleXML)
 	}
 }
 

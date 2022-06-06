@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"google.golang.org/grpc/metadata"
 
@@ -78,4 +79,16 @@ func RemoveStringRepeated(str []string) (ret []string) {
 		}
 	}
 	return ret
+}
+
+func CheckSubstrings(str string, subs ...string) bool {
+	if len(subs) == 0 {
+		return true
+	}
+	for _, sub := range subs {
+		if strings.Contains(str, sub) {
+			return true
+		}
+	}
+	return false
 }

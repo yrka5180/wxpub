@@ -47,7 +47,6 @@ func Init() {
 		LogLevel = logrus.InfoLevel
 	}
 
-	// InternalAPISecret = config.MustString("internal_api_secret")
 	RedisAddresses = strings.Split(config2.MustString("redis_addresses"), ",")
 
 	AppID = config2.MustString("app_id")

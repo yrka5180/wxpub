@@ -56,36 +56,67 @@ func (a *WXRepository) GetWXCheckSign(signature, timestamp, nonce, token string)
 	return utils.Sha1(b.String()) == signature
 }
 
-func (a *WXRepository) HandleEventXML(ctx context.Context, reqBody *entity.TextRequestBody) (respBody []byte, err error) {
+func (a *WXRepository) HandleXML(ctx context.Context, reqBody *entity.TextRequestBody) ([]byte, error) {
 	traceID := utils.ShouldGetTraceID(ctx)
-	log.Debugf("HandleEventXML traceID:%s", traceID)
+	log.Debugf("HandleXML traceID:%s", traceID)
 	if reqBody == nil {
 		return nil, fmt.Errorf("xml request body is empty")
 	}
-	responseTextBody, err := a.handlerEvent(ctx, reqBody)
-	if err != nil {
-		log.Errorf("HandleEventXML handlerEvent failed traceID:%s,err:%+v", traceID, err)
-		return nil, err
+	var responseTextBody []byte
+	var err error
+	switch reqBody.MsgType {
+	case consts.Text:
+		responseTextBody, err = a.handlerTextXML(ctx, reqBody)
+		if err != nil {
+			log.Errorf("HandleXML handlerTextXML failed traceID:%s,err:%+v", traceID, err)
+			return nil, err
+		}
+	case consts.Event:
+		responseTextBody, err = a.handlerEventXML(ctx, reqBody)
+		if err != nil {
+			log.Errorf("HandleXML handlerEventXML failed traceID:%s,err:%+v", traceID, err)
+			return nil, err
+		}
 	}
 	return responseTextBody, nil
 }
 
-func (a *WXRepository) handlerEvent(ctx context.Context, reqBody *entity.TextRequestBody) ([]byte, error) {
+func (a *WXRepository) handlerTextXML(ctx context.Context, reqBody *entity.TextRequestBody) ([]byte, error) {
+	traceID := utils.ShouldGetTraceID(ctx)
+	log.Debugf("handlerTextXML traceID:%s", traceID)
+	var err error
+	// 判断是否存在该消息id,用 FromUserName+CreateTime 去重
+	exist, err := a.wx.IsExistMsgIDFromRedis(ctx, a.genMsgID(reqBody.FromUserName, reqBody.CreateTime))
+	if err != nil {
+		log.Errorf("handlerTextXML IsExistMsgIDFromRedis failed,traceID:%s,err:%+v", traceID, err)
+		return nil, err
+	}
+	// 若存在返回空串,不存在则持久化存储,并保存msg id 到 redis
+	if exist {
+		return nil, nil
+	}
+	// 关键词回复，keys:告警、alert、绑定、用户
+	if !utils.CheckSubstrings(reqBody.Content, []string{"alert", "告警", "绑定", "用户"}...) {
+		return nil, nil
+	}
+	// 用户绑定链接推送
+	return a.makeTextResponseBody(reqBody.ToUserName, reqBody.FromUserName, fmt.Sprintf("%s%s", consts.SubscribeRespContent, config.VerifyProfileURL))
+}
+
+func (a *WXRepository) handlerEventXML(ctx context.Context, reqBody *entity.TextRequestBody) ([]byte, error) {
 	var respContent string
 	var err error
 	// 事件类型
 	switch reqBody.Event {
-	// 关注订阅
-	case consts.SubscribeEvent:
+	case consts.SubscribeEvent: // 关注订阅
 		if respContent, err = a.handlerSubscribeEvent(ctx, reqBody); err != nil {
 			return nil, err
 		}
-	case consts.UnsubscribeEvent:
+	case consts.UnsubscribeEvent: // 取消关注订阅
 		if respContent, err = a.handlerUnSubscribeEvent(ctx, reqBody); err != nil {
 			return nil, err
 		}
-	case consts.TEMPLATESENDJOBFINISHEvent:
-		// 事件回调内部系统错误重发
+	case consts.TEMPLATESENDJOBFINISHEvent: // 事件回调内部系统错误重发
 		if respContent, err = a.handlerTEMPLATESENDJOBFINISHEvent(ctx, reqBody); err != nil {
 			return nil, err
 		}
@@ -99,7 +130,7 @@ func (a *WXRepository) handlerSubscribeEvent(ctx context.Context, reqBody *entit
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("handlerSubscribeEvent traceID:%s", traceID)
 	// 判断是否存在该消息id,用 FromUserName+CreateTime 去重
-	msgID := fmt.Sprintf("%s%d", reqBody.FromUserName, reqBody.CreateTime)
+	msgID := a.genMsgID(reqBody.FromUserName, reqBody.CreateTime)
 	exist, err := a.isExistUserMsgID(ctx, msgID, reqBody.FromUserName, reqBody.CreateTime)
 	if err != nil {
 		log.Errorf("handlerSubscribeEvent WXRepository wx repo isExistUserMsgID traceID:%s,err:%+v", traceID, err)
@@ -130,7 +161,7 @@ func (a *WXRepository) handlerUnSubscribeEvent(ctx context.Context, reqBody *ent
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("handlerUnSubscribeEvent traceID:%s", traceID)
 	// 判断是否存在该消息id,用 FromUserName+CreateTime 去重
-	msgID := fmt.Sprintf("%s%d", reqBody.FromUserName, reqBody.CreateTime)
+	msgID := a.genMsgID(reqBody.FromUserName, reqBody.CreateTime)
 	exist, err := a.isExistUserMsgID(ctx, msgID, reqBody.FromUserName, reqBody.CreateTime)
 	if err != nil {
 		log.Errorf("handlerUnSubscribeEvent WXRepository wx repo isExistUserMsgID traceID:%s,err:%+v", traceID, err)
@@ -159,8 +190,7 @@ func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, re
 	traceID := utils.ShouldGetTraceID(ctx)
 	log.Debugf("handlerTEMPLATESENDJOBFINISHEvent traceID:%s", traceID)
 	// 判断是否存在该消息id,用 FromUserName+CreateTime 去重
-	msgID := fmt.Sprintf("%s%d", reqBody.FromUserName, reqBody.CreateTime)
-	exist, err := a.isExistTemplateSendJobMsgID(ctx, msgID, reqBody.FromUserName, reqBody.CreateTime)
+	exist, err := a.isExistTemplateSendJobMsgID(ctx, a.genMsgID(reqBody.FromUserName, reqBody.CreateTime), reqBody.FromUserName, reqBody.CreateTime)
 	if err != nil {
 		log.Errorf("handlerTEMPLATESENDJOBFINISHEvent WXRepository wx repo isExistTemplateSendJobMsgID traceID:%s,err:%+v", traceID, err)
 		return "", err
@@ -301,4 +331,8 @@ func (a *WXRepository) makeTextResponseBody(fromUserName, toUserName, content st
 
 func (a *WXRepository) value2CDATA(v string) entity.CDATAText {
 	return entity.CDATAText{Text: "<![CDATA[" + v + "]]>"}
+}
+
+func (a *WXRepository) genMsgID(fromUserName string, createTime int64) string {
+	return fmt.Sprintf("%s%d", fromUserName, createTime)
 }

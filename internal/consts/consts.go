@@ -1,10 +1,14 @@
 package consts
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type ServerMode string
 
 type contextKey string
+
+type MsgType string
 
 func (c contextKey) String() string {
 	return string(c)
@@ -39,15 +43,12 @@ const (
 )
 
 const (
-	Module               = "wx-public-proxy"
-	DLockPrefix          = "__dlock-"
-	RedisKeyAccessToken  = Module + "-access_token"
-	RedisLockAccessToken = DLockPrefix + RedisKeyAccessToken
-	RedisKeyMsgID        = Module + "-msg_id-"
-
-	RedisKeyVerifyCodeSmsID = "sms"
+	Module                  = "wx-public-proxy"
+	DLockPrefix             = "__dlock-"
+	RedisKeyAccessToken     = Module + "-access_token"
+	RedisLockAccessToken    = DLockPrefix + RedisKeyAccessToken
+	RedisKeyMsgID           = Module + "-msg_id-"
 	RedisKeyPrefixChallenge = Module + "-challenge_"
-	RedisKeyPrefixSms       = Module + "-sms_"
 )
 
 const (
@@ -58,6 +59,11 @@ const (
 
 const (
 	Credential = "client_credential"
+)
+
+const (
+	Text  MsgType = "text"
+	Event MsgType = "event"
 )
 
 const (
@@ -79,9 +85,8 @@ const (
 )
 
 const (
-	MaxRetryCount     = 3        // 消息最大失败重试次数，实际调用接口次数为3*3(http client repeated count)=9
-	MaxWXCallBackTime = 15       // 微信回调最大时间
-	MaxExpireTime     = 3 * 3600 // 消息最大过期时间
+	MaxRetryCount     = 3  // 消息最大失败重试次数，实际调用接口次数为3*3(http client repeated count)=9
+	MaxWXCallBackTime = 15 // 微信回调最大时间
 )
 
 const (

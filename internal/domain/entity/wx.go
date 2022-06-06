@@ -2,6 +2,8 @@ package entity
 
 import (
 	"encoding/xml"
+
+	"git.nova.net.cn/nova/misc/wx-public/proxy/internal/consts"
 )
 
 type WXCheckReq struct {
@@ -16,7 +18,7 @@ type TextRequestBody struct {
 	ToUserName   string
 	FromUserName string
 	CreateTime   int64
-	MsgType      string
+	MsgType      consts.MsgType
 	Content      string
 	MsgID        int64
 	Event        string

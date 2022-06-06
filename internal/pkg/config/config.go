@@ -26,7 +26,6 @@ func Init() {
 	configMap, err = parseFromINI()
 	if err == nil {
 		log.Info("read ini success")
-		return
 	}
 	log.Errorf("read ini fail, err: %v, try to read env", err)
 	configMap = parseFromENV()

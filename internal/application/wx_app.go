@@ -16,13 +16,13 @@ var _ WXInterface = &wxApp{}
 
 type WXInterface interface {
 	GetWXCheckSign(signature, timestamp, nonce, token string) bool
-	HandleEventXML(ctx context.Context, reqBody *entity.TextRequestBody) (respBody []byte, err error)
+	HandleXML(ctx context.Context, reqBody *entity.TextRequestBody) (respBody []byte, err error)
 }
 
 func (w *wxApp) GetWXCheckSign(signature, timestamp, nonce, token string) bool {
 	return w.wx.GetWXCheckSign(signature, timestamp, nonce, token)
 }
 
-func (w *wxApp) HandleEventXML(ctx context.Context, reqBody *entity.TextRequestBody) (respBody []byte, err error) {
-	return w.wx.HandleEventXML(ctx, reqBody)
+func (w *wxApp) HandleXML(ctx context.Context, reqBody *entity.TextRequestBody) (respBody []byte, err error) {
+	return w.wx.HandleXML(ctx, reqBody)
 }
