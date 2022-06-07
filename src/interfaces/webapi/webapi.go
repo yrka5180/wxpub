@@ -7,6 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"git.nova.net.cn/nova/misc/wx-public/proxy/src/g"
+
 	"git.nova.net.cn/nova/misc/wx-public/proxy/src/config"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/repository"
@@ -24,7 +26,7 @@ func Run(ctx context.Context, cancelFunc context.CancelFunc) {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
-	cleanFunc, err := initialize(ctx, cancelFunc)
+	cleanFunc, err := initialize(ctx)
 	if err != nil {
 		fmt.Println("webapi init fail:", err)
 		os.Exit(code)
@@ -46,12 +48,13 @@ EXIT:
 	log.Infoln("Shutting down server...")
 
 	cleanFunc()
+	cancelFunc()
 	fmt.Println("webapi exited")
 
 	os.Exit(code)
 }
 
-func initialize(ctx context.Context, cancelFunc context.CancelFunc) (func(), error) {
+func initialize(ctx context.Context) (func(), error) {
 	// init config
 	config.Init()
 	// init log
@@ -65,7 +68,8 @@ func initialize(ctx context.Context, cancelFunc context.CancelFunc) (func(), err
 	tasks.ConsumerTask(ctx)
 
 	engine := router.New()
-	httpClean := httpx.Init(config.ListenAddr, engine, cancelFunc)
+	httpClean := httpx.Init(config.ListenAddr, engine)
+	go g.Wait()
 	return func() {
 		cleanFunc()
 		httpClean()

@@ -6,18 +6,17 @@ import (
 	"net/http"
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/g"
 	log "github.com/sirupsen/logrus"
 )
 
-func Init(addr string, handler http.Handler, cancelFunc context.CancelFunc) func() {
+func Init(addr string, handler http.Handler) func() {
 	srv := &http.Server{
 		Addr:    addr,
 		Handler: handler,
 	}
 	startServer(srv)
 	return func() {
-		gracefulShutdown(srv, cancelFunc)
+		gracefulShutdown(srv)
 	}
 }
 
@@ -29,7 +28,7 @@ func startServer(srv *http.Server) {
 	}()
 }
 
-func gracefulShutdown(srv *http.Server, cancelFunc context.CancelFunc) {
+func gracefulShutdown(srv *http.Server) {
 	log.Infoln("Shutting down server...")
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
@@ -42,6 +41,4 @@ func gracefulShutdown(srv *http.Server, cancelFunc context.CancelFunc) {
 	default:
 		fmt.Println("http server stopped")
 	}
-	go g.Wait()
-	cancelFunc()
 }
