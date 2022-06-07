@@ -1,1 +1,1 @@
-# wx-proxy
+# wx-pub-platform
