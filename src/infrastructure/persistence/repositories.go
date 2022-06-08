@@ -15,8 +15,8 @@ import (
 
 	"gorm.io/gorm"
 
-	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
-	captchaPb "git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace"
+	smsPb "github.com/Leeooj2/sms-xuanwu/pkg/grpcIFace"
+	captchaPb "github.com/Leeooj2/captcha/pkg/grpcIFace"
 	"github.com/go-redis/redis/v7"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"

@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"encoding/json"
+	"git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/uuid"
 	"time"
 
 	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/redis"
@@ -11,7 +12,6 @@ import (
 	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/entity"
 	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
 
-	"git.nova.net.cn/nova/go-common/uuid"
 	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
 	captchaPb "git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace"
 	log "github.com/sirupsen/logrus"
