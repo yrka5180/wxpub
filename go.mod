@@ -4,22 +4,17 @@ go 1.17
 
 require (
 	bou.ke/monkey v1.0.2
-	git.nova.net.cn/nova/go-common/uuid v0.0.0-20220331073514-eaa8a56c82fc
 	git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace v0.0.0-20210406140908-c976b41ebd96
 	git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace v0.0.0-20210406140912-7c6267b0a662
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/google/uuid v1.3.0
 	github.com/hololee2cn/pkg v0.0.0-20220609064745-6bcbb6ef3e4b
-	github.com/mattn/go-isatty v0.0.14
 	github.com/sirupsen/logrus v1.8.1
 	github.com/smartystreets/goconvey v1.7.2
 	google.golang.org/grpc v1.47.0
 	gorm.io/driver/mysql v1.3.4
 	gorm.io/gorm v1.23.5
-)
-
-require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

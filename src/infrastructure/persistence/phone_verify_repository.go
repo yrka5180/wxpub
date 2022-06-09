@@ -13,9 +13,9 @@ import (
 	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
 	"github.com/hololee2cn/wxpub/v1/src/utils"
 
-	"git.nova.net.cn/nova/go-common/uuid"
 	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
 	captchaPb "git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -90,7 +90,7 @@ func (r *PhoneVerifyRepo) SendSms(ctx context.Context, content string, sender st
 		Items: []*smsPb.SendMsgRequest_Item{
 			{
 				To:        phone,
-				MessageID: uuid.Get(), // 不需要查询，可以忽略
+				MessageID: uuid.New().String(), // 不需要查询，可以忽略
 			},
 		},
 	})
