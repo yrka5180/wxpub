@@ -15,9 +15,9 @@ import (
 
 	"gorm.io/gorm"
 
-	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
-	captchaPb "git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace"
 	"github.com/go-redis/redis/v7"
+	captchaPb "github.com/hololee2cn/captcha/pkg/grpcIFace"
+	smsPb "github.com/hololee2cn/sms-xuanwu/pkg/grpcIFace"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"gorm.io/driver/mysql"

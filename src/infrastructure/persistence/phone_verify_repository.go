@@ -13,9 +13,9 @@ import (
 	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
 	"github.com/hololee2cn/wxpub/v1/src/utils"
 
-	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
-	captchaPb "git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace"
 	"github.com/google/uuid"
+	captchaPb "github.com/hololee2cn/captcha/pkg/grpcIFace"
+	smsPb "github.com/hololee2cn/sms-xuanwu/pkg/grpcIFace"
 	log "github.com/sirupsen/logrus"
 )
 
