@@ -3,9 +3,11 @@ package repository
 import (
 	"context"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/infrastructure/persistence"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
+	"github.com/hololee2cn/pkg/ginx"
+
+	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
+	"github.com/hololee2cn/wxpub/v1/src/infrastructure/persistence"
+	"github.com/hololee2cn/wxpub/v1/src/utils"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -31,7 +33,7 @@ func DefaultMessageRepository() *MessageRepository {
 }
 
 func (t *MessageRepository) SendTmplMsg(ctx context.Context, param entity.SendTmplMsgReq) (entity.SendTmplMsgResp, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("SendTmplMsg traceID:%s", traceID)
 	var resp entity.SendTmplMsgResp
 	var err error
@@ -69,7 +71,7 @@ func (t *MessageRepository) SendTmplMsg(ctx context.Context, param entity.SendTm
 }
 
 func (t *MessageRepository) TmplMsgStatus(ctx context.Context, requestID string) (entity.TmplMsgStatusResp, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("TmplMsgStatus traceID:%s", traceID)
 	var resp entity.TmplMsgStatusResp
 	resp.Lists = make([]entity.TmplMsgStatusItem, 0)

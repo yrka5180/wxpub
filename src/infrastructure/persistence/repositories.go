@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/grpc/credentials/insecure"
 
-	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/redis"
+	redis3 "github.com/hololee2cn/wxpub/v1/src/pkg/redis"
 
 	"gorm.io/gorm/logger"
 
@@ -15,9 +15,9 @@ import (
 
 	"gorm.io/gorm"
 
-	smsPb "github.com/Leeooj2/sms-xuanwu/pkg/grpcIFace"
-	captchaPb "github.com/Leeooj2/captcha/pkg/grpcIFace"
 	"github.com/go-redis/redis/v7"
+	captchaPb "github.com/hololee2cn/captcha/pkg/grpcIFace"
+	smsPb "github.com/hololee2cn/sms-xuanwu/pkg/grpcIFace"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"gorm.io/driver/mysql"

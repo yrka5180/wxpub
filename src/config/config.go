@@ -4,9 +4,9 @@ import (
 	"strings"
 	"sync"
 
-	config2 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/config"
+	config2 "github.com/hololee2cn/wxpub/v1/src/pkg/config"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
 	"github.com/sirupsen/logrus"
 )
 

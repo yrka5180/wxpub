@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
+	"github.com/hololee2cn/pkg/ginx"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -129,8 +129,8 @@ func RequestWithRepeat(traceID string, method, uri string, payload []byte, heade
 	defer func() {
 		log.Debugf("get http request response, traceID:%s, statusCode:%d, use time: %d, err: %+v", traceID, statusCode, time.Since(start).Milliseconds(), err)
 	}()
-	if len(header[consts.HTTPTraceIDHeader]) == 0 {
-		header[consts.HTTPTraceIDHeader] = traceID
+	if len(header[ginx.HTTPTraceIDHeader]) == 0 {
+		header[ginx.HTTPTraceIDHeader] = traceID
 	}
 	statusCode, body, respHeader, err = request(context.TODO(), DefaultHTTPClient, GetRequestProperty(method, uri, payload, header))
 	return
@@ -143,8 +143,8 @@ func RequestWithContextAndRepeat(ctx context.Context, req RequestProperty, trace
 	defer func() {
 		log.Debugf("get http context request response, traceID:%s, statusCode:%d, use time: %d, err: %+v", traceID, statusCode, time.Since(start).Milliseconds(), err)
 	}()
-	if len(req.Header[consts.HTTPTraceIDHeader]) == 0 {
-		req.Header[consts.HTTPTraceIDHeader] = traceID
+	if len(req.Header[ginx.HTTPTraceIDHeader]) == 0 {
+		req.Header[ginx.HTTPTraceIDHeader] = traceID
 	}
 	statusCode, body, respHeader, err = request(ctx, DefaultHTTPClient, req)
 	return

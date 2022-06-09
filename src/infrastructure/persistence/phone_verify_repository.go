@@ -3,17 +3,19 @@ package persistence
 import (
 	"context"
 	"encoding/json"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/uuid"
 	"time"
 
-	redis2 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/redis"
+	"github.com/hololee2cn/pkg/ginx"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
+	redis2 "github.com/hololee2cn/wxpub/v1/src/pkg/redis"
 
-	smsPb "git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace"
-	captchaPb "git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
+	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
+	"github.com/hololee2cn/wxpub/v1/src/utils"
+
+	"github.com/google/uuid"
+	captchaPb "github.com/hololee2cn/captcha/pkg/grpcIFace"
+	smsPb "github.com/hololee2cn/sms-xuanwu/pkg/grpcIFace"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -38,7 +40,7 @@ func DefaultPhoneVerifyRepo() *PhoneVerifyRepo {
 }
 
 func (r *PhoneVerifyRepo) GenCaptcha(ctx context.Context, width int32, height int32) (captchaID, captchaBase64Value string, err error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("GenCaptcha traceID:%s", traceID)
 
 	c := utils.ToOutGoingContext(ctx)
@@ -59,7 +61,7 @@ func (r *PhoneVerifyRepo) GenCaptcha(ctx context.Context, width int32, height in
 }
 
 func (r *PhoneVerifyRepo) VerifyCaptcha(ctx context.Context, captchaID string, captchaAnswer string) (ok bool, err error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("VerifyCaptcha traceID:%s", traceID)
 
 	c := utils.ToOutGoingContext(ctx)
@@ -77,7 +79,7 @@ func (r *PhoneVerifyRepo) VerifyCaptcha(ctx context.Context, captchaID string, c
 }
 
 func (r *PhoneVerifyRepo) SendSms(ctx context.Context, content string, sender string, phone string) (err error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("SendSms traceID:%s", traceID)
 
 	c := utils.ToOutGoingContext(ctx)
@@ -88,7 +90,7 @@ func (r *PhoneVerifyRepo) SendSms(ctx context.Context, content string, sender st
 		Items: []*smsPb.SendMsgRequest_Item{
 			{
 				To:        phone,
-				MessageID: uuid.Get(), // 不需要查询，可以忽略
+				MessageID: uuid.New().String(), // 不需要查询，可以忽略
 			},
 		},
 	})
@@ -102,7 +104,7 @@ func (r *PhoneVerifyRepo) SendSms(ctx context.Context, content string, sender st
 func (r *PhoneVerifyRepo) SetVerifyCodeSmsStorage(ctx context.Context, challenge string, verifyCodeAnswer string) (err error) {
 	var verifyCodeSmsRedisValue entity.VerifyCodeRedisValue
 
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("SetVerifyCodeSmsStorage traceID:%s", traceID)
 
 	smsCreateTime := time.Now().UnixNano()
@@ -124,7 +126,7 @@ func (r *PhoneVerifyRepo) VerifySmsCode(ctx context.Context, challenge, verifyCo
 	var value []byte
 	var verifyCodeValue entity.VerifyCodeRedisValue
 	now := time.Now().UnixNano()
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("VerifySmsCode traceID:%s", traceID)
 
 	value, err = redis2.RGet(consts.RedisKeyPrefixChallenge + challenge)

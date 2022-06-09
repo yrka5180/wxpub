@@ -9,12 +9,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/hololee2cn/pkg/ginx"
+
 	"google.golang.org/grpc/metadata"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-
 	"github.com/google/uuid"
-	log "github.com/sirupsen/logrus"
 )
 
 func GetUUID() (string, error) {
@@ -24,19 +23,6 @@ func GetUUID() (string, error) {
 	}
 
 	return u.String(), nil
-}
-
-func ShouldGetTraceID(c context.Context) (traceID string) {
-	it := c.Value(consts.ContextTraceID)
-	if it == nil {
-		// log.Warnln("Could not get trace id from context")
-		return
-	}
-	var ok bool
-	if traceID, ok = it.(string); !ok {
-		log.Errorf("Invalid trace id value in context: %v", it)
-	}
-	return
 }
 
 func Sha1(str string) string {
@@ -61,7 +47,7 @@ func VerifyMobilePhoneFormat(phone string) bool {
 
 func ToOutGoingContext(c context.Context) (out context.Context) {
 	data := make(map[string]string)
-	data[consts.HTTPTraceIDHeader] = ShouldGetTraceID(c)
+	data[ginx.HTTPTraceIDHeader] = ginx.ShouldGetTraceID(c)
 
 	md := metadata.New(data)
 	out = metadata.NewOutgoingContext(c, md)

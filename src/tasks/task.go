@@ -4,14 +4,14 @@ import (
 	"context"
 	"time"
 
-	errors2 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/errorx"
+	errors2 "github.com/hololee2cn/pkg/errorx"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/g"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
+	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
+	"github.com/hololee2cn/wxpub/v1/src/g"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/repository"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/infrastructure/persistence"
+	"github.com/hololee2cn/wxpub/v1/src/domain/repository"
+	"github.com/hololee2cn/wxpub/v1/src/infrastructure/persistence"
 	log "github.com/sirupsen/logrus"
 )
 

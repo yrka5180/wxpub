@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"bou.ke/monkey"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/infrastructure/persistence"
+	"github.com/hololee2cn/wxpub/v1/src/infrastructure/persistence"
 	. "github.com/smartystreets/goconvey/convey"
 )
 

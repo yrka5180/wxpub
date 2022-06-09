@@ -4,12 +4,12 @@ import (
 	"context"
 	"time"
 
-	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/redis"
+	"github.com/hololee2cn/pkg/ginx"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
+	redis3 "github.com/hololee2cn/wxpub/v1/src/pkg/redis"
 
 	"github.com/go-redis/redis/v7"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -32,7 +32,7 @@ func DefaultWxRepo() *WxRepo {
 }
 
 func (a *WxRepo) SetMsgIDToRedis(ctx context.Context, msgID string) error {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("SetMsgIDToRedis traceID:%s", traceID)
 	var err error
 	for i := 0; i < 3; i++ {
@@ -47,7 +47,7 @@ func (a *WxRepo) SetMsgIDToRedis(ctx context.Context, msgID string) error {
 }
 
 func (a *WxRepo) IsExistMsgIDFromRedis(ctx context.Context, msgID string) (bool, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("IsExistMsgIDFromRedis traceID:%s", traceID)
 	var err error
 	for i := 0; i < 3; i++ {

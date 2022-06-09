@@ -8,12 +8,14 @@ import (
 	"strings"
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/config"
+	"github.com/hololee2cn/pkg/ginx"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/infrastructure/persistence"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
+	"github.com/hololee2cn/wxpub/v1/src/config"
+
+	"github.com/hololee2cn/wxpub/v1/src/consts"
+	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
+	"github.com/hololee2cn/wxpub/v1/src/infrastructure/persistence"
+	"github.com/hololee2cn/wxpub/v1/src/utils"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -57,7 +59,7 @@ func (a *WXRepository) GetWXCheckSign(signature, timestamp, nonce, token string)
 }
 
 func (a *WXRepository) HandleXML(ctx context.Context, reqBody *entity.TextRequestBody) ([]byte, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("HandleXML traceID:%s", traceID)
 	if reqBody == nil {
 		return nil, fmt.Errorf("xml request body is empty")
@@ -82,7 +84,7 @@ func (a *WXRepository) HandleXML(ctx context.Context, reqBody *entity.TextReques
 }
 
 func (a *WXRepository) handlerTextXML(ctx context.Context, reqBody *entity.TextRequestBody) ([]byte, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("handlerTextXML traceID:%s", traceID)
 	var err error
 	// 判断是否存在该消息id,用 FromUserName+CreateTime 去重
@@ -132,7 +134,7 @@ func (a *WXRepository) handlerEventXML(ctx context.Context, reqBody *entity.Text
 }
 
 func (a *WXRepository) handlerSubscribeEvent(ctx context.Context, reqBody *entity.TextRequestBody) (string, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("handlerSubscribeEvent traceID:%s", traceID)
 	// 判断是否存在该消息id,用 FromUserName+CreateTime 去重
 	msgID := a.genMsgID(reqBody.FromUserName, reqBody.CreateTime)
@@ -163,7 +165,7 @@ func (a *WXRepository) handlerSubscribeEvent(ctx context.Context, reqBody *entit
 }
 
 func (a *WXRepository) handlerUnSubscribeEvent(ctx context.Context, reqBody *entity.TextRequestBody) (string, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("handlerUnSubscribeEvent traceID:%s", traceID)
 	// 判断是否存在该消息id,用 FromUserName+CreateTime 去重
 	msgID := a.genMsgID(reqBody.FromUserName, reqBody.CreateTime)
@@ -192,7 +194,7 @@ func (a *WXRepository) handlerUnSubscribeEvent(ctx context.Context, reqBody *ent
 }
 
 func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, reqBody *entity.TextRequestBody) (string, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("handlerTEMPLATESENDJOBFINISHEvent traceID:%s", traceID)
 	// 判断是否存在该消息id,用 FromUserName+CreateTime 去重
 	exist, err := a.isExistTemplateSendJobMsgID(ctx, a.genMsgID(reqBody.FromUserName, reqBody.CreateTime), reqBody.FromUserName, reqBody.CreateTime)
@@ -268,7 +270,7 @@ func (a *WXRepository) handlerTEMPLATESENDJOBFINISHEvent(ctx context.Context, re
 }
 
 func (a *WXRepository) isExistUserMsgID(ctx context.Context, msgID string, fromUserName string, createTime int64) (bool, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("IsExistUserMsgID traceID:%s", traceID)
 	exist, err := a.wx.IsExistMsgIDFromRedis(ctx, msgID)
 	if err != nil {
@@ -297,7 +299,7 @@ func (a *WXRepository) isExistUserMsgID(ctx context.Context, msgID string, fromU
 }
 
 func (a *WXRepository) isExistTemplateSendJobMsgID(ctx context.Context, msgID string, fromUserName string, createTime int64) (bool, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("isExistTemplateSendJobMsgID traceID:%s", traceID)
 	exist, err := a.wx.IsExistMsgIDFromRedis(ctx, msgID)
 	if err != nil {

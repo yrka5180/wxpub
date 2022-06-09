@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/interfaces/webapi"
+	"github.com/hololee2cn/wxpub/v1/src/interfaces/webapi"
 )
 
 var (
