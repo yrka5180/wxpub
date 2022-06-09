@@ -6,25 +6,14 @@ import (
 
 type ServerMode string
 
-type contextKey string
-
 type MsgType string
-
-func (c contextKey) String() string {
-	return string(c)
-}
 
 const (
 	ServerModeDebug   ServerMode = gin.DebugMode
 	ServerModeRelease ServerMode = gin.ReleaseMode
 
-	HTTPTraceIDHeader  = "x-nova-trace-id"
 	HTTPTimeoutHeader  = "x-nova-timeout"
 	DefaultHTTPTimeOut = 60
-
-	// GinContextContext 存在 gin context 中的标准库 context 实例的 key
-	GinContextContext = "context"
-	ContextTraceID    = contextKey(HTTPTraceIDHeader)
 
 	Authorization          = "Authorization"
 	InternalAPITokenHeader = "x-auth-token"

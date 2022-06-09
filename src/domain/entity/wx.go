@@ -3,7 +3,7 @@ package entity
 import (
 	"encoding/xml"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
 )
 
 type WXCheckReq struct {

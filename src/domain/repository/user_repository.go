@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/config"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
+	"github.com/hololee2cn/wxpub/v1/src/config"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
+	"github.com/hololee2cn/wxpub/v1/src/utils"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/infrastructure/persistence"
+	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
+	"github.com/hololee2cn/wxpub/v1/src/infrastructure/persistence"
 )
 
 type UserRepository struct {

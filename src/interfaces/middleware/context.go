@@ -5,18 +5,20 @@ import (
 	"strconv"
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
+	"github.com/hololee2cn/pkg/ginx"
+
 	"github.com/gin-gonic/gin"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
+	"github.com/hololee2cn/wxpub/v1/src/utils"
 	log "github.com/sirupsen/logrus"
 )
 
-func NovaContext(ctx *gin.Context) {
-	traceID := ctx.GetHeader(consts.HTTPTraceIDHeader)
+func GinContext(ctx *gin.Context) {
+	traceID := ctx.GetHeader(ginx.HTTPTraceIDHeader)
 	timeoutStr := ctx.GetHeader(consts.HTTPTimeoutHeader)
 	if !validTraceID(traceID) {
 		var err error
-		log.Infof("Request %s doesn't input a trace id", ctx.Request.URL.Path)
+		log.Warnf("Request %s doesn't input a trace id", ctx.Request.URL.Path)
 		traceID, err = utils.GetUUID()
 		if err != nil {
 			log.Errorf("Request %s new uuid failed, err:%s", ctx.Request.URL.Path, err.Error())
@@ -24,13 +26,13 @@ func NovaContext(ctx *gin.Context) {
 	}
 	timeoutSec, _ := strconv.Atoi(timeoutStr)
 	if timeoutSec < 1 || timeoutSec > consts.DefaultHTTPTimeOut {
-		log.Infof("Request %s doesn't input a timeout argument or it's invalid: %s", ctx.Request.URL.Path, timeoutStr)
+		log.Warnf("Request %s doesn't input a timeout argument or it's invalid: %s", ctx.Request.URL.Path, timeoutStr)
 		timeoutSec = consts.DefaultHTTPTimeOut
 	}
 
-	c, cancelF := context.WithTimeout(context.WithValue(context.Background(), consts.ContextTraceID, traceID), time.Second*time.Duration(timeoutSec))
+	c, cancelF := context.WithTimeout(context.WithValue(context.Background(), ginx.ContextTraceID, traceID), time.Second*time.Duration(timeoutSec))
 	defer cancelF()
-	ctx.Set(consts.GinContextContext, c)
+	ctx.Set(ginx.GinContextContext, c)
 	ctx.Next()
 }
 

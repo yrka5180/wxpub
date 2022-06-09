@@ -7,17 +7,17 @@ import (
 	"net/http"
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/httputil"
+	"github.com/hololee2cn/pkg/ginx"
 
-	errors2 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/errorx"
-	redis3 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/redis"
+	"github.com/hololee2cn/wxpub/v1/src/pkg/httputil"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/config"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
+	errors2 "github.com/hololee2cn/pkg/errorx"
+	redis3 "github.com/hololee2cn/wxpub/v1/src/pkg/redis"
 
 	"github.com/go-redis/redis/v7"
+	"github.com/hololee2cn/wxpub/v1/src/config"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
+	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -40,7 +40,7 @@ func DefaultAkRepo() *AkRepo {
 }
 
 func (a *AkRepo) GetAccessTokenFromRequest(ctx context.Context) (entity.AccessTokenResp, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("getAccessTokenFromRequest traceID:%s", traceID)
 	// 请求wx access token
 	requestProperty := httputil.GetRequestProperty(http.MethodGet, config.WXAccessTokenURL+fmt.Sprintf("?grant_type=%s&appid=%s&secret=%s", consts.Credential, config.AppID, config.AppSecret),
@@ -69,7 +69,7 @@ func (a *AkRepo) GetAccessTokenFromRequest(ctx context.Context) (entity.AccessTo
 }
 
 func (a *AkRepo) GetAccessTokenFromRedis(ctx context.Context) (string, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("GetAccessTokenFromRedis traceID:%s", traceID)
 	// 先从redis中获取老accessToken
 	var oldAk []byte
@@ -90,7 +90,7 @@ func (a *AkRepo) GetAccessTokenFromRedis(ctx context.Context) (string, error) {
 }
 
 func (a *AkRepo) SetAccessTokenToRedis(ctx context.Context, accessToken string, expiresIn int) error {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("SetAccessTokenToRedis traceID:%s", traceID)
 	err := redis3.RSet(consts.RedisKeyAccessToken, accessToken, expiresIn)
 	if err != nil {

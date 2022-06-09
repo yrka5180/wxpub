@@ -7,16 +7,16 @@ import (
 	"os/signal"
 	"syscall"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/g"
+	"github.com/hololee2cn/wxpub/v1/src/g"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/config"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/repository"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/infrastructure/persistence"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/interfaces/webapi/router"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/extra"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/httpx"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/tasks"
+	"github.com/hololee2cn/wxpub/v1/src/config"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
+	"github.com/hololee2cn/wxpub/v1/src/domain/repository"
+	"github.com/hololee2cn/wxpub/v1/src/infrastructure/persistence"
+	"github.com/hololee2cn/wxpub/v1/src/interfaces/webapi/router"
+	"github.com/hololee2cn/wxpub/v1/src/pkg/extra"
+	"github.com/hololee2cn/wxpub/v1/src/pkg/httpx"
+	"github.com/hololee2cn/wxpub/v1/src/tasks"
 	log "github.com/sirupsen/logrus"
 )
 

@@ -5,10 +5,10 @@ import (
 	"errors"
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
+	"github.com/hololee2cn/pkg/ginx"
 
 	"github.com/go-redis/redis/v7"
+	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
 
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -35,7 +35,7 @@ func DefaultUserRepo() *UserRepo {
 }
 
 func (a *UserRepo) IsExistUserMsgFromDB(ctx context.Context, fromUserName string, createTime int64) (bool, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("IsExistUserMsgFromDB traceID:%s", traceID)
 	var user entity.User
 	err := a.DB.Where("open_id = ? AND create_time = ?", fromUserName, createTime).First(&user).Error
@@ -52,7 +52,7 @@ func (a *UserRepo) IsExistUserMsgFromDB(ctx context.Context, fromUserName string
 }
 
 func (a *UserRepo) IsExistUserFromDB(ctx context.Context, fromUserName string) (bool, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("IsExistUserFromDB traceID:%s", traceID)
 	var user entity.User
 	err := a.DB.Where("open_id = ?", fromUserName).First(&user).Error
@@ -69,7 +69,7 @@ func (a *UserRepo) IsExistUserFromDB(ctx context.Context, fromUserName string) (
 }
 
 func (a *UserRepo) SaveUser(ctx context.Context, user entity.User, isUpdateAll bool) error {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("SaveUser traceID:%s", traceID)
 	// 先查看是否有这用户，如果没有则创建，否则将创建时间和删除时间更新
 	exist, err := a.IsExistUserFromDB(ctx, user.OpenID)
@@ -98,7 +98,7 @@ func (a *UserRepo) SaveUser(ctx context.Context, user entity.User, isUpdateAll b
 }
 
 func (a *UserRepo) DelUser(ctx context.Context, user entity.User) error {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("DelUser traceID:%s", traceID)
 	user.DeleteTime = time.Now().Unix()
 	if err := a.DB.Model(&entity.User{}).Where("open_id = ?", user.OpenID).Updates(&user).Error; err != nil {
@@ -109,7 +109,7 @@ func (a *UserRepo) DelUser(ctx context.Context, user entity.User) error {
 }
 
 func (a *UserRepo) UpdateUserTime(ctx context.Context, user entity.User) error {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("UpdateUserTime traceID:%s", traceID)
 	if err := a.DB.Model(&entity.User{}).Where("open_id = ?", user.OpenID).Updates(map[string]interface{}{
 		"create_time": user.CreateTime,
@@ -122,7 +122,7 @@ func (a *UserRepo) UpdateUserTime(ctx context.Context, user entity.User) error {
 }
 
 func (a *UserRepo) GetUserByOpenID(ctx context.Context, openID string) (user entity.User, err error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("GetUserByID traceID:%s", traceID)
 	if err = a.DB.Where("open_id = ?", openID).First(&user).Error; err != nil {
 		log.Errorf("GetUserByOpenID get user by open_id failed,traceID: %s, err: %+v", traceID, err)
@@ -132,7 +132,7 @@ func (a *UserRepo) GetUserByOpenID(ctx context.Context, openID string) (user ent
 }
 
 func (a *UserRepo) ListUserByPhones(ctx context.Context, phones []string) (users []entity.User, err error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("ListUserByPhones traceID:%s", traceID)
 	if err = a.DB.Where("phone IN (?)", phones).Find(&users).Error; err != nil {
 		log.Errorf("ListUserByPhones get list user by phones failed,traceID:%s,err:%+v", traceID, err)

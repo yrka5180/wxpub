@@ -3,12 +3,12 @@ package router
 import (
 	"strings"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/config"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/repository"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/interfaces/controller"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/interfaces/middleware"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/ginx"
 	"github.com/gin-gonic/gin"
+	"github.com/hololee2cn/pkg/ginx"
+	"github.com/hololee2cn/wxpub/v1/src/config"
+	"github.com/hololee2cn/wxpub/v1/src/domain/repository"
+	"github.com/hololee2cn/wxpub/v1/src/interfaces/controller"
+	"github.com/hololee2cn/wxpub/v1/src/interfaces/middleware"
 )
 
 var (
@@ -47,7 +47,7 @@ func initRouter(router *gin.Engine) {
 	// user info verify and binding
 	routerVerify(open)
 
-	router.Use(middleware.NovaContext)
+	router.Use(middleware.GinContext)
 
 	// msg handler
 	routerMsg(open)

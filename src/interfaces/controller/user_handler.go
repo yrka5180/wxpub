@@ -3,14 +3,14 @@ package controller
 import (
 	"strconv"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/ginx"
+	"github.com/hololee2cn/pkg/ginx"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-	errors2 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/errorx"
+	errors2 "github.com/hololee2cn/pkg/errorx"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/application"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
+	"github.com/hololee2cn/wxpub/v1/src/application"
+	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
+	"github.com/hololee2cn/wxpub/v1/src/utils"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -27,8 +27,8 @@ func NewUserController(user application.UserInterface) *User {
 }
 
 func (u *User) GenCaptcha(c *gin.Context) {
-	ctx := ginx.DefaultTodoNovaContext(c)
-	traceID := utils.ShouldGetTraceID(ctx)
+	ctx := ginx.DefaultTodoContext(c)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
 	width := ginx.QueryStr(c, "width", strconv.Itoa(consts.CaptchaDefaultWidth))
@@ -58,8 +58,8 @@ func (u *User) GenCaptcha(c *gin.Context) {
 }
 
 func (u *User) SendSms(c *gin.Context) {
-	ctx := ginx.DefaultTodoNovaContext(c)
-	traceID := utils.ShouldGetTraceID(ctx)
+	ctx := ginx.DefaultTodoContext(c)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
 	var req entity.SendSmsReq
@@ -89,8 +89,8 @@ func (u *User) SendSms(c *gin.Context) {
 }
 
 func (u *User) VerifyAndUpdatePhone(c *gin.Context) {
-	ctx := ginx.DefaultTodoNovaContext(c)
-	traceID := utils.ShouldGetTraceID(ctx)
+	ctx := ginx.DefaultTodoContext(c)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
 	var req entity.VerifyCodeReq

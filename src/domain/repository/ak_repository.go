@@ -4,11 +4,12 @@ import (
 	"context"
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/redis"
+	"github.com/hololee2cn/pkg/ginx"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/infrastructure/persistence"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
+	"github.com/hololee2cn/wxpub/v1/src/pkg/redis"
+
+	"github.com/hololee2cn/wxpub/v1/src/consts"
+	"github.com/hololee2cn/wxpub/v1/src/infrastructure/persistence"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -32,7 +33,7 @@ func DefaultAccessTokenRepository() *AccessTokenRepository {
 }
 
 func (a *AccessTokenRepository) GetAccessToken(ctx context.Context) (string, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("GetAccessToken traceID:%s", traceID)
 	// 先从redis中取access token，没有则调用接口获取并保存
 	var ak string
@@ -49,7 +50,7 @@ func (a *AccessTokenRepository) GetAccessToken(ctx context.Context) (string, err
 }
 
 func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("FreshAccessToken traceID:%s", traceID)
 	var err error
 	var oldAk string
@@ -117,7 +118,7 @@ func (a *AccessTokenRepository) FreshAccessToken(ctx context.Context) (string, e
 }
 
 func (a *AccessTokenRepository) getAccessTokenFromRemote(ctx context.Context) (string, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("FreshAccessToken traceID:%s", traceID)
 	akResp, err := a.ak.GetAccessTokenFromRequest(ctx)
 	if err != nil {

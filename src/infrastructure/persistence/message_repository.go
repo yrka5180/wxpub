@@ -7,18 +7,19 @@ import (
 	"net/http"
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/httputil"
+	"github.com/hololee2cn/pkg/ginx"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
-	errors3 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/errorx"
+	"github.com/hololee2cn/wxpub/v1/src/pkg/httputil"
+
+	errors3 "github.com/hololee2cn/pkg/errorx"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
 
 	"gorm.io/gorm"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/config"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/entity"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
-
 	errors2 "errors"
+
+	"github.com/hololee2cn/wxpub/v1/src/config"
+	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -42,7 +43,7 @@ func DefaultMessageRepo() *MessageRepo {
 }
 
 func (a *MessageRepo) SendTmplMsgFromRequest(ctx context.Context, param entity.SendTmplMsgRemoteReq) (entity.SendTmplMsgRemoteResp, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("SendTmplMsgFromRequest traceID:%s", traceID)
 	// 请求wx msg send
 	bs, err := json.Marshal(param)
@@ -76,7 +77,7 @@ func (a *MessageRepo) SendTmplMsgFromRequest(ctx context.Context, param entity.S
 }
 
 func (a *MessageRepo) SaveMsgLog(ctx context.Context, param entity.MsgLog) error {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("SaveMsgLog traceID:%s", traceID)
 	if err := a.DB.Create(&param).Error; err != nil {
 		log.Errorf("SaveMsgLog create failure msg log failed,traceID:%s,err:%+v", traceID, err)
@@ -86,7 +87,7 @@ func (a *MessageRepo) SaveMsgLog(ctx context.Context, param entity.MsgLog) error
 }
 
 func (a *MessageRepo) BatchSaveMsgLog(ctx context.Context, msgLogs []entity.MsgLog) error {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("BatchSaveMsgLog traceID:%s", traceID)
 	if err := a.DB.Create(&msgLogs).Error; err != nil {
 		log.Errorf("BatchSaveMsgLog batch insert msg log failed,traceID:%s,err:%+v", traceID, err)
@@ -97,7 +98,7 @@ func (a *MessageRepo) BatchSaveMsgLog(ctx context.Context, msgLogs []entity.MsgL
 
 // UpdateMsgLog sup non-zero value
 func (a *MessageRepo) UpdateMsgLog(ctx context.Context, msgLog entity.MsgLog) error {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("UpdateMsgLog traceID:%s", traceID)
 	err := a.DB.Model(&msgLog).Updates(msgLog).Error
 	if err != nil {
@@ -108,7 +109,7 @@ func (a *MessageRepo) UpdateMsgLog(ctx context.Context, msgLog entity.MsgLog) er
 }
 
 func (a *MessageRepo) UpdateMsgLogSendStatus(ctx context.Context, msgLog entity.MsgLog) error {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("UpdateMsgLogStatus traceID:%s", traceID)
 	err := a.DB.Model(&entity.MsgLog{}).Where("id = ?", msgLog.ID).Updates(map[string]interface{}{
 		"cause":       msgLog.Cause,
@@ -124,7 +125,7 @@ func (a *MessageRepo) UpdateMsgLogSendStatus(ctx context.Context, msgLog entity.
 }
 
 func (a *MessageRepo) GetMsgLogByMsgID(ctx context.Context, msgID int64) (entity.MsgLog, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("GetMsgLogByMsgID traceID:%s", traceID)
 	var m entity.MsgLog
 	err := a.DB.Where("msg_id = ?", msgID).First(&m).Error
@@ -136,7 +137,7 @@ func (a *MessageRepo) GetMsgLogByMsgID(ctx context.Context, msgID int64) (entity
 }
 
 func (a *MessageRepo) IsExistMsgLogFromDB(ctx context.Context, fromUserName string, createTime int64) (bool, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("IsExistMsgLogFromDB traceID:%s", traceID)
 	var failureMsgLog entity.MsgLog
 	err := a.DB.Where("to_user = ? AND create_time = ?", fromUserName, createTime).First(&failureMsgLog).Error
@@ -153,7 +154,7 @@ func (a *MessageRepo) IsExistMsgLogFromDB(ctx context.Context, fromUserName stri
 }
 
 func (a *MessageRepo) ListPendingMsgLogs(ctx context.Context) ([]entity.MsgLog, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("GetPendingMsgLog traceID:%s", traceID)
 	var msgLogs []entity.MsgLog
 	err := a.DB.Where("status = ? AND count < ?", consts.SendPending, consts.MaxRetryCount).Find(&msgLogs).Error
@@ -165,7 +166,7 @@ func (a *MessageRepo) ListPendingMsgLogs(ctx context.Context) ([]entity.MsgLog, 
 }
 
 func (a *MessageRepo) UpdateMaxRetryCntMsgLogs(ctx context.Context) error {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("UpdateMaxRetryCntMsgLogsStatus traceID:%s", traceID)
 	err := a.DB.Model(&entity.MsgLog{}).Where("status = ? AND count >= ?", consts.SendPending, consts.MaxRetryCount).Updates(map[string]interface{}{
 		"cause":  consts.SendMaxRetryFailureCause,
@@ -179,7 +180,7 @@ func (a *MessageRepo) UpdateMaxRetryCntMsgLogs(ctx context.Context) error {
 }
 
 func (a *MessageRepo) UpdateTimeoutMsgLogs(ctx context.Context) error {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("UpdateTimeoutMsgLogsStatus traceID:%s", traceID)
 	err := a.DB.Model(&entity.MsgLog{}).Where("status = ? AND count >= ? AND create_time <= ?", consts.Sending, consts.MaxRetryCount, time.Now().Unix()-consts.MaxWXCallBackTime).
 		Updates(map[string]interface{}{
@@ -194,13 +195,13 @@ func (a *MessageRepo) UpdateTimeoutMsgLogs(ctx context.Context) error {
 }
 
 func (a *MessageRepo) getListMsgLogsByReqIDSession(ctx context.Context, requestID string) *gorm.DB {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("GetListMsgLogsByRequestIDSession traceID:%s", traceID)
 	return a.DB.Where("request_id = ?", requestID)
 }
 
 func (a *MessageRepo) ListMsgLogsByReqIDCnt(ctx context.Context, requestID string) (int64, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("ListMsgLogsByReqIDCnt traceID:%s", traceID)
 	db := a.getListMsgLogsByReqIDSession(ctx, requestID)
 	var count int64
@@ -213,7 +214,7 @@ func (a *MessageRepo) ListMsgLogsByReqIDCnt(ctx context.Context, requestID strin
 }
 
 func (a *MessageRepo) ListMsgLogsByReqID(ctx context.Context, requestID string) ([]entity.MsgLog, error) {
-	traceID := utils.ShouldGetTraceID(ctx)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("ListMsgLogsByReqID traceID:%s", traceID)
 	var msgLogs []entity.MsgLog
 	db := a.getListMsgLogsByReqIDSession(ctx, requestID)

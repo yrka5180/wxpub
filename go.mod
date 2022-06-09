@@ -1,4 +1,4 @@
-module git.nova.net.cn/nova/misc/wx-public/proxy
+module github.com/hololee2cn/wxpub/v1
 
 go 1.17
 
@@ -7,11 +7,11 @@ require (
 	git.nova.net.cn/nova/go-common/uuid v0.0.0-20220331073514-eaa8a56c82fc
 	git.nova.net.cn/nova/notify/sms-xuanwu/pkg/grpcIFace v0.0.0-20210406140908-c976b41ebd96
 	git.nova.net.cn/nova/shared/captcha/pkg/grpcIFace v0.0.0-20210406140912-7c6267b0a662
-	github.com/gin-gonic/gin v1.8.0
+	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/google/uuid v1.3.0
+	github.com/hololee2cn/pkg v0.0.0-20220609064745-6bcbb6ef3e4b
 	github.com/mattn/go-isatty v0.0.14
-	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/smartystreets/goconvey v1.7.2
 	google.golang.org/grpc v1.47.0
@@ -38,6 +38,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/smartystreets/assertions v1.2.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect

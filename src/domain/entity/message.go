@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
+	"github.com/hololee2cn/wxpub/v1/src/utils"
 
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/consts"
+	"github.com/hololee2cn/wxpub/v1/src/consts"
 )
 
 type SendTmplMsgReq struct {

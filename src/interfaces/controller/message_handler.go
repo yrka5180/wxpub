@@ -1,13 +1,11 @@
 package controller
 
 import (
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/application"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/domain/entity"
-	errors2 "git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/errorx"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/pkg/ginx"
-	"git.nova.net.cn/nova/misc/wx-public/proxy/src/utils"
-
 	"github.com/gin-gonic/gin"
+	errors2 "github.com/hololee2cn/pkg/errorx"
+	"github.com/hololee2cn/pkg/ginx"
+	"github.com/hololee2cn/wxpub/v1/src/application"
+	"github.com/hololee2cn/wxpub/v1/src/domain/entity"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -22,8 +20,8 @@ func NewMessageController(msg application.MessageInterface) *Message {
 }
 
 func (a *Message) SendTmplMessage(c *gin.Context) {
-	ctx := ginx.DefaultTodoNovaContext(c)
-	traceID := utils.ShouldGetTraceID(ctx)
+	ctx := ginx.DefaultTodoContext(c)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
 	var param entity.SendTmplMsgReq
@@ -39,8 +37,8 @@ func (a *Message) SendTmplMessage(c *gin.Context) {
 }
 
 func (a *Message) TmplMsgStatus(c *gin.Context) {
-	ctx := ginx.DefaultTodoNovaContext(c)
-	traceID := utils.ShouldGetTraceID(ctx)
+	ctx := ginx.DefaultTodoContext(c)
+	traceID := ginx.ShouldGetTraceID(ctx)
 	log.Debugf("%s", traceID)
 
 	var param entity.TmplMsgStatusReq
